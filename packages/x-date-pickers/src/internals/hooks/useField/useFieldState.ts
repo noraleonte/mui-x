@@ -10,7 +10,6 @@ import {
   FieldChangeHandlerContext,
 } from './useField.types';
 import {
-  addPositionPropertiesToSections,
   splitFormatIntoSections,
   mergeDateIntoReferenceDate,
   getSectionsBoundaries,
@@ -68,8 +67,8 @@ export const useFieldState = <
       onChange,
       format,
       formatDensity = 'dense',
-      selectedSections: selectedSectionsProp,
-      onSelectedSectionsChange,
+      selectedSection: selectedSectionsProp,
+      onSelectedSectionChange,
       shouldRespectLeadingZeros = false,
       timezone: timezoneProp,
     },
@@ -94,7 +93,7 @@ export const useFieldState = <
 
   const getSectionsFromValue = React.useCallback(
     (value: TValue, fallbackSections: TSection[] | null = null) =>
-      fieldValueManager.getSectionsFromValue(utils, value, fallbackSections, isRTL, (date) =>
+      fieldValueManager.getSectionsFromValue(utils, value, fallbackSections, (date) =>
         splitFormatIntoSections(
           utils,
           timezone,
@@ -154,16 +153,16 @@ export const useFieldState = <
     };
   });
 
-  const [selectedSections, innerSetSelectedSections] = useControlled({
+  const [selectedSection, innerSetSelectedSection] = useControlled({
     controlled: selectedSectionsProp,
     default: null,
     name: 'useField',
     state: 'selectedSectionIndexes',
   });
 
-  const setSelectedSections = (newSelectedSections: FieldSelectedSections) => {
-    innerSetSelectedSections(newSelectedSections);
-    onSelectedSectionsChange?.(newSelectedSections);
+  const setSelectedSection = (newSelectedSections: FieldSelectedSections) => {
+    innerSetSelectedSection(newSelectedSections);
+    onSelectedSectionChange?.(newSelectedSections);
 
     setState((prevState) => ({
       ...prevState,
@@ -172,20 +171,18 @@ export const useFieldState = <
   };
 
   const selectedSectionIndex = React.useMemo<number | null>(() => {
-    if (selectedSections == null) {
+    if (selectedSection == null) {
       return null;
     }
 
-    if (typeof selectedSections === 'number') {
-      return selectedSections;
+    if (typeof selectedSection === 'number') {
+      return selectedSection;
     }
 
-    const index = state.sections.findIndex(
-        (section) => section.type === selectedSections,
-    );
+    const index = state.sections.findIndex((section) => section.type === selectedSection);
 
-    return index === -1 ? null : index
-  }, [selectedSections, state.sections]);
+    return index === -1 ? null : index;
+  }, [selectedSection, state.sections]);
 
   const publishValue = ({
     value,
@@ -220,7 +217,7 @@ export const useFieldState = <
       modified: true,
     };
 
-    return addPositionPropertiesToSections<TSection>(newSections, isRTL);
+    return newSections;
   };
 
   const clearValue = () => {
@@ -317,10 +314,10 @@ export const useFieldState = <
      */
     if (
       shouldGoToNextSection &&
-        selectedSectionIndex &&
-        selectedSectionIndex < state.sections.length - 1
+      selectedSectionIndex != null &&
+      selectedSectionIndex < state.sections.length - 1
     ) {
-      setSelectedSections(selectedSectionIndex + 1);
+      setSelectedSection(selectedSectionIndex + 1);
     }
 
     /**
@@ -412,7 +409,7 @@ export const useFieldState = <
   return {
     state,
     selectedSectionIndex,
-    setSelectedSections,
+    setSelectedSection,
     clearValue,
     clearActiveSection,
     updateSectionValue,

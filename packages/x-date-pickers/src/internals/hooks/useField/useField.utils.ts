@@ -1,10 +1,9 @@
-import * as React from 'react'
+import * as React from 'react';
 import {
   AvailableAdjustKeyCode,
   FieldSectionsValueBoundaries,
   SectionNeighbors,
   SectionOrdering,
-  FieldSectionWithoutPosition,
   FieldSectionValueBoundaries,
 } from './useField.types';
 import {
@@ -17,7 +16,7 @@ import {
 } from '../../../models';
 import { PickersLocaleText } from '../../../locales/utils/pickersLocaleTextApi';
 import { getMonthsInYear } from '../../utils/date-utils';
-import {getActiveElement} from "../../utils/utils";
+import { getActiveElement } from '../../utils/utils';
 
 export const getDateSectionConfigFromFormatToken = <TDate>(
   utils: MuiPickersAdapter<TDate>,
@@ -275,7 +274,7 @@ export const adjustSectionValue = <TDate, TSection extends FieldSection>(
 };
 
 export const getSectionVisibleValue = (
-  section: FieldSectionWithoutPosition,
+  section: FieldSection,
   target: 'input-rtl' | 'input-ltr' | 'non-input',
 ) => {
   let value = section.value || section.placeholder;
@@ -315,43 +314,6 @@ export const getSectionVisibleValue = (
 
 export const cleanString = (dirtyString: string) =>
   dirtyString.replace(/[\u2066\u2067\u2068\u2069]/g, '');
-
-export const addPositionPropertiesToSections = <TSection extends FieldSection>(
-  sections: FieldSectionWithoutPosition<TSection>[],
-  isRTL: boolean,
-): TSection[] => {
-  let position = 0;
-  let positionInInput = isRTL ? 1 : 0;
-  const newSections: TSection[] = [];
-
-  for (let i = 0; i < sections.length; i += 1) {
-    const section = sections[i];
-    const renderedValue = getSectionVisibleValue(section, isRTL ? 'input-rtl' : 'input-ltr');
-    const sectionStr = `${section.startSeparator}${renderedValue}${section.endSeparator}`;
-
-    const sectionLength = cleanString(sectionStr).length;
-    const sectionLengthInInput = sectionStr.length;
-
-    // The ...InInput values consider the unicode characters but do include them in their indexes
-    const cleanedValue = cleanString(renderedValue);
-    const startInInput =
-      positionInInput + renderedValue.indexOf(cleanedValue[0]) + section.startSeparator.length;
-    const endInInput = startInInput + cleanedValue.length;
-
-    newSections.push({
-      ...section,
-      start: position,
-      end: position + sectionLength,
-      startInInput,
-      endInInput,
-    } as TSection);
-    position += sectionLength;
-    // Move position to the end of string associated to the current section
-    positionInInput += sectionLengthInInput;
-  }
-
-  return newSections;
-};
 
 const getSectionPlaceholder = <TDate>(
   utils: MuiPickersAdapter<TDate>,
@@ -509,7 +471,7 @@ export const splitFormatIntoSections = <TDate>(
   isRTL: boolean,
 ) => {
   let startSeparator: string = '';
-  const sections: FieldSectionWithoutPosition[] = [];
+  const sections: FieldSection[] = [];
   const now = utils.date()!;
 
   const commitToken = (token: string) => {
@@ -827,7 +789,7 @@ export const validateSections = <TSection extends FieldSection>(
 const transferDateSectionValue = <TDate>(
   utils: MuiPickersAdapter<TDate>,
   timezone: PickersTimezone,
-  section: FieldSectionWithoutPosition,
+  section: FieldSection,
   dateToTransferFrom: TDate,
   dateToTransferTo: TDate,
 ) => {
@@ -902,7 +864,7 @@ export const mergeDateIntoReferenceDate = <TDate>(
   utils: MuiPickersAdapter<TDate>,
   timezone: PickersTimezone,
   dateToTransferFrom: TDate,
-  sections: FieldSectionWithoutPosition[],
+  sections: FieldSection[],
   referenceDate: TDate,
   shouldLimitToEditedSections: boolean,
 ) =>
@@ -921,10 +883,7 @@ export const mergeDateIntoReferenceDate = <TDate>(
 
 export const isAndroid = () => navigator.userAgent.toLowerCase().indexOf('android') > -1;
 
-export const getSectionOrder = (
-  sections: FieldSectionWithoutPosition[],
-  isRTL: boolean,
-): SectionOrdering => {
+export const getSectionOrder = (sections: FieldSection[], isRTL: boolean): SectionOrdering => {
   const neighbors: SectionNeighbors = {};
   if (!isRTL) {
     sections.forEach((_, index) => {
@@ -975,15 +934,27 @@ export const getSectionOrder = (
   return { neighbors, startIndex: rtl2ltr[0], endIndex: rtl2ltr[sections.length - 1] };
 };
 
+export const getSectionIndexFromDOMElement = (element: HTMLElement | undefined) => {
+  const sectionIndex = Number(element?.dataset.sectionindex ?? '-1');
+
+  return sectionIndex === -1 ? null : sectionIndex;
+};
+
 export const getActiveSectionIndexFromDOM = (containerRef: React.RefObject<HTMLDivElement>) => {
-  const activeElement = getActiveElement(document) as HTMLInputElement | undefined
+  const activeElement = getActiveElement(document) as HTMLElement | undefined;
   if (!activeElement || !containerRef.current || !containerRef.current.contains(activeElement)) {
-    return null
+    return null;
   }
 
-  const browserActiveSectionIndex = Number(
-      (getActiveElement(document) as HTMLInputElement | undefined)?.dataset.sectionindex ?? '-1',
-  );
+  return getSectionIndexFromDOMElement(getActiveElement(document) as HTMLInputElement | undefined);
+};
 
-  return browserActiveSectionIndex === -1 ? null : browserActiveSectionIndex
-}
+export const isFocusInsideContainer = (
+  containerRef: React.RefObject<HTMLDivElement>,
+): containerRef is { current: HTMLDivElement } => {
+  if (typeof document === 'undefined' || !containerRef.current) {
+    return false;
+  }
+
+  return containerRef.current.contains(getActiveElement(document));
+};

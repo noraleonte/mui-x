@@ -2,7 +2,6 @@ import {
   PickerValueManager,
   replaceInvalidDateByNull,
   FieldValueManager,
-  addPositionPropertiesToSections,
   createDateStrForInputFromSections,
   areDatesEqual,
   getTodayDate,
@@ -91,7 +90,7 @@ export const rangeFieldValueManager: FieldValueManager<DateRange<any>, any, Rang
 
     return [prevReferenceValue[1], value[1]];
   },
-  getSectionsFromValue: (utils, [start, end], fallbackSections, isRTL, getSectionsFromDate) => {
+  getSectionsFromValue: (utils, [start, end], fallbackSections, getSectionsFromDate) => {
     const separatedFallbackSections =
       fallbackSections == null
         ? { startDate: null, endDate: null }
@@ -114,7 +113,8 @@ export const rangeFieldValueManager: FieldValueManager<DateRange<any>, any, Rang
           return {
             ...section,
             dateName: position,
-            endSeparator: `${section.endSeparator}${isRTL ? '\u2069 – \u2066' : ' – '}`,
+            // TODO: Check if RTL still works
+            endSeparator: `${section.endSeparator} – `,
           };
         }
 
@@ -125,13 +125,10 @@ export const rangeFieldValueManager: FieldValueManager<DateRange<any>, any, Rang
       });
     };
 
-    return addPositionPropertiesToSections<RangeFieldSection>(
-      [
-        ...getSections(start, separatedFallbackSections.startDate, 'start'),
-        ...getSections(end, separatedFallbackSections.endDate, 'end'),
-      ],
-      isRTL,
-    );
+    return [
+      ...getSections(start, separatedFallbackSections.startDate, 'start'),
+      ...getSections(end, separatedFallbackSections.endDate, 'end'),
+    ];
   },
   getValueStrFromSections: (sections, isRTL) => {
     const dateRangeSections = splitDateRangeSections(sections);

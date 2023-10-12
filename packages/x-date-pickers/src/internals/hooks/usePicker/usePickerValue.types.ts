@@ -251,7 +251,7 @@ export interface UsePickerValueBaseProps<TValue, TError> {
 export interface UsePickerValueNonStaticProps<TValue, TSection extends FieldSection>
   extends Pick<
     UseFieldInternalProps<TValue, unknown, TSection, unknown>,
-    'selectedSections' | 'onSelectedSectionsChange'
+    'selectedSection' | 'onSelectedSectionChange'
   > {
   /**
    * If `true`, the popover or modal will close after submitting the full date.
@@ -314,7 +314,7 @@ export interface UsePickerValueActions {
 export type UsePickerValueFieldResponse<TValue, TSection extends FieldSection, TError> = Required<
   Pick<
     UseFieldInternalProps<TValue, unknown, TSection, TError>,
-    'value' | 'onChange' | 'selectedSections' | 'onSelectedSectionsChange'
+    'value' | 'onChange' | 'selectedSection' | 'onSelectedSectionChange'
   >
 >;
 
@@ -326,7 +326,7 @@ export interface UsePickerValueViewsResponse<TValue> {
   onChange: (value: TValue, selectionState?: PickerSelectionState) => void;
   open: boolean;
   onClose: () => void;
-  onSelectedSectionsChange: (newValue: FieldSelectedSections) => void;
+  onSelectedSectionChange: (newValue: FieldSelectedSections) => void;
 }
 
 /**

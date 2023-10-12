@@ -108,12 +108,12 @@ export interface UseFieldInternalProps<TValue, TDate, TSection extends FieldSect
    * 4. If `null` is provided, no section will be selected
    * If not provided, the selected sections will be handled internally.
    */
-  selectedSections?: FieldSelectedSections;
+  selectedSection?: FieldSelectedSections;
   /**
-   * Callback fired when the selected sections change.
-   * @param {FieldSelectedSections} newValue The new selected sections.
+   * Callback fired when the selected section changes.
+   * @param {FieldSelectedSections} newValue The new selected section.
    */
-  onSelectedSectionsChange?: (newValue: FieldSelectedSections) => void;
+  onSelectedSectionChange?: (newValue: FieldSelectedSections) => void;
   /**
    * The ref object used to imperatively interact with the field.
    */
@@ -154,9 +154,7 @@ export interface FieldRef<TSection extends FieldSection> {
 }
 
 export interface UseFieldForwardedProps {
-  onMouseUp?: React.MouseEventHandler;
   onPaste?: React.ClipboardEventHandler<HTMLInputElement>;
-  onClick?: React.MouseEventHandler;
   onBlur?: () => void;
   error?: boolean;
   onClear?: React.MouseEventHandler;
@@ -173,16 +171,10 @@ export type UseFieldResponse<TForwardedProps extends UseFieldForwardedProps> = O
   Pick<React.HTMLAttributes<HTMLInputElement>, 'autoCorrect' | 'inputMode' | 'placeholder'> & {
     ref: React.Ref<HTMLInputElement>;
     value: string;
-    onChange: React.ChangeEventHandler<HTMLInputElement>;
     error: boolean;
     readOnly: boolean;
     autoComplete: 'off';
   };
-
-export type FieldSectionWithoutPosition<TSection extends FieldSection = FieldSection> = Omit<
-  TSection,
-  'start' | 'end' | 'startInInput' | 'endInInput'
->;
 
 export type FieldSectionValueBoundaries<TDate, SectionType extends FieldSectionType> = {
   minimum: number;
@@ -245,16 +237,14 @@ export interface FieldValueManager<TValue, TDate, TSection extends FieldSection>
    * @param {MuiPickersAdapter<TDate>} utils The utils to manipulate the date.
    * @param {TValue} value The current value to generate sections from.
    * @param {TSection[] | null} fallbackSections The sections to use as a fallback if a date is null or invalid.
-   * @param {boolean} isRTL `true` if the direction is "right to left".
-   * @param {(date: TDate) => FieldSectionWithoutPosition[]} getSectionsFromDate Returns the sections of the given date.
+   * @param {(date: TDate) => FieldSection[]} getSectionsFromDate Returns the sections of the given date.
    * @returns {TSection[]}  The new section list.
    */
   getSectionsFromValue: (
     utils: MuiPickersAdapter<TDate>,
     value: TValue,
     fallbackSections: TSection[] | null,
-    isRTL: boolean,
-    getSectionsFromDate: (date: TDate) => FieldSectionWithoutPosition[],
+    getSectionsFromDate: (date: TDate) => FieldSection[],
   ) => TSection[];
   /**
    * Creates the string value to render in the input based on the current section list.

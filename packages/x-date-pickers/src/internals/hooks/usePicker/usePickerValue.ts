@@ -169,8 +169,8 @@ export const usePickerValue = <
     value: inValue,
     defaultValue: inDefaultValue,
     closeOnSelect = wrapperVariant === 'desktop',
-    selectedSections: selectedSectionsProp,
-    onSelectedSectionsChange,
+    selectedSection: selectedSectionProp,
+    onSelectedSectionChange,
     timezone: timezoneProp,
   } = props;
 
@@ -212,11 +212,11 @@ export const usePickerValue = <
   const utils = useUtils<TDate>();
   const adapter = useLocalizationContext<TDate>();
 
-  const [selectedSections, setSelectedSections] = useControlled({
-    controlled: selectedSectionsProp,
+  const [selectedSection, setSelectedSection] = useControlled({
+    controlled: selectedSectionProp,
     default: null,
     name: 'usePickerValue',
-    state: 'selectedSections',
+    state: 'selectedSection',
   });
 
   const { isOpen, setIsOpen } = useOpenState(props);
@@ -397,10 +397,10 @@ export const usePickerValue = <
       updateDate({ name: 'setValueFromField', value: newValue, context }),
   );
 
-  const handleFieldSelectedSectionsChange = useEventCallback(
+  const handleFieldSelectedSectionChange = useEventCallback(
     (newSelectedSections: FieldSelectedSections) => {
-      setSelectedSections(newSelectedSections);
-      onSelectedSectionsChange?.(newSelectedSections);
+      setSelectedSection(newSelectedSections);
+      onSelectedSectionChange?.(newSelectedSections);
     },
   );
 
@@ -417,8 +417,8 @@ export const usePickerValue = <
   const fieldResponse: UsePickerValueFieldResponse<TValue, TSection, TError> = {
     value: dateState.draft,
     onChange: handleChangeFromField,
-    selectedSections,
-    onSelectedSectionsChange: handleFieldSelectedSectionsChange,
+    selectedSection,
+    onSelectedSectionChange: handleFieldSelectedSectionChange,
   };
 
   const viewValue = React.useMemo(
@@ -431,7 +431,7 @@ export const usePickerValue = <
     onChange: handleChange,
     onClose: handleClose,
     open: isOpen,
-    onSelectedSectionsChange: handleFieldSelectedSectionsChange,
+    onSelectedSectionChange: handleFieldSelectedSectionChange,
   };
 
   const isValid = (testedValue: TValue) => {

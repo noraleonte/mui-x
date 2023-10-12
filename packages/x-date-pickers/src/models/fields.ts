@@ -71,24 +71,6 @@ export interface FieldSection {
    */
   modified: boolean;
   /**
-   * Start index of the section in the format
-   */
-  start: number;
-  /**
-   * End index of the section in the format
-   */
-  end: number;
-  /**
-   * Start index of the section value in the input.
-   * Takes into account invisible unicode characters such as \u2069 but does not include them
-   */
-  startInInput: number;
-  /**
-   * End index of the section value in the input.
-   * Takes into account invisible unicode characters such as \u2069 but does not include them
-   */
-  endInInput: number;
-  /**
    * Separator displayed before the value of the section in the input.
    * If it contains escaped characters, then it must not have the escaping characters.
    * For example, on Day.js, the `year` section of the format `YYYY [year]` has an end separator equal to `year` not `[year]`
@@ -121,10 +103,7 @@ export interface FieldRef<TSection extends FieldSection> {
   setSelectedSections: (selectedSections: FieldSelectedSections) => void;
 }
 
-export type FieldSelectedSections =
-  | number
-  | FieldSectionType
-  | null
+export type FieldSelectedSections = number | FieldSectionType | null;
 
 /**
  * Props the single input field can receive when used inside a picker.

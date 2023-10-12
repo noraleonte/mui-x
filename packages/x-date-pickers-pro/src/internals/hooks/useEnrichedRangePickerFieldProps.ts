@@ -307,7 +307,7 @@ const useSingleInputFieldSlotProps = <TDate, TView extends DateOrTimeViewWithMer
   const handleSelectedSectionsChange = useEventCallback(
     (selectedSections: FieldSelectedSections) => {
       setTimeout(updateRangePosition);
-      fieldProps.onSelectedSectionsChange?.(selectedSections);
+      fieldProps.onSelectedSectionChange?.(selectedSections);
     },
   );
 
@@ -341,7 +341,7 @@ const useSingleInputFieldSlotProps = <TDate, TView extends DateOrTimeViewWithMer
     unstableFieldRef: handleFieldRef,
     inputRef: handleInputRef,
     onKeyDown: onSpaceOrEnter(openPicker, fieldProps.onKeyDown),
-    onSelectedSectionsChange: handleSelectedSectionsChange,
+    onSelectedSectionChange: handleSelectedSectionsChange,
     onBlur,
     InputProps: {
       ref: anchorRef,

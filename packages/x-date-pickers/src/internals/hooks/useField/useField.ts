@@ -15,10 +15,10 @@ import {
 import {
   adjustSectionValue,
   isAndroid,
-  cleanString,
   getSectionOrder,
-  selectActiveSectionInDOM,
-  getDOMActiveSectionIndex, getActiveSectionIndexFromDOM
+  getActiveSectionIndexFromDOM,
+  isFocusInsideContainer,
+  getSectionIndexFromDOMElement,
 } from './useField.utils';
 import { useFieldState } from './useFieldState';
 import { useFieldCharacterEditing } from './useFieldCharacterEditing';
@@ -36,12 +36,11 @@ export const useField = <
   params: UseFieldParams<TValue, TDate, TSection, TForwardedProps, TInternalProps>,
 ): UseFieldResponse<TForwardedProps> => {
   const utils = useUtils<TDate>();
-  const inputRef = typeof document === 'undefined' ? { current: undefined } : { current: {} };
 
   const {
     state,
     selectedSectionIndex,
-    setSelectedSections,
+    setSelectedSection,
     clearValue,
     clearActiveSection,
     updateSectionValue,
@@ -56,9 +55,7 @@ export const useField = <
     internalProps,
     internalProps: { readOnly = false, unstableFieldRef, minutesStep },
     forwardedProps: {
-      onClick,
       onBlur,
-      onMouseUp,
       onPaste,
       error,
       clearable,
@@ -82,7 +79,6 @@ export const useField = <
 
   const containerRef = React.useRef<HTMLDivElement>(null);
   const handleRef = useForkRef(inContainerRef, containerRef);
-  const focusTimeoutRef = React.useRef<NodeJS.Timeout | undefined>(undefined);
   const theme = useTheme();
   const isRTL = theme.direction === 'rtl';
 
@@ -93,28 +89,25 @@ export const useField = <
 
   const syncSelectionFromDOM = () => {
     if (readOnly) {
-      setSelectedSections(null);
+      setSelectedSection(null);
       return;
     }
 
-    const browserActiveSectionIndex = getActiveSectionIndexFromDOM(containerRef)
-    setSelectedSections(browserActiveSectionIndex);
+    const browserActiveSectionIndex = getActiveSectionIndexFromDOM(containerRef);
+    setSelectedSection(browserActiveSectionIndex);
   };
 
-  const handleInputClick = useEventCallback((event: React.MouseEvent, ...args) => {
+  const handleInputClick = useEventCallback((event: React.MouseEvent) => {
     // The click event on the clear button would propagate to the input, trigger this handler and result in a wrong section selection.
     // We avoid this by checking if the call of `handleInputClick` is actually intended, or a side effect.
     if (event.isDefaultPrevented()) {
       return;
     }
 
-    onClick?.(event, ...(args as []));
     syncSelectionFromDOM();
   });
 
   const handleInputMouseUp = useEventCallback((event: React.MouseEvent) => {
-    onMouseUp?.(event);
-
     // Without this, the browser will remove the selected when clicking inside an already-selected section.
     event.preventDefault();
   });
@@ -125,7 +118,7 @@ export const useField = <
 
   const handleContainerBlur = useEventCallback((...args) => {
     onBlur?.(...(args as []));
-    setSelectedSections(null);
+    setSelectedSection(null);
   });
 
   const handleInputPaste = useEventCallback((event: React.ClipboardEvent<HTMLInputElement>) => {
@@ -169,69 +162,18 @@ export const useField = <
       return;
     }
 
-    const targetValue = event.target.value;
-    const eventData = (event.nativeEvent as InputEvent).data;
-    // Calling `.fill(04/11/2022)` in playwright will trigger a change event with the requested content to insert in `event.nativeEvent.data`
-    // usual changes have only the currently typed character in the `event.nativeEvent.data`
-    const shouldUseEventData = eventData && eventData.length > 1;
-    const valueStr = shouldUseEventData ? eventData : targetValue;
-    const cleanValueStr = cleanString(valueStr);
+    const keyPressed = event.target.value;
 
-    // If no section is selected or eventData should be used, we just try to parse the new value
-    // This line is mostly triggered by imperative code / application tests.
-    if (selectedSectionIndex == null || shouldUseEventData) {
-      updateValueFromValueStr(shouldUseEventData ? eventData : cleanValueStr);
-      return;
-    }
-
-    const prevValueStr = cleanString(
-        fieldValueManager.getValueStrFromSections(state.sections, isRTL),
-    );
-
-    let startOfDiffIndex = -1;
-    let endOfDiffIndex = -1;
-    for (let i = 0; i < prevValueStr.length; i += 1) {
-      if (startOfDiffIndex === -1 && prevValueStr[i] !== cleanValueStr[i]) {
-        startOfDiffIndex = i;
-      }
-
-      if (
-          endOfDiffIndex === -1 &&
-          prevValueStr[prevValueStr.length - i - 1] !== cleanValueStr[cleanValueStr.length - i - 1]
-      ) {
-        endOfDiffIndex = i;
-      }
-    }
-
-    const activeSection = state.sections[selectedSectionIndex];
-
-    const hasDiffOutsideOfActiveSection =
-        startOfDiffIndex < activeSection.start ||
-        prevValueStr.length - endOfDiffIndex - 1 > activeSection.end;
-
-    if (hasDiffOutsideOfActiveSection) {
-      // TODO: Support if the new date is valid
-      return;
-    }
-
-    // The active section being selected, the browser has replaced its value with the key pressed by the user.
-    const activeSectionEndRelativeToNewValue =
-        cleanValueStr.length -
-        prevValueStr.length +
-        activeSection.end -
-        cleanString(activeSection.endSeparator || '').length;
-
-    const keyPressed = cleanValueStr.slice(
-        activeSection.start + cleanString(activeSection.startSeparator || '').length,
-        activeSectionEndRelativeToNewValue,
-    );
-
+    // TODO: Support Android
     if (isAndroid() && keyPressed.length === 0) {
-      setTempAndroidValueStr(valueStr);
+      // setTempAndroidValueStr(valueStr);
       return;
     }
 
-    applyCharacterEditing({ keyPressed, sectionIndex: selectedSectionIndex });
+    applyCharacterEditing({
+      keyPressed,
+      sectionIndex: getSectionIndexFromDOMElement(event.target)!,
+    });
   });
 
   const handleInputKeyDown = useEventCallback((event: React.KeyboardEvent) => {
@@ -251,12 +193,11 @@ export const useField = <
         event.preventDefault();
 
         if (selectedSectionIndex == null) {
-          setSelectedSections(sectionOrder.startIndex);
+          setSelectedSection(sectionOrder.startIndex);
         } else {
-          const nextSectionIndex =
-            sectionOrder.neighbors[selectedSectionIndex].rightIndex;
+          const nextSectionIndex = sectionOrder.neighbors[selectedSectionIndex].rightIndex;
           if (nextSectionIndex !== null) {
-            setSelectedSections(nextSectionIndex);
+            setSelectedSection(nextSectionIndex);
           }
         }
         break;
@@ -267,12 +208,11 @@ export const useField = <
         event.preventDefault();
 
         if (selectedSectionIndex == null) {
-          setSelectedSections(sectionOrder.endIndex);
+          setSelectedSection(sectionOrder.endIndex);
         } else {
-          const nextSectionIndex =
-            sectionOrder.neighbors[selectedSectionIndex].leftIndex;
+          const nextSectionIndex = sectionOrder.neighbors[selectedSectionIndex].leftIndex;
           if (nextSectionIndex !== null) {
-            setSelectedSections(nextSectionIndex);
+            setSelectedSection(nextSectionIndex);
           }
         }
         break;
@@ -331,23 +271,23 @@ export const useField = <
       return;
     }
 
-    const isFocusInsideContainer = containerRef.current.contains(getActiveElement(document))
-
     if (selectedSectionIndex == null) {
-      if (isFocusInsideContainer) {
-        containerRef.current.blur()
+      if (isFocusInsideContainer(containerRef)) {
+        containerRef.current.blur();
       }
       return;
     }
 
-    const inputToFocus = containerRef.current.querySelector<HTMLInputElement>(`input[data-sectionindex="${selectedSectionIndex}"]`)
+    const inputToFocus = containerRef.current.querySelector<HTMLInputElement>(
+      `input[data-sectionindex="${selectedSectionIndex}"]`,
+    );
     if (!inputToFocus) {
-      return
+      return;
     }
 
     // Fix scroll jumping on iOS browser: https://github.com/mui/mui-x/issues/8321
     const currentScrollTop = inputToFocus.scrollTop;
-    inputToFocus.select()
+    inputToFocus.select();
     // Even reading this variable seems to do the trick, but also setting it just to make use of it
     inputToFocus.scrollTop = currentScrollTop;
   });
@@ -378,10 +318,8 @@ export const useField = <
   React.useEffect(() => {
     // Select the right section when focused on mount (`autoFocus = true` on the input)
     if (containerRef.current && containerRef.current.contains(getActiveElement(document))) {
-      setSelectedSections(0);
+      setSelectedSection(0);
     }
-
-    return () => window.clearTimeout(focusTimeoutRef.current);
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // If `state.tempValueStrAndroid` is still defined when running `useEffect`,
@@ -413,26 +351,24 @@ export const useField = <
     return 'numeric';
   }, [selectedSectionIndex, state.sections]);
 
-  const inputHasFocus =
-    containerRef.current && containerRef.current.contains(getActiveElement(document));
   const areAllSectionsEmpty = valueManager.areValuesEqual(
     utils,
     state.value,
     valueManager.emptyValue,
   );
-  const shouldShowPlaceholder = !inputHasFocus && areAllSectionsEmpty;
+  const shouldShowPlaceholder = !isFocusInsideContainer(containerRef) && areAllSectionsEmpty;
 
   React.useImperativeHandle(unstableFieldRef, () => ({
     getSections: () => state.sections,
     getActiveSectionIndex: () => getActiveSectionIndexFromDOM(containerRef),
-    setSelectedSections: (activeSectionIndex) => setSelectedSections(activeSectionIndex),
+    setSelectedSections: (activeSectionIndex) => setSelectedSection(activeSectionIndex),
   }));
 
   const handleClearValue = useEventCallback((event: React.MouseEvent, ...args) => {
     event.preventDefault();
     onClear?.(event, ...(args as []));
     clearValue();
-    setSelectedSections(0);
+    setSelectedSection(0);
   });
 
   const textFieldElements = React.useMemo<FakeTextFieldElement[]>(
@@ -443,11 +379,21 @@ export const useField = <
         value: shouldShowPlaceholder ? '' : section.value || section.placeholder,
         placeholder: section.placeholder,
         'data-sectionindex': sectionIndex,
-        onChange: () => {},
+        onChange: handleInputChange,
+        onClick: handleInputClick,
         onFocus: handleInputFocus,
         onKeyDown: handleInputKeyDown,
+        onMouseUp: handleInputMouseUp,
       })),
-    [state.sections, shouldShowPlaceholder, handleInputFocus, handleInputKeyDown],
+    [
+      state.sections,
+      shouldShowPlaceholder,
+      handleInputFocus,
+      handleInputKeyDown,
+      handleInputChange,
+      handleInputClick,
+      handleInputMouseUp,
+    ],
   );
 
   return {
@@ -459,11 +405,8 @@ export const useField = <
     value: shouldShowPlaceholder ? '' : valueStr,
     inputMode,
     readOnly,
-    onClick: handleInputClick,
     onBlur: handleContainerBlur,
     onPaste: handleInputPaste,
-    onChange: handleInputChange,
-    onMouseUp: handleInputMouseUp,
     onClear: handleClearValue,
     error: inputError,
     ref: handleRef,
