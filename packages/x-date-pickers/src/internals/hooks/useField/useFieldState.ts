@@ -7,7 +7,6 @@ import {
   UseFieldInternalProps,
   UseFieldParams,
   UseFieldState,
-  FieldSelectedSectionsIndexes,
   FieldChangeHandlerContext,
 } from './useField.types';
 import {
@@ -172,32 +171,20 @@ export const useFieldState = <
     }));
   };
 
-  const selectedSectionIndexes = React.useMemo<FieldSelectedSectionsIndexes | null>(() => {
+  const selectedSectionIndex = React.useMemo<number | null>(() => {
     if (selectedSections == null) {
       return null;
     }
 
-    if (selectedSections === 'all') {
-      return {
-        startIndex: 0,
-        endIndex: state.sections.length - 1,
-        shouldSelectBoundarySelectors: true,
-      };
-    }
-
     if (typeof selectedSections === 'number') {
-      return { startIndex: selectedSections, endIndex: selectedSections };
+      return selectedSections;
     }
 
-    if (typeof selectedSections === 'string') {
-      const selectedSectionIndex = state.sections.findIndex(
+    const index = state.sections.findIndex(
         (section) => section.type === selectedSections,
-      );
+    );
 
-      return { startIndex: selectedSectionIndex, endIndex: selectedSectionIndex };
-    }
-
-    return selectedSections;
+    return index === -1 ? null : index
   }, [selectedSections, state.sections]);
 
   const publishValue = ({
@@ -249,11 +236,11 @@ export const useFieldState = <
   };
 
   const clearActiveSection = () => {
-    if (selectedSectionIndexes == null) {
+    if (selectedSectionIndex == null) {
       return;
     }
 
-    const activeSection = state.sections[selectedSectionIndexes.startIndex];
+    const activeSection = state.sections[selectedSectionIndex];
 
     if (activeSection.value === '') {
       return;
@@ -266,7 +253,7 @@ export const useFieldState = <
       .filter((section) => section.value !== '').length;
     const isTheOnlyNonEmptySection = nonEmptySectionCountBefore === 1;
 
-    const newSections = setSectionValue(selectedSectionIndexes.startIndex, '');
+    const newSections = setSectionValue(selectedSectionIndex, '');
     const newActiveDate = isTheOnlyNonEmptySection ? null : utils.date(new Date(''));
     const newValues = activeDateManager.getNewValuesFromNewActiveDate(newActiveDate);
 
@@ -330,22 +317,17 @@ export const useFieldState = <
      */
     if (
       shouldGoToNextSection &&
-      selectedSectionIndexes &&
-      selectedSectionIndexes.startIndex < state.sections.length - 1
+        selectedSectionIndex &&
+        selectedSectionIndex < state.sections.length - 1
     ) {
-      setSelectedSections(selectedSectionIndexes.startIndex + 1);
-    } else if (
-      selectedSectionIndexes &&
-      selectedSectionIndexes.startIndex !== selectedSectionIndexes.endIndex
-    ) {
-      setSelectedSections(selectedSectionIndexes.startIndex);
+      setSelectedSections(selectedSectionIndex + 1);
     }
 
     /**
      * 2. Try to build a valid date from the new section value
      */
     const activeDateManager = fieldValueManager.getActiveDateManager(utils, state, activeSection);
-    const newSections = setSectionValue(selectedSectionIndexes!.startIndex, newSectionValue);
+    const newSections = setSectionValue(selectedSectionIndex!, newSectionValue);
     const newActiveDateSections = activeDateManager.getSections(newSections);
     const newActiveDate = getDateFromDateSections(utils, newActiveDateSections);
 
@@ -429,7 +411,7 @@ export const useFieldState = <
 
   return {
     state,
-    selectedSectionIndexes,
+    selectedSectionIndex,
     setSelectedSections,
     clearValue,
     clearActiveSection,

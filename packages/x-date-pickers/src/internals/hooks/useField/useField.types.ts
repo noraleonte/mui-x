@@ -22,7 +22,6 @@ export interface UseFieldParams<
   TForwardedProps extends UseFieldForwardedProps,
   TInternalProps extends UseFieldInternalProps<any, any, any, any>,
 > {
-  inputRef?: React.Ref<HTMLInputElement>;
   forwardedProps: TForwardedProps;
   internalProps: TInternalProps;
   valueManager: PickerValueManager<TValue, TDate, InferError<TInternalProps>>;
@@ -155,16 +154,15 @@ export interface FieldRef<TSection extends FieldSection> {
 }
 
 export interface UseFieldForwardedProps {
-  onKeyDown?: React.KeyboardEventHandler;
   onMouseUp?: React.MouseEventHandler;
   onPaste?: React.ClipboardEventHandler<HTMLInputElement>;
   onClick?: React.MouseEventHandler;
-  onFocus?: () => void;
   onBlur?: () => void;
   error?: boolean;
   onClear?: React.MouseEventHandler;
   clearable?: boolean;
   disabled?: boolean;
+  ref?: React.Ref<HTMLDivElement>;
 }
 
 export type UseFieldResponse<TForwardedProps extends UseFieldForwardedProps> = Omit<
@@ -238,16 +236,6 @@ interface FieldActiveDateManager<TValue, TDate, TSection extends FieldSection> {
     newActiveDate: TDate | null,
   ) => Pick<UseFieldState<TValue, any>, 'value' | 'referenceValue'>;
 }
-
-export type FieldSelectedSectionsIndexes = {
-  startIndex: number;
-  endIndex: number;
-  /**
-   * If `true`, the selectors at the very beginning and very end of the input will be selected.
-   * @default false
-   */
-  shouldSelectBoundarySelectors?: boolean;
-};
 
 export interface FieldValueManager<TValue, TDate, TSection extends FieldSection> {
   /**

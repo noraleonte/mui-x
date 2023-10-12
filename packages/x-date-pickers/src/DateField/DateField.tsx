@@ -1,6 +1,5 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import MuiTextField from '@mui/material/TextField';
 import { useThemeProps } from '@mui/material/styles';
 import { useSlotProps } from '@mui/base/utils';
 import { refType } from '@mui/utils';
@@ -11,6 +10,7 @@ import {
 } from './DateField.types';
 import { useDateField } from './useDateField';
 import { useClearableField } from '../hooks';
+import { FakeTextField } from '../internals/components/FakeTextField';
 
 type DateFieldComponent = (<TDate>(
   props: DateFieldProps<TDate> & React.RefAttributes<HTMLDivElement>,
@@ -18,7 +18,7 @@ type DateFieldComponent = (<TDate>(
 
 const DateField = React.forwardRef(function DateField<TDate>(
   inProps: DateFieldProps<TDate>,
-  ref: React.Ref<HTMLDivElement>,
+  inRef: React.Ref<HTMLDivElement>,
 ) {
   const themeProps = useThemeProps({
     props: inProps,
@@ -30,11 +30,14 @@ const DateField = React.forwardRef(function DateField<TDate>(
 
   const ownerState = themeProps;
 
-  const TextField = slots?.textField ?? components?.TextField ?? MuiTextField;
-  const { inputRef: externalInputRef, ...textFieldProps }: DateFieldProps<TDate> = useSlotProps({
+  const TextField = slots?.textField ?? components?.TextField ?? FakeTextField;
+  const textFieldProps: DateFieldProps<TDate> = useSlotProps({
     elementType: TextField,
     externalSlotProps: slotProps?.textField ?? componentsProps?.textField,
     externalForwardedProps: other,
+    additionalProps: {
+      ref: inRef,
+    },
     ownerState,
   });
 
@@ -42,19 +45,8 @@ const DateField = React.forwardRef(function DateField<TDate>(
   textFieldProps.inputProps = { ...inputProps, ...textFieldProps.inputProps };
   textFieldProps.InputProps = { ...InputProps, ...textFieldProps.InputProps };
 
-  const {
-    ref: inputRef,
-    onPaste,
-    onKeyDown,
-    inputMode,
-    readOnly,
-    clearable,
-    onClear,
-    ...fieldProps
-  } = useDateField<TDate, typeof textFieldProps>({
-    props: textFieldProps,
-    inputRef: externalInputRef,
-  });
+  const { ref, onPaste, onKeyDown, inputMode, readOnly, clearable, onClear, ...fieldProps } =
+    useDateField<TDate, typeof textFieldProps>(textFieldProps);
 
   const { InputProps: ProcessedInputProps, fieldProps: processedFieldProps } = useClearableField<
     typeof fieldProps,
@@ -80,7 +72,7 @@ const DateField = React.forwardRef(function DateField<TDate>(
         ...ProcessedInputProps,
         readOnly,
       }}
-      inputProps={{ ...fieldProps.inputProps, inputMode, onPaste, onKeyDown, ref: inputRef }}
+      inputProps={{ ...fieldProps.inputProps, inputMode, onPaste, onKeyDown }}
     />
   );
 }) as DateFieldComponent;

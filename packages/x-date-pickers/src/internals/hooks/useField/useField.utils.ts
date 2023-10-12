@@ -1,3 +1,4 @@
+import * as React from 'react'
 import {
   AvailableAdjustKeyCode,
   FieldSectionsValueBoundaries,
@@ -16,6 +17,7 @@ import {
 } from '../../../models';
 import { PickersLocaleText } from '../../../locales/utils/pickersLocaleTextApi';
 import { getMonthsInYear } from '../../utils/date-utils';
+import {getActiveElement} from "../../utils/utils";
 
 export const getDateSectionConfigFromFormatToken = <TDate>(
   utils: MuiPickersAdapter<TDate>,
@@ -972,3 +974,16 @@ export const getSectionOrder = (
 
   return { neighbors, startIndex: rtl2ltr[0], endIndex: rtl2ltr[sections.length - 1] };
 };
+
+export const getActiveSectionIndexFromDOM = (containerRef: React.RefObject<HTMLDivElement>) => {
+  const activeElement = getActiveElement(document) as HTMLInputElement | undefined
+  if (!activeElement || !containerRef.current || !containerRef.current.contains(activeElement)) {
+    return null
+  }
+
+  const browserActiveSectionIndex = Number(
+      (getActiveElement(document) as HTMLInputElement | undefined)?.dataset.sectionindex ?? '-1',
+  );
+
+  return browserActiveSectionIndex === -1 ? null : browserActiveSectionIndex
+}

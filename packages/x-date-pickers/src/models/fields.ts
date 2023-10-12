@@ -125,8 +125,6 @@ export type FieldSelectedSections =
   | number
   | FieldSectionType
   | null
-  | 'all'
-  | { startIndex: number; endIndex: number };
 
 /**
  * Props the single input field can receive when used inside a picker.
