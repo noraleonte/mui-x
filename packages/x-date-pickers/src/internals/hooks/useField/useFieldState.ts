@@ -15,6 +15,7 @@ import {
   getSectionsBoundaries,
   validateSections,
   getDateFromDateSections,
+  resetSectionsTempValueStr,
 } from './useField.utils';
 import { InferError } from '../useValidation';
 import { FieldSection, FieldSelectedSection } from '../../../models';
@@ -134,7 +135,6 @@ export const useFieldState = <
       sections,
       value: valueFromTheOutside,
       referenceValue: valueManager.emptyValue,
-      tempValueStrAndroid: null,
     };
 
     const granularity = getSectionTypeGranularity(sections);
@@ -191,10 +191,9 @@ export const useFieldState = <
   }: Pick<UseFieldState<TValue, TSection>, 'value' | 'referenceValue' | 'sections'>) => {
     setState((prevState) => ({
       ...prevState,
-      sections,
+      sections: resetSectionsTempValueStr(sections),
       value,
       referenceValue,
-      tempValueStrAndroid: null,
     }));
 
     const context: FieldChangeHandlerContext<InferError<TInternalProps>> = {
@@ -263,45 +262,9 @@ export const useFieldState = <
       setState((prevState) => ({
         ...prevState,
         ...newValues,
-        sections: newSections,
-        tempValueStrAndroid: null,
+        sections: resetSectionsTempValueStr(newSections),
       }));
     }
-  };
-
-  const updateValueFromValueStr = (valueStr: string) => {
-    const parseDateStr = (dateStr: string, referenceDate: TDate) => {
-      const date = utils.parse(dateStr, format);
-      if (date == null || !utils.isValid(date)) {
-        return null;
-      }
-
-      const sections = splitFormatIntoSections(
-        utils,
-        timezone,
-        localeText,
-        format,
-        date,
-        formatDensity,
-        shouldRespectLeadingZeros,
-        isRTL,
-      );
-      return mergeDateIntoReferenceDate(utils, timezone, date, sections, referenceDate, false);
-    };
-
-    const newValue = fieldValueManager.parseValueStr(valueStr, state.referenceValue, parseDateStr);
-
-    const newReferenceValue = fieldValueManager.updateReferenceValue(
-      utils,
-      newValue,
-      state.referenceValue,
-    );
-
-    publishValue({
-      value: newValue,
-      referenceValue: newReferenceValue,
-      sections: getSectionsFromValue(newValue, state.sections),
-    });
   };
 
   const updateSectionValue = ({
@@ -365,13 +328,20 @@ export const useFieldState = <
     return setState((prevState) => ({
       ...prevState,
       ...values,
-      sections: newSections,
-      tempValueStrAndroid: null,
+      sections: resetSectionsTempValueStr(newSections),
     }));
   };
 
-  const setTempAndroidValueStr = (tempValueStrAndroid: string | null) =>
-    setState((prev) => ({ ...prev, tempValueStrAndroid }));
+  const setSectionTempValueStr = (sectionIndex: number, tempValueStr: string) =>
+    setState((prev) => ({
+      ...prev,
+      sections: prev.sections.map((section, index) =>
+        index === sectionIndex ? { ...section, tempValueStr } : section,
+      ),
+    }));
+
+  const resetSectionsTempValueStrFromState = () =>
+    setState((prev) => ({ ...prev, sections: resetSectionsTempValueStr(prev.sections) }));
 
   React.useEffect(() => {
     const sections = getSectionsFromValue(state.value);
@@ -413,8 +383,8 @@ export const useFieldState = <
     clearValue,
     clearActiveSection,
     updateSectionValue,
-    updateValueFromValueStr,
-    setTempAndroidValueStr,
+    setSectionTempValueStr,
+    resetSectionsTempValueStr: resetSectionsTempValueStrFromState,
     sectionsValueBoundaries,
     placeholder,
     timezone,

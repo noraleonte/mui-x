@@ -154,7 +154,6 @@ export interface FieldRef<TSection extends FieldSection> {
 }
 
 export interface UseFieldForwardedProps {
-  onPaste?: React.ClipboardEventHandler<HTMLInputElement>;
   onBlur?: () => void;
   error?: boolean;
   onClear?: React.MouseEventHandler;
@@ -169,7 +168,6 @@ export type UseFieldResponse<TForwardedProps extends UseFieldForwardedProps> = O
 > &
   Required<UseFieldForwardedProps> & {
     ref: React.Ref<HTMLInputElement>;
-    value: string;
     error: boolean;
     readOnly: boolean;
   };
@@ -266,20 +264,6 @@ export interface FieldValueManager<TValue, TDate, TSection extends FieldSection>
     activeSection: TSection,
   ) => FieldActiveDateManager<TValue, TDate, TSection>;
   /**
-   * Parses a string version (most of the time coming from the input).
-   * This method should only be used when the change does not come from a single section.
-   * @template TValue, TDate
-   * @param {string} valueStr The string value to parse.
-   * @param {TValue} referenceValue The reference value currently stored in state.
-   * @param {(dateStr: string, referenceDate: TDate) => TDate | null} parseDate A method to convert a string date into a parsed one.
-   * @returns {TValue} The new parsed value.
-   */
-  parseValueStr: (
-    valueStr: string,
-    referenceValue: TValue,
-    parseDate: (dateStr: string, referenceDate: TDate) => TDate | null,
-  ) => TValue;
-  /**
    * Update the reference value with the new value.
    * This method must make sure that no date inside the returned `referenceValue` is invalid.
    * @template TValue, TDate
@@ -303,25 +287,6 @@ export interface UseFieldState<TValue, TSection extends FieldSection> {
    */
   referenceValue: TValue;
   sections: TSection[];
-  /**
-   * Android `onChange` behavior when the input selection is not empty is quite different from a desktop behavior.
-   * There are two `onChange` calls:
-   * 1. A call with the selected content removed.
-   * 2. A call with the key pressed added to the value.
-   **
-   * For instance, if the input value equals `month / day / year` and `day` is selected.
-   * The pressing `1` will have the following behavior:
-   * 1. A call with `month /  / year`.
-   * 2. A call with `month / 1 / year`.
-   *
-   * But if you don't update the input with the value passed on the first `onChange`.
-   * Then the second `onChange` will add the key press at the beginning of the selected value.
-   * 1. A call with `month / / year` that we don't set into state.
-   * 2. A call with `month / 1day / year`.
-   *
-   * The property below allows us to set the first `onChange` value into state waiting for the second one.
-   */
-  tempValueStrAndroid: string | null;
 }
 
 export type UseFieldValidationProps<

@@ -66,6 +66,4 @@ export const singleItemFieldValueManager: FieldValueManager<any, any, FieldSecti
           : newActiveDate,
     }),
   }),
-  parseValueStr: (valueStr, referenceValue, parseDate) =>
-    parseDate(valueStr.trim(), referenceValue),
 };

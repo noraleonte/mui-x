@@ -528,6 +528,7 @@ export const splitFormatIntoSections = <TDate>(
       startSeparator: sections.length === 0 ? startSeparator : '',
       endSeparator: '',
       modified: false,
+      tempValueStr: null,
     });
 
     return null;
@@ -957,4 +958,22 @@ export const isFocusInsideContainer = (
   }
 
   return containerRef.current.contains(getActiveElement(document));
+};
+
+export const resetSectionsTempValueStr = <TSection extends FieldSection>(sections: TSection[]) => {
+  let hasChanged = false;
+  const newSections = sections.map((section) => {
+    if (section.tempValueStr != null) {
+      hasChanged = true;
+      return { ...section, tempValueStr: null };
+    }
+
+    return section;
+  });
+
+  if (!hasChanged) {
+    return sections;
+  }
+
+  return newSections;
 };

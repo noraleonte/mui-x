@@ -10,6 +10,7 @@ import {
   getDateSectionConfigFromFormatToken,
   getDaysInWeekStr,
   getLetterEditingOptions,
+  resetSectionsTempValueStr,
 } from './useField.utils';
 import { UpdateSectionValueParams } from './useFieldState';
 
@@ -28,7 +29,7 @@ interface UseFieldEditingParams<TDate, TSection extends FieldSection> {
   sections: TSection[];
   updateSectionValue: (params: UpdateSectionValueParams<TSection>) => void;
   sectionsValueBoundaries: FieldSectionsValueBoundaries<TDate>;
-  setTempAndroidValueStr: (newValue: string | null) => void;
+  resetSectionsTempValueStr: () => void;
   timezone: PickersTimezone;
 }
 
@@ -78,7 +79,7 @@ export const useFieldCharacterEditing = <TDate, TSection extends FieldSection>({
   sections,
   updateSectionValue,
   sectionsValueBoundaries,
-  setTempAndroidValueStr,
+  resetSectionsTempValueStr,
   timezone,
 }: UseFieldEditingParams<TDate, TSection>) => {
   const utils = useUtils<TDate>();
@@ -387,7 +388,7 @@ export const useFieldCharacterEditing = <TDate, TSection extends FieldSection>({
     const isNumericEditing = !Number.isNaN(Number(params.keyPressed));
     const response = isNumericEditing ? applyNumericEditing(params) : applyLetterEditing(params);
     if (response == null) {
-      setTempAndroidValueStr(null);
+      resetSectionsTempValueStr();
     } else {
       updateSectionValue({
         activeSection,

@@ -82,6 +82,26 @@ export interface FieldSection {
    * For example, on Day.js, the `year` section of the format `[year] YYYY` has a start separator equal to `[year]`
    */
   endSeparator: string;
+  /**
+   * Some Android keyboards have an `onChange` behavior when the input selection is not empty that is quite different from a desktop behavior.
+   * There are two `onChange` calls:
+   * 1. A call with the selected content removed.
+   * 2. A call with the key pressed added to the value.
+   **
+   * For instance, if the input value equals `25` and `25` is selected.
+   * The pressing `1` will have the following behavior:
+   * 1. A call with ``.
+   * 2. A call with `1`.
+   *
+   * But if you don't update the input with the value passed on the first `onChange`.
+   * Then the second `onChange` will add the key press at the beginning of the selected value.
+   * 1. A call with `` that we don't set into state.
+   * 2. A call with `125`.
+   *
+   * The property below allows us to set the first `onChange` value into state waiting for the second one.
+   * @default null
+   */
+  tempValueStr: string | null;
 }
 
 export interface FieldRef<TSection extends FieldSection> {

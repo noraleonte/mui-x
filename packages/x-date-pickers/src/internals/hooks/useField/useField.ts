@@ -19,6 +19,7 @@ import {
   getActiveSectionIndexFromDOM,
   isFocusInsideContainer,
   getSectionIndexFromDOMElement,
+  resetSectionsTempValueStr,
 } from './useField.utils';
 import { useFieldState } from './useFieldState';
 import { useFieldCharacterEditing } from './useFieldCharacterEditing';
@@ -44,8 +45,8 @@ export const useField = <
     clearValue,
     clearActiveSection,
     updateSectionValue,
-    updateValueFromValueStr,
-    setTempAndroidValueStr,
+    setSectionTempValueStr,
+    resetSectionsTempValueStr,
     sectionsValueBoundaries,
     timezone,
   } = useFieldState(params);
@@ -55,7 +56,6 @@ export const useField = <
     internalProps: { readOnly = false, unstableFieldRef, minutesStep },
     forwardedProps: {
       onBlur,
-      onPaste,
       error,
       clearable,
       onClear,
@@ -72,7 +72,7 @@ export const useField = <
     sections: state.sections,
     updateSectionValue,
     sectionsValueBoundaries,
-    setTempAndroidValueStr,
+    resetSectionsTempValueStr,
     timezone,
   });
 
@@ -121,39 +121,27 @@ export const useField = <
   });
 
   const handleInputPaste = useEventCallback((event: React.ClipboardEvent<HTMLInputElement>) => {
-    onPaste?.(event);
-
     if (readOnly) {
       event.preventDefault();
       return;
     }
 
+    // TODO: Check behavior
+    const activeSectionIndex = getSectionIndexFromDOMElement(event.target as HTMLInputElement)!;
+    const activeSection = state.sections[activeSectionIndex];
+
     const pastedValue = event.clipboardData.getData('text');
-    if (selectedSectionIndex != null) {
-      const activeSection = state.sections[selectedSectionIndex];
-
-      const lettersOnly = /^[a-zA-Z]+$/.test(pastedValue);
-      const digitsOnly = /^[0-9]+$/.test(pastedValue);
-      const digitsAndLetterOnly = /^(([a-zA-Z]+)|)([0-9]+)(([a-zA-Z]+)|)$/.test(pastedValue);
-      const isValidPastedValue =
-        (activeSection.contentType === 'letter' && lettersOnly) ||
-        (activeSection.contentType === 'digit' && digitsOnly) ||
-        (activeSection.contentType === 'digit-with-letter' && digitsAndLetterOnly);
-      if (isValidPastedValue) {
-        // Early return to let the paste update section, value
-        return;
-      }
-      if (lettersOnly || digitsOnly) {
-        // The pasted value correspond to a single section but not the expected type
-        // skip the modification
-        event.preventDefault();
-        return;
-      }
+    const lettersOnly = /^[a-zA-Z]+$/.test(pastedValue);
+    const digitsOnly = /^[0-9]+$/.test(pastedValue);
+    const digitsAndLetterOnly = /^(([a-zA-Z]+)|)([0-9]+)(([a-zA-Z]+)|)$/.test(pastedValue);
+    const isValidPastedValue =
+      (activeSection.contentType === 'letter' && lettersOnly) ||
+      (activeSection.contentType === 'digit' && digitsOnly) ||
+      (activeSection.contentType === 'digit-with-letter' && digitsAndLetterOnly);
+    if (!isValidPastedValue) {
+      // We skip the `onChange` call to avoid invalid values
+      event.preventDefault();
     }
-
-    event.preventDefault();
-    resetCharacterQuery();
-    updateValueFromValueStr(pastedValue);
   });
 
   const handleInputChange = useEventCallback((event: React.ChangeEvent<HTMLInputElement>) => {
@@ -162,16 +150,16 @@ export const useField = <
     }
 
     const keyPressed = event.target.value;
+    const sectionIndex = getSectionIndexFromDOMElement(event.target)!;
 
-    // TODO: Support Android
     if (isAndroid() && keyPressed.length === 0) {
-      // setTempAndroidValueStr(valueStr);
+      setSectionTempValueStr(sectionIndex, keyPressed);
       return;
     }
 
     applyCharacterEditing({
       keyPressed,
-      sectionIndex: getSectionIndexFromDOMElement(event.target)!,
+      sectionIndex,
     });
   });
 
@@ -321,22 +309,19 @@ export const useField = <
     }
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // If `state.tempValueStrAndroid` is still defined when running `useEffect`,
+  // If `tempValueStr` is still defined for some section when running `useEffect`,
   // Then `onChange` has only been called once, which means the user pressed `Backspace` to reset the section.
   // This causes a small flickering on Android,
   // But we can't use `useEnhancedEffect` which is always called before the second `onChange` call and then would cause false positives.
   React.useEffect(() => {
-    if (state.tempValueStrAndroid != null && selectedSectionIndex != null) {
+    const sectionWithTempValueStr = state.sections.findIndex(
+      (section) => section.tempValueStr != null,
+    );
+    if (sectionWithTempValueStr > -1 && selectedSectionIndex != null) {
       resetCharacterQuery();
       clearActiveSection();
     }
-  }, [state.tempValueStrAndroid]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  const valueStr = React.useMemo(
-    () =>
-      state.tempValueStrAndroid ?? fieldValueManager.getValueStrFromSections(state.sections, isRTL),
-    [state.sections, fieldValueManager, state.tempValueStrAndroid, isRTL],
-  );
+  }, [state.sections]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const areAllSectionsEmpty = valueManager.areValuesEqual(
     utils,
@@ -371,6 +356,7 @@ export const useField = <
         onFocus: handleInputFocus,
         onKeyDown: handleInputKeyDown,
         onMouseUp: handleInputMouseUp,
+        onPaste: handleInputPaste,
         inputMode: section.contentType === 'letter' ? 'text' : 'numeric',
         autoComplete: 'off',
         disabled,
@@ -384,6 +370,7 @@ export const useField = <
       handleInputChange,
       handleInputClick,
       handleInputMouseUp,
+      handleInputPaste,
       disabled,
       readOnly,
     ],
@@ -393,10 +380,8 @@ export const useField = <
     disabled,
     ...otherForwardedProps,
     elements: textFieldElements,
-    value: shouldShowPlaceholder ? '' : valueStr,
     readOnly,
     onBlur: handleContainerBlur,
-    // onPaste: handleInputPaste,
     onClear: handleClearValue,
     error: inputError,
     ref: handleRef,
