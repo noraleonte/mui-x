@@ -17,7 +17,7 @@ describe('<DesktopDatePicker /> - Field', () => {
       clock: 'fake',
       clockConfig: new Date('2018-01-01T10:05:05.000'),
     });
-    const { clickOnInput } = buildFieldInteractions({
+    const { clickOnField } = buildFieldInteractions({
       clock,
       render,
       Component: DesktopDatePicker,
@@ -32,7 +32,7 @@ describe('<DesktopDatePicker /> - Field', () => {
 
       const input = getTextbox();
       expectInputPlaceholder(input, 'MMMM DD');
-      clickOnInput(input, 1);
+      clickOnField(input, 0);
 
       fireEvent.change(input, { target: { value: 'N DD' } }); // Press "1"
       expectInputValue(input, 'November DD');
@@ -62,7 +62,7 @@ describe('<DesktopDatePicker /> - Field', () => {
     });
   });
 
-  describeAdapters('Timezone', DesktopDatePicker, ({ adapter, render, clickOnInput }) => {
+  describeAdapters('Timezone', DesktopDatePicker, ({ adapter, render, clickOnField }) => {
     it('should clear the selected section when all sections are completed when using timezones', () => {
       function WrappedDesktopDatePicker() {
         const [value, setValue] = React.useState(adapter.date()!);
@@ -79,7 +79,7 @@ describe('<DesktopDatePicker /> - Field', () => {
 
       const input = getTextbox();
       expectInputValue(input, 'June 2022');
-      clickOnInput(input, 0);
+      clickOnField(input, 0);
 
       userEvent.keyPress(input, { key: 'Backspace' });
       expectInputValue(input, 'MMMM 2022');

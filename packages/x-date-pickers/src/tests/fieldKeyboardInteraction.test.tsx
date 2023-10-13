@@ -75,7 +75,7 @@ describe(`RTL - test arrows navigation`, () => {
     moment.locale('en');
   });
 
-  const { clickOnInput } = buildFieldInteractions({ clock, render, Component: DateTimeField });
+  const { clickOnField } = buildFieldInteractions({ clock, render, Component: DateTimeField });
 
   it('should move selected section to the next section respecting RTL order in empty field', () => {
     render(
@@ -84,7 +84,7 @@ describe(`RTL - test arrows navigation`, () => {
       </ThemeProvider>,
     );
     const input = getTextbox();
-    clickOnInput(input, 24);
+    clickOnField(input, 3);
 
     const expectedValues = ['hh', 'mm', 'YYYY', 'MM', 'DD', 'DD'];
 
@@ -101,7 +101,7 @@ describe(`RTL - test arrows navigation`, () => {
       </ThemeProvider>,
     );
     const input = getTextbox();
-    clickOnInput(input, 18);
+    clickOnField(input, 2);
 
     const expectedValues = ['DD', 'MM', 'YYYY', 'mm', 'hh', 'hh'];
 
@@ -118,7 +118,7 @@ describe(`RTL - test arrows navigation`, () => {
       </ThemeProvider>,
     );
     const input = getTextbox();
-    clickOnInput(input, 24);
+    clickOnField(input, 3);
 
     // 25/04/2018 => 1397/02/05
     const expectedValues = ['11', '54', '1397', '02', '05', '05'];
@@ -136,7 +136,7 @@ describe(`RTL - test arrows navigation`, () => {
       </ThemeProvider>,
     );
     const input = getTextbox();
-    clickOnInput(input, 18);
+    clickOnField(input, 2);
 
     // 25/04/2018 => 1397/02/05
     const expectedValues = ['05', '02', '1397', '54', '11', '11'];
@@ -169,7 +169,7 @@ adapterToTest.forEach((adapterName) => {
       }
     });
 
-    const { clickOnInput } = buildFieldInteractions({ clock, render, Component: DateTimeField });
+    const { clickOnField } = buildFieldInteractions({ clock, render, Component: DateTimeField });
 
     const cleanValueStr = (
       valueStr: string,
@@ -197,7 +197,7 @@ adapterToTest.forEach((adapterName) => {
     }) => {
       render(<DateTimeField defaultValue={initialValue} format={format} />);
       const input = getTextbox();
-      clickOnInput(input, 1);
+      clickOnField(input, 1);
       userEvent.keyPress(input, { key });
 
       expectInputValue(

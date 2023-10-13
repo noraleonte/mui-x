@@ -638,7 +638,7 @@ describe('<DateField /> - Editing', () => {
     },
   );
 
-  describeAdapters('Pasting', DateField, ({ adapter, render, renderWithProps, clickOnInput }) => {
+  describeAdapters('Pasting', DateField, ({ adapter, render, renderWithProps, clickOnField }) => {
     const firePasteEvent = (input: HTMLInputElement, pastedValue: string) => {
       act(() => {
         const clipboardEvent = new window.Event('paste', {
@@ -726,7 +726,7 @@ describe('<DateField /> - Editing', () => {
         />,
       );
       const input = getTextbox();
-      clickOnInput(input, 1);
+      clickOnField(input, 0);
 
       // Select all sections
       userEvent.keyPress(input, { key: 'a', ctrlKey: true });
@@ -936,7 +936,7 @@ describe('<DateField /> - Editing', () => {
     },
   );
 
-  describeAdapters('Editing from the outside', DateField, ({ adapter, render, clickOnInput }) => {
+  describeAdapters('Editing from the outside', DateField, ({ adapter, render, clickOnField }) => {
     it('should be able to reset the value from the outside', () => {
       const { setProps } = render(<DateField value={adapter.date(new Date(2022, 10, 23))} />);
       const input = getTextbox();
@@ -944,7 +944,7 @@ describe('<DateField /> - Editing', () => {
 
       setProps({ value: null });
 
-      clickOnInput(input, 0);
+      clickOnField(input, 0);
       expectInputValue(input, 'MM/DD/YYYY');
     });
 
@@ -952,7 +952,7 @@ describe('<DateField /> - Editing', () => {
       const { setProps } = render(<DateField />);
       const input = getTextbox();
 
-      clickOnInput(input, 0);
+      clickOnField(input, 0);
 
       fireEvent.change(input, { target: { value: '1/DD/YYYY' } }); // Press "1"
       expectInputValue(input, '01/DD/YYYY');
@@ -975,7 +975,7 @@ describe('<DateField /> - Editing', () => {
       setProps({ value: adapter.date(new Date(2022, 10, 23)) });
       expectInputValue(input, '11/23/2022');
 
-      // not using clickOnInput here because it will call `runLast` on the fake timer
+      // not using clickOnField here because it will call `runLast` on the fake timer
       act(() => {
         fireEvent.mouseDown(input);
         fireEvent.mouseUp(input);
@@ -993,7 +993,7 @@ describe('<DateField /> - Editing', () => {
   describeAdapters(
     'Android editing',
     DateField,
-    ({ adapter, render, renderWithProps, clickOnInput }) => {
+    ({ adapter, render, renderWithProps, clickOnField }) => {
       let originalUserAgent: string = '';
 
       beforeEach(() => {
@@ -1018,9 +1018,8 @@ describe('<DateField /> - Editing', () => {
 
         const input = getTextbox();
         const initialValueStr = input.value;
-        const sectionStart = initialValueStr.indexOf('2');
 
-        clickOnInput(input, sectionStart, sectionStart + 1);
+        clickOnField(input, 1);
 
         act(() => {
           // Remove the selected section

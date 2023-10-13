@@ -24,11 +24,7 @@ export interface BuildFieldInteractionsResponse<P extends {}> {
     input: HTMLInputElement;
     selectSection: FieldSectionSelector;
   };
-  clickOnInput: (
-    input: HTMLInputElement,
-    cursorStartPosition: number,
-    cursorEndPosition?: number,
-  ) => void;
+  clickOnField: (container: HTMLDivElement, sectionIndex: number) => void;
   testFieldKeyPress: (
     params: P & {
       key: string;
@@ -49,22 +45,18 @@ export const buildFieldInteractions = <P extends {}>({
   render,
   Component,
 }: BuildFieldInteractionsParams<P>): BuildFieldInteractionsResponse<P> => {
-  const clickOnInput: BuildFieldInteractionsResponse<P>['clickOnInput'] = (
-    input,
-    cursorStartPosition,
-    cursorEndPosition = cursorStartPosition,
+  const clickOnField: BuildFieldInteractionsResponse<P>['clickOnField'] = (
+    container,
+    sectionIndex,
   ) => {
-    if (document.activeElement !== input) {
-      act(() => {
-        input.focus();
-      });
-      clock.runToLast();
-    }
+    const inputToClick = container.querySelector<HTMLInputElement>(
+      `input[data-sectionindex="${sectionIndex}"]`,
+    )!;
+
     act(() => {
-      fireEvent.mouseDown(input);
-      fireEvent.mouseUp(input);
-      input.setSelectionRange(cursorStartPosition, cursorEndPosition);
-      fireEvent.click(input);
+      fireEvent.mouseDown(inputToClick);
+      fireEvent.mouseUp(inputToClick);
+      fireEvent.click(inputToClick);
 
       clock.runToLast();
     });
@@ -124,17 +116,19 @@ export const buildFieldInteractions = <P extends {}>({
         clock.runToLast();
       }
 
-      let clickPosition: number;
+      let sectionIndex: number;
       if (selectedSection) {
         const sections = fieldRef.current!.getSections();
         const cleanSections = index === 'first' ? sections : [...sections].reverse();
-        const sectionToSelect = cleanSections.find((section) => section.type === selectedSection);
-        clickPosition = sectionToSelect!.startInInput;
+        sectionIndex = cleanSections.findIndex((section) => section.type === selectedSection);
+        if (sectionIndex === -1) {
+          throw new Error(`No section of type ${selectedSection}`);
+        }
       } else {
-        clickPosition = 1;
+        sectionIndex = 0;
       }
 
-      clickOnInput(input, clickPosition);
+      clickOnField(input, sectionIndex);
     };
 
     return { input, selectSection, ...result };
@@ -171,10 +165,10 @@ export const buildFieldInteractions = <P extends {}>({
     });
   };
 
-  return { clickOnInput, testFieldKeyPress, testFieldChange, renderWithProps };
+  return { clickOnField, testFieldKeyPress, testFieldChange, renderWithProps };
 };
 
-export const cleanText = (text, specialCase?: 'singleDigit' | 'RTL') => {
+export const cleanText = (text: string, specialCase?: 'singleDigit' | 'RTL') => {
   const clean = text.replace(/\u202f/g, ' ');
   switch (specialCase) {
     case 'singleDigit':

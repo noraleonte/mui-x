@@ -13,7 +13,7 @@ import {
 const TIMEZONE_TO_TEST = ['UTC', 'system', 'America/New_York'];
 
 describe('<DateTimeField /> - Timezone', () => {
-  describeAdapters('Timezone prop', DateTimeField, ({ adapter, render, clickOnInput }) => {
+  describeAdapters('Timezone prop', DateTimeField, ({ adapter, render, clickOnField }) => {
     if (!adapter.isTimezoneCompatible) {
       return;
     }
@@ -21,7 +21,7 @@ describe('<DateTimeField /> - Timezone', () => {
     const format = `${adapter.formats.keyboardDate} ${adapter.formats.hours24h}`;
 
     const fillEmptyValue = (input: HTMLInputElement, timezone: string) => {
-      clickOnInput(input, 0);
+      clickOnField(input, 0);
 
       // Set month
       userEvent.keyPress(input, { key: 'ArrowDown' });
@@ -96,7 +96,7 @@ describe('<DateTimeField /> - Timezone', () => {
             />,
           );
           const input = getTextbox();
-          clickOnInput(input, 0);
+          clickOnField(input, 0);
           userEvent.keyPress(input, { key: 'ArrowDown' });
 
           // Check the rendered value (uses America/Chicago timezone)
