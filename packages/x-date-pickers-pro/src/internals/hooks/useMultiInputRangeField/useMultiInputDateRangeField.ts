@@ -29,10 +29,8 @@ import { excludeProps } from './shared';
 export const useMultiInputDateRangeField = <TDate, TTextFieldSlotProps extends {}>({
   sharedProps: inSharedProps,
   startTextFieldProps,
-  startInputRef,
   unstableStartFieldRef,
   endTextFieldProps,
-  endInputRef,
   unstableEndFieldRef,
 }: UseMultiInputDateRangeFieldParams<
   TDate,
@@ -118,8 +116,8 @@ export const useMultiInputDateRangeField = <TDate, TTextFieldSlotProps extends {
     value: valueProp === undefined ? undefined : valueProp[0],
     defaultValue: defaultValue === undefined ? undefined : defaultValue[0],
     onChange: handleStartDateChange,
-    selectedSection: selectedSections,
-    onSelectedSectionChange: onSelectedSectionsChange,
+    selectedSection,
+    onSelectedSectionChange,
   };
 
   const endFieldProps: UseDateFieldComponentProps<
@@ -138,19 +136,13 @@ export const useMultiInputDateRangeField = <TDate, TTextFieldSlotProps extends {
     value: valueProp === undefined ? undefined : valueProp[1],
     defaultValue: defaultValue === undefined ? undefined : defaultValue[1],
     onChange: handleEndDateChange,
-    selectedSection: selectedSections,
-    onSelectedSectionChange: onSelectedSectionsChange,
+    selectedSection,
+    onSelectedSectionChange,
   };
 
-  const startDateResponse = useDateField({
-    props: startFieldProps,
-    inputRef: startInputRef,
-  }) as UseFieldResponse<TTextFieldSlotProps>;
+  const startDateResponse = useDateField(startFieldProps) as UseFieldResponse<TTextFieldSlotProps>;
 
-  const endDateResponse = useDateField({
-    props: endFieldProps,
-    inputRef: endInputRef,
-  }) as UseFieldResponse<TTextFieldSlotProps>;
+  const endDateResponse = useDateField(endFieldProps) as UseFieldResponse<TTextFieldSlotProps>;
 
   /* TODO: Undo this change when a clearable behavior for multiple input range fields is implemented */
   return {

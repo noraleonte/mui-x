@@ -4,7 +4,7 @@ import { UseFieldValidationProps } from '../useField/useField.types';
 import { WrapperVariant } from '../../models/common';
 import {
   FieldSection,
-  FieldSelectedSections,
+  FieldSelectedSection,
   FieldValueType,
   TimezoneProps,
   MuiPickersAdapter,
@@ -326,7 +326,7 @@ export interface UsePickerValueViewsResponse<TValue> {
   onChange: (value: TValue, selectionState?: PickerSelectionState) => void;
   open: boolean;
   onClose: () => void;
-  onSelectedSectionChange: (newValue: FieldSelectedSections) => void;
+  onSelectedSectionChange: (newValue: FieldSelectedSection) => void;
 }
 
 /**

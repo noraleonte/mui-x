@@ -6,6 +6,6 @@
   sx={{ minWidth: 300 }}
   unstableFieldRef={fieldRef}
   inputRef={inputRef}
-  selectedSections={selectedSections}
-  onSelectedSectionsChange={setSelectedSections}
+  selectedSection={selectedSection}
+  onSelectedSectionChange={setSelectedSection}
 />

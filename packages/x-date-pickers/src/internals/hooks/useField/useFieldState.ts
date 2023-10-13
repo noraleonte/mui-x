@@ -17,7 +17,7 @@ import {
   getDateFromDateSections,
 } from './useField.utils';
 import { InferError } from '../useValidation';
-import { FieldSection, FieldSelectedSections } from '../../../models';
+import { FieldSection, FieldSelectedSection } from '../../../models';
 import { useValueWithTimezone } from '../useValueWithTimezone';
 import {
   GetDefaultReferenceDateProps,
@@ -67,7 +67,7 @@ export const useFieldState = <
       onChange,
       format,
       formatDensity = 'dense',
-      selectedSection: selectedSectionsProp,
+      selectedSection: selectedSectionProp,
       onSelectedSectionChange,
       shouldRespectLeadingZeros = false,
       timezone: timezoneProp,
@@ -154,13 +154,13 @@ export const useFieldState = <
   });
 
   const [selectedSection, innerSetSelectedSection] = useControlled({
-    controlled: selectedSectionsProp,
+    controlled: selectedSectionProp,
     default: null,
     name: 'useField',
     state: 'selectedSectionIndexes',
   });
 
-  const setSelectedSection = (newSelectedSections: FieldSelectedSections) => {
+  const setSelectedSection = (newSelectedSections: FieldSelectedSection) => {
     innerSetSelectedSection(newSelectedSections);
     onSelectedSectionChange?.(newSelectedSections);
 

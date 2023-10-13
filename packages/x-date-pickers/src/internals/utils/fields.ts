@@ -16,8 +16,8 @@ const SHARED_FIELD_INTERNAL_PROP_NAMES = [
   'readOnly',
   'onError',
   'shouldRespectLeadingZeros',
-  'selectedSections',
-  'onSelectedSectionsChange',
+  'selectedSection',
+  'onSelectedSectionChange',
   'unstableFieldRef',
 ] as const;
 

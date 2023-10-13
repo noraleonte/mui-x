@@ -140,10 +140,7 @@ const JoySingleInputDateRangeField = React.forwardRef(
   (props: JoySingleInputDateRangeFieldProps, ref: React.Ref<HTMLDivElement>) => {
     const { slots, slotProps, onAdornmentClick, ...other } = props;
 
-    const {
-      inputRef: externalInputRef,
-      ...textFieldProps
-    }: SingleInputDateRangeFieldProps<
+    const textFieldProps: SingleInputDateRangeFieldProps<
       Dayjs,
       JoyFieldProps & { inputRef: React.Ref<HTMLInputElement> }
     > = useSlotProps({
@@ -158,10 +155,7 @@ const JoySingleInputDateRangeField = React.forwardRef(
       clearable,
       ref: inputRef,
       ...fieldProps
-    } = useSingleInputDateRangeField<Dayjs, JoyFieldProps>({
-      props: textFieldProps,
-      inputRef: externalInputRef,
-    });
+    } = useSingleInputDateRangeField<Dayjs, JoyFieldProps>(textFieldProps);
 
     /* If you don't need a clear button, you can skip the use of this hook */
     const { InputProps: ProcessedInputProps, fieldProps: processedFieldProps } =
@@ -300,13 +294,13 @@ const JoyMultiInputDateRangeField = React.forwardRef(
       className,
     } = props;
 
-    const { inputRef: startInputRef, ...startTextFieldProps } = useSlotProps({
+    const startTextFieldProps = useSlotProps({
       elementType: FormControl,
       externalSlotProps: slotProps?.textField,
       ownerState: { ...props, position: 'start' },
     }) as MultiInputFieldSlotTextFieldProps;
 
-    const { inputRef: endInputRef, ...endTextFieldProps } = useSlotProps({
+    const endTextFieldProps = useSlotProps({
       elementType: FormControl,
       externalSlotProps: slotProps?.textField,
       ownerState: { ...props, position: 'end' },
@@ -329,13 +323,11 @@ const JoyMultiInputDateRangeField = React.forwardRef(
         maxDate,
         disableFuture,
         disablePast,
-        selectedSection: selectedSections,
-        onSelectedSectionChange: onSelectedSectionsChange,
+        selectedSection,
+        onSelectedSectionChange,
       },
       startTextFieldProps,
       endTextFieldProps,
-      startInputRef,
-      endInputRef,
     });
 
     return (
@@ -385,22 +377,14 @@ interface JoyDateFieldProps
 
 const JoyDateField = React.forwardRef(
   (props: JoyDateFieldProps, ref: React.Ref<HTMLDivElement>) => {
-    const {
-      inputRef: externalInputRef,
-      slots,
-      slotProps,
-      ...textFieldProps
-    } = props;
+    const { slots, slotProps, ...textFieldProps } = props;
 
     const {
       onClear,
       clearable,
       ref: inputRef,
       ...fieldProps
-    } = useDateField<Dayjs, typeof textFieldProps>({
-      props: textFieldProps,
-      inputRef: externalInputRef,
-    });
+    } = useDateField<Dayjs, typeof textFieldProps>(textFieldProps);
 
     /* If you don't need a clear button, you can skip the use of this hook */
     const { InputProps: ProcessedInputProps, fieldProps: processedFieldProps } =

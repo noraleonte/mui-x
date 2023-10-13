@@ -1,6 +1,5 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import MuiTextField from '@mui/material/TextField';
 import { useThemeProps } from '@mui/material/styles';
 import { useSlotProps } from '@mui/base/utils';
 import { refType } from '@mui/utils';
@@ -11,6 +10,7 @@ import {
 } from './DateTimeField.types';
 import { useDateTimeField } from './useDateTimeField';
 import { useClearableField } from '../hooks';
+import { FakeTextField } from '../internals/components/FakeTextField';
 
 type DateTimeFieldComponent = (<TDate>(
   props: DateTimeFieldProps<TDate> & React.RefAttributes<HTMLDivElement>,
@@ -18,7 +18,7 @@ type DateTimeFieldComponent = (<TDate>(
 
 const DateTimeField = React.forwardRef(function DateTimeField<TDate>(
   inProps: DateTimeFieldProps<TDate>,
-  ref: React.Ref<HTMLDivElement>,
+  inRef: React.Ref<HTMLDivElement>,
 ) {
   const themeProps = useThemeProps({
     props: inProps,
@@ -30,33 +30,25 @@ const DateTimeField = React.forwardRef(function DateTimeField<TDate>(
 
   const ownerState = themeProps;
 
-  const TextField = slots?.textField ?? components?.TextField ?? MuiTextField;
-  const { inputRef: externalInputRef, ...textFieldProps }: DateTimeFieldProps<TDate> = useSlotProps(
-    {
-      elementType: TextField,
-      externalSlotProps: slotProps?.textField ?? componentsProps?.textField,
-      externalForwardedProps: other,
-      ownerState,
+  const TextField = slots?.textField ?? components?.TextField ?? FakeTextField;
+  const textFieldProps: DateTimeFieldProps<TDate> = useSlotProps({
+    elementType: TextField,
+    externalSlotProps: slotProps?.textField ?? componentsProps?.textField,
+    externalForwardedProps: other,
+    ownerState,
+    additionalProps: {
+      ref: inRef,
     },
-  );
+  });
 
   // TODO: Remove when mui/material-ui#35088 will be merged
   textFieldProps.inputProps = { ...inputProps, ...textFieldProps.inputProps };
   textFieldProps.InputProps = { ...InputProps, ...textFieldProps.InputProps };
 
-  const {
-    ref: inputRef,
-    onPaste,
-    onKeyDown,
-    inputMode,
-    readOnly,
-    clearable,
-    onClear,
-    ...fieldProps
-  } = useDateTimeField<TDate, typeof textFieldProps>({
-    props: textFieldProps,
-    inputRef: externalInputRef,
-  });
+  const { ref, readOnly, clearable, onClear, ...fieldProps } = useDateTimeField<
+    TDate,
+    typeof textFieldProps
+  >(textFieldProps);
 
   const { InputProps: ProcessedInputProps, fieldProps: processedFieldProps } = useClearableField<
     typeof fieldProps,
@@ -78,7 +70,6 @@ const DateTimeField = React.forwardRef(function DateTimeField<TDate>(
       ref={ref}
       {...processedFieldProps}
       InputProps={{ ...ProcessedInputProps, readOnly }}
-      inputProps={{ ...fieldProps.inputProps, inputMode, onPaste, onKeyDown, ref: inputRef }}
     />
   );
 }) as DateTimeFieldComponent;
@@ -274,10 +265,10 @@ DateTimeField.propTypes = {
   onError: PropTypes.func,
   onFocus: PropTypes.func,
   /**
-   * Callback fired when the selected sections change.
-   * @param {FieldSelectedSections} newValue The new selected sections.
+   * Callback fired when the selected section changes.
+   * @param {FieldSelectedSection} newValue The new selected section.
    */
-  onSelectedSectionsChange: PropTypes.func,
+  onSelectedSectionChange: PropTypes.func,
   /**
    * It prevents the user from changing the value of the field
    * (not from interacting with the field).
@@ -304,23 +295,9 @@ DateTimeField.propTypes = {
    * 4. If `null` is provided, no section will be selected
    * If not provided, the selected sections will be handled internally.
    */
-  selectedSections: PropTypes.oneOfType([
-    PropTypes.oneOf([
-      'all',
-      'day',
-      'hours',
-      'meridiem',
-      'minutes',
-      'month',
-      'seconds',
-      'weekDay',
-      'year',
-    ]),
+  selectedSection: PropTypes.oneOfType([
+    PropTypes.oneOf(['day', 'hours', 'meridiem', 'minutes', 'month', 'seconds', 'weekDay', 'year']),
     PropTypes.number,
-    PropTypes.shape({
-      endIndex: PropTypes.number.isRequired,
-      startIndex: PropTypes.number.isRequired,
-    }),
   ]),
   /**
    * Disable specific clock time.

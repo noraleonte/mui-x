@@ -232,10 +232,10 @@ DateRangePicker.propTypes = {
    */
   onRangePositionChange: PropTypes.func,
   /**
-   * Callback fired when the selected sections change.
-   * @param {FieldSelectedSections} newValue The new selected sections.
+   * Callback fired when the selected section changes.
+   * @param {FieldSelectedSection} newValue The new selected section.
    */
-  onSelectedSectionsChange: PropTypes.func,
+  onSelectedSectionChange: PropTypes.func,
   /**
    * Control the popup or dialog open state.
    * @default false
@@ -272,23 +272,9 @@ DateRangePicker.propTypes = {
    * 4. If `null` is provided, no section will be selected
    * If not provided, the selected sections will be handled internally.
    */
-  selectedSections: PropTypes.oneOfType([
-    PropTypes.oneOf([
-      'all',
-      'day',
-      'hours',
-      'meridiem',
-      'minutes',
-      'month',
-      'seconds',
-      'weekDay',
-      'year',
-    ]),
+  selectedSection: PropTypes.oneOfType([
+    PropTypes.oneOf(['day', 'hours', 'meridiem', 'minutes', 'month', 'seconds', 'weekDay', 'year']),
     PropTypes.number,
-    PropTypes.shape({
-      endIndex: PropTypes.number.isRequired,
-      startIndex: PropTypes.number.isRequired,
-    }),
   ]),
   /**
    * Disable specific date.

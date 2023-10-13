@@ -47,7 +47,6 @@ export const useField = <
     updateValueFromValueStr,
     setTempAndroidValueStr,
     sectionsValueBoundaries,
-    placeholder,
     timezone,
   } = useFieldState(params);
 
@@ -60,7 +59,7 @@ export const useField = <
       error,
       clearable,
       onClear,
-      disabled,
+      disabled = false,
       ref: inContainerRef,
       ...otherForwardedProps
     },
@@ -339,18 +338,6 @@ export const useField = <
     [state.sections, fieldValueManager, state.tempValueStrAndroid, isRTL],
   );
 
-  const inputMode = React.useMemo(() => {
-    if (selectedSectionIndex == null) {
-      return 'text';
-    }
-
-    if (state.sections[selectedSectionIndex].contentType === 'letter') {
-      return 'text';
-    }
-
-    return 'numeric';
-  }, [selectedSectionIndex, state.sections]);
-
   const areAllSectionsEmpty = valueManager.areValuesEqual(
     utils,
     state.value,
@@ -384,6 +371,10 @@ export const useField = <
         onFocus: handleInputFocus,
         onKeyDown: handleInputKeyDown,
         onMouseUp: handleInputMouseUp,
+        inputMode: section.contentType === 'letter' ? 'text' : 'numeric',
+        autoComplete: 'off',
+        disabled,
+        readOnly,
       })),
     [
       state.sections,
@@ -393,20 +384,19 @@ export const useField = <
       handleInputChange,
       handleInputClick,
       handleInputMouseUp,
+      disabled,
+      readOnly,
     ],
   );
 
   return {
-    placeholder,
-    autoComplete: 'off',
-    disabled: Boolean(disabled),
+    disabled,
     ...otherForwardedProps,
     elements: textFieldElements,
     value: shouldShowPlaceholder ? '' : valueStr,
-    inputMode,
     readOnly,
     onBlur: handleContainerBlur,
-    onPaste: handleInputPaste,
+    // onPaste: handleInputPaste,
     onClear: handleClearValue,
     error: inputError,
     ref: handleRef,

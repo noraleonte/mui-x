@@ -132,27 +132,13 @@ const MultiInputDateTimeRangeField = React.forwardRef(function MultiInputDateTim
   });
 
   const {
-    startDate: {
-      onKeyDown: onStartInputKeyDown,
-      ref: startInputRef,
-      readOnly: startReadOnly,
-      inputMode: startInputMode,
-      ...startDateProps
-    },
-    endDate: {
-      onKeyDown: onEndInputKeyDown,
-      ref: endInputRef,
-      readOnly: endReadOnly,
-      inputMode: endInputMode,
-      ...endDateProps
-    },
+    startDate: { readOnly: startReadOnly, ...startDateProps },
+    endDate: { readOnly: endReadOnly, ...endDateProps },
   } = useMultiInputDateTimeRangeField<TDate, FieldsTextFieldProps>({
     sharedProps: { ...dateTimeFieldInternalProps, disabled },
     startTextFieldProps,
     endTextFieldProps,
-    startInputRef: startTextFieldProps.inputRef,
     unstableStartFieldRef,
-    endInputRef: endTextFieldProps.inputRef,
     unstableEndFieldRef,
   });
 
@@ -165,12 +151,6 @@ const MultiInputDateTimeRangeField = React.forwardRef(function MultiInputDateTim
           ...startDateProps.InputProps,
           readOnly: startReadOnly,
         }}
-        inputProps={{
-          ...startDateProps.inputProps,
-          ref: startInputRef,
-          inputMode: startInputMode,
-          onKeyDown: onStartInputKeyDown,
-        }}
       />
       <Separator {...separatorProps} />
       <TextField
@@ -179,13 +159,6 @@ const MultiInputDateTimeRangeField = React.forwardRef(function MultiInputDateTim
         InputProps={{
           ...endDateProps.InputProps,
           readOnly: endReadOnly,
-        }}
-        inputProps={{
-          ...endDateProps.inputProps,
-          ref: endInputRef,
-          readOnly: endReadOnly,
-          inputMode: endInputMode,
-          onKeyDown: onEndInputKeyDown,
         }}
       />
     </Root>
@@ -317,10 +290,10 @@ MultiInputDateTimeRangeField.propTypes = {
    */
   onError: PropTypes.func,
   /**
-   * Callback fired when the selected sections change.
-   * @param {FieldSelectedSections} newValue The new selected sections.
+   * Callback fired when the selected section changes.
+   * @param {FieldSelectedSection} newValue The new selected section.
    */
-  onSelectedSectionsChange: PropTypes.func,
+  onSelectedSectionChange: PropTypes.func,
   /**
    * It prevents the user from changing the value of the field
    * (not from interacting with the field).
@@ -342,23 +315,9 @@ MultiInputDateTimeRangeField.propTypes = {
    * 4. If `null` is provided, no section will be selected
    * If not provided, the selected sections will be handled internally.
    */
-  selectedSections: PropTypes.oneOfType([
-    PropTypes.oneOf([
-      'all',
-      'day',
-      'hours',
-      'meridiem',
-      'minutes',
-      'month',
-      'seconds',
-      'weekDay',
-      'year',
-    ]),
+  selectedSection: PropTypes.oneOfType([
+    PropTypes.oneOf(['day', 'hours', 'meridiem', 'minutes', 'month', 'seconds', 'weekDay', 'year']),
     PropTypes.number,
-    PropTypes.shape({
-      endIndex: PropTypes.number.isRequired,
-      startIndex: PropTypes.number.isRequired,
-    }),
   ]),
   /**
    * Disable specific clock time.

@@ -5,7 +5,7 @@ import { useOpenState } from '../useOpenState';
 import { useLocalizationContext, useUtils } from '../useUtils';
 import { FieldChangeHandlerContext } from '../useField';
 import { InferError, useValidation } from '../useValidation';
-import { FieldSection, FieldSelectedSections, PickerChangeHandlerContext } from '../../../models';
+import { FieldSection, FieldSelectedSection, PickerChangeHandlerContext } from '../../../models';
 import {
   PickerShortcutChangeImportance,
   PickersShortcutsItemContext,
@@ -398,7 +398,7 @@ export const usePickerValue = <
   );
 
   const handleFieldSelectedSectionChange = useEventCallback(
-    (newSelectedSections: FieldSelectedSections) => {
+    (newSelectedSections: FieldSelectedSection) => {
       setSelectedSection(newSelectedSections);
       onSelectedSectionChange?.(newSelectedSections);
     },

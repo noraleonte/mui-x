@@ -1,7 +1,7 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import { useClearableField } from '@mui/x-date-pickers/hooks';
-import MuiTextField from '@mui/material/TextField';
+import { FakeTextField } from '@mui/x-date-pickers/internals';
 import { useThemeProps } from '@mui/material/styles';
 import { useSlotProps } from '@mui/base/utils';
 import { refType } from '@mui/utils';
@@ -18,7 +18,7 @@ type DateRangeFieldComponent = (<TDate>(
 
 const SingleInputTimeRangeField = React.forwardRef(function SingleInputTimeRangeField<TDate>(
   inProps: SingleInputTimeRangeFieldProps<TDate>,
-  ref: React.Ref<HTMLDivElement>,
+  inRef: React.Ref<HTMLDivElement>,
 ) {
   const themeProps = useThemeProps({
     props: inProps,
@@ -30,32 +30,25 @@ const SingleInputTimeRangeField = React.forwardRef(function SingleInputTimeRange
 
   const ownerState = themeProps;
 
-  const TextField = slots?.textField ?? components?.TextField ?? MuiTextField;
-  const { inputRef: externalInputRef, ...textFieldProps }: SingleInputTimeRangeFieldProps<TDate> =
-    useSlotProps({
-      elementType: TextField,
-      externalSlotProps: slotProps?.textField ?? componentsProps?.textField,
-      externalForwardedProps: other,
-      ownerState,
-    });
+  const TextField = slots?.textField ?? components?.TextField ?? FakeTextField;
+  const textFieldProps: SingleInputTimeRangeFieldProps<TDate> = useSlotProps({
+    elementType: TextField,
+    externalSlotProps: slotProps?.textField ?? componentsProps?.textField,
+    externalForwardedProps: other,
+    ownerState,
+    additionalProps: {
+      ref: inRef,
+    },
+  });
 
   // TODO: Remove when mui/material-ui#35088 will be merged
   textFieldProps.inputProps = { ...inputProps, ...textFieldProps.inputProps };
   textFieldProps.InputProps = { ...InputProps, ...textFieldProps.InputProps };
 
-  const {
-    ref: inputRef,
-    onPaste,
-    onKeyDown,
-    inputMode,
-    readOnly,
-    clearable,
-    onClear,
-    ...fieldProps
-  } = useSingleInputTimeRangeField<TDate, typeof textFieldProps>({
-    props: textFieldProps,
-    inputRef: externalInputRef,
-  });
+  const { ref, readOnly, clearable, onClear, ...fieldProps } = useSingleInputTimeRangeField<
+    TDate,
+    typeof textFieldProps
+  >(textFieldProps);
 
   const { InputProps: ProcessedInputProps, fieldProps: processedFieldProps } = useClearableField<
     typeof fieldProps,
@@ -78,7 +71,6 @@ const SingleInputTimeRangeField = React.forwardRef(function SingleInputTimeRange
       ref={ref}
       {...processedFieldProps}
       InputProps={{ ...ProcessedInputProps, readOnly }}
-      inputProps={{ ...fieldProps.inputProps, inputMode, onPaste, onKeyDown, ref: inputRef }}
     />
   );
 }) as DateRangeFieldComponent;
@@ -260,10 +252,10 @@ SingleInputTimeRangeField.propTypes = {
   onError: PropTypes.func,
   onFocus: PropTypes.func,
   /**
-   * Callback fired when the selected sections change.
-   * @param {FieldSelectedSections} newValue The new selected sections.
+   * Callback fired when the selected section changes.
+   * @param {FieldSelectedSection} newValue The new selected section.
    */
-  onSelectedSectionsChange: PropTypes.func,
+  onSelectedSectionChange: PropTypes.func,
   /**
    * It prevents the user from changing the value of the field
    * (not from interacting with the field).
@@ -290,23 +282,9 @@ SingleInputTimeRangeField.propTypes = {
    * 4. If `null` is provided, no section will be selected
    * If not provided, the selected sections will be handled internally.
    */
-  selectedSections: PropTypes.oneOfType([
-    PropTypes.oneOf([
-      'all',
-      'day',
-      'hours',
-      'meridiem',
-      'minutes',
-      'month',
-      'seconds',
-      'weekDay',
-      'year',
-    ]),
+  selectedSection: PropTypes.oneOfType([
+    PropTypes.oneOf(['day', 'hours', 'meridiem', 'minutes', 'month', 'seconds', 'weekDay', 'year']),
     PropTypes.number,
-    PropTypes.shape({
-      endIndex: PropTypes.number.isRequired,
-      startIndex: PropTypes.number.isRequired,
-    }),
   ]),
   /**
    * Disable specific clock time.

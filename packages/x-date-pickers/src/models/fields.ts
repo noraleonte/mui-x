@@ -98,12 +98,12 @@ export interface FieldRef<TSection extends FieldSection> {
   getActiveSectionIndex: () => number | null;
   /**
    * Updates the selected sections.
-   * @param {FieldSelectedSections} selectedSections The sections to select.
+   * @param {FieldSelectedSection} selectedSection The sections to select.
    */
-  setSelectedSections: (selectedSections: FieldSelectedSections) => void;
+  setSelectedSections: (selectedSection: FieldSelectedSection) => void;
 }
 
-export type FieldSelectedSections = number | FieldSectionType | null;
+export type FieldSelectedSection = number | FieldSectionType | null;
 
 /**
  * Props the single input field can receive when used inside a picker.

@@ -5,7 +5,7 @@ import { ClearIcon } from '../../../icons';
 import {
   FieldSectionType,
   FieldSection,
-  FieldSelectedSections,
+  FieldSelectedSection,
   MuiPickersAdapter,
   TimezoneProps,
   FieldSectionContentType,
@@ -108,12 +108,12 @@ export interface UseFieldInternalProps<TValue, TDate, TSection extends FieldSect
    * 4. If `null` is provided, no section will be selected
    * If not provided, the selected sections will be handled internally.
    */
-  selectedSection?: FieldSelectedSections;
+  selectedSection?: FieldSelectedSection;
   /**
    * Callback fired when the selected section changes.
-   * @param {FieldSelectedSections} newValue The new selected section.
+   * @param {FieldSelectedSection} newValue The new selected section.
    */
-  onSelectedSectionChange?: (newValue: FieldSelectedSections) => void;
+  onSelectedSectionChange?: (newValue: FieldSelectedSection) => void;
   /**
    * The ref object used to imperatively interact with the field.
    */
@@ -148,9 +148,9 @@ export interface FieldRef<TSection extends FieldSection> {
   getActiveSectionIndex: () => number | null;
   /**
    * Updates the selected sections.
-   * @param {FieldSelectedSections} selectedSections The sections to select.
+   * @param {FieldSelectedSection} selectedSection The sections to select.
    */
-  setSelectedSections: (selectedSections: FieldSelectedSections) => void;
+  setSelectedSections: (selectedSection: FieldSelectedSection) => void;
 }
 
 export interface UseFieldForwardedProps {
@@ -167,13 +167,11 @@ export type UseFieldResponse<TForwardedProps extends UseFieldForwardedProps> = O
   TForwardedProps,
   keyof UseFieldForwardedProps
 > &
-  Required<UseFieldForwardedProps> &
-  Pick<React.HTMLAttributes<HTMLInputElement>, 'autoCorrect' | 'inputMode' | 'placeholder'> & {
+  Required<UseFieldForwardedProps> & {
     ref: React.Ref<HTMLInputElement>;
     value: string;
     error: boolean;
     readOnly: boolean;
-    autoComplete: 'off';
   };
 
 export type FieldSectionValueBoundaries<TDate, SectionType extends FieldSectionType> = {
