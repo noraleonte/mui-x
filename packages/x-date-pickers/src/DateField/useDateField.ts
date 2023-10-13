@@ -6,7 +6,6 @@ import { useField } from '../internals/hooks/useField';
 import {
   UseDateFieldProps,
   UseDateFieldDefaultizedProps,
-  UseDateFieldParams,
   UseDateFieldComponentProps,
 } from './DateField.types';
 import { validateDate } from '../internals/utils/validation/validateDate';
