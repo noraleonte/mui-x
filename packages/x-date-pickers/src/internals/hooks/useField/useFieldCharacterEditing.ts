@@ -10,7 +10,6 @@ import {
   getDateSectionConfigFromFormatToken,
   getDaysInWeekStr,
   getLetterEditingOptions,
-  resetSectionsTempValueStr,
 } from './useField.utils';
 import { UpdateSectionValueParams } from './useFieldState';
 

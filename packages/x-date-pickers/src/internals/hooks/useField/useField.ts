@@ -19,7 +19,6 @@ import {
   getActiveSectionIndexFromDOM,
   isFocusInsideContainer,
   getSectionIndexFromDOMElement,
-  resetSectionsTempValueStr,
 } from './useField.utils';
 import { useFieldState } from './useFieldState';
 import { useFieldCharacterEditing } from './useFieldCharacterEditing';
