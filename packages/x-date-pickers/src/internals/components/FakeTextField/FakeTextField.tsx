@@ -2,13 +2,9 @@ import * as React from 'react';
 import Stack from '@mui/material/Stack';
 
 export interface FakeTextFieldElement extends React.HTMLAttributes<HTMLDivElement> {
-  value: string;
-  placeholder: string;
   before: string;
   after: string;
 }
-
-export interface A {}
 
 interface FakeTextFieldProps {
   elements: FakeTextFieldElement[];
