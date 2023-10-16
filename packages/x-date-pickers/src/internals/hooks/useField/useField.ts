@@ -149,10 +149,21 @@ export const useField = <
     }
 
     const keyPressed = event.target.value;
+    if (targetValue === '') {
+      resetCharacterQuery();
+      clearValue();
+      return;
+    }
+
     const sectionIndex = getSectionIndexFromDOMElement(event.target)!;
 
-    if (isAndroid() && keyPressed.length === 0) {
-      setSectionTempValueStr(sectionIndex, keyPressed);
+    if (keyPressed.length === 0) {
+      if (isAndroid()) {
+        setSectionTempValueStr(sectionIndex, keyPressed);
+      } else {
+        resetCharacterQuery();
+        clearActiveSection();
+      }
       return;
     }
 
@@ -205,7 +216,7 @@ export const useField = <
       }
 
       // Reset the value of the selected section
-      case ['Backspace', 'Delete'].includes(event.key): {
+      case event.key === 'Delete': {
         event.preventDefault();
 
         if (readOnly) {
