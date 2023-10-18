@@ -936,7 +936,9 @@ export const getSectionOrder = (sections: FieldSection[], isRTL: boolean): Secti
 };
 
 export const getSectionIndexFromDOMElement = (element: HTMLElement | undefined) => {
-  const sectionIndex = Number(element?.dataset.sectionindex ?? '-1');
+  const sectionIndex = Number(
+    (element === undefined ? undefined : element.parentElement)?.dataset.sectionindex ?? '-1',
+  );
 
   return sectionIndex === -1 ? null : sectionIndex;
 };

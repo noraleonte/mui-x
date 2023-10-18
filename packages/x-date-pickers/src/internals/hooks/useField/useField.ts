@@ -268,6 +268,23 @@ export const useField = <
       return;
     }
 
+    const selection = document.getSelection();
+    if (!selection) {
+      return;
+    }
+
+    const range = new Range();
+    const start = containerRef.current.querySelector('div[data-sectionindex="0"] .before')!;
+    const end = containerRef.current.querySelector('div[data-sectionindex="2"] .after')!;
+
+    range.setStart(start, 0);
+    range.setEnd(end, 0);
+
+    selection.removeAllRanges();
+    selection.addRange(range);
+
+    return;
+
     if (selectedSectionIndex == null) {
       if (isFocusInsideContainer(containerRef)) {
         containerRef.current.blur();
@@ -276,7 +293,7 @@ export const useField = <
     }
 
     const inputToFocus = containerRef.current.querySelector<HTMLInputElement>(
-      `input[data-sectionindex="${selectedSectionIndex}"]`,
+      `div[data-sectionindex="${selectedSectionIndex}"] input`,
     );
     if (!inputToFocus) {
       return;
@@ -356,21 +373,42 @@ export const useField = <
   const textFieldElements = React.useMemo<FakeTextFieldElement[]>(
     () =>
       state.sections.map((section, sectionIndex) => ({
-        before: section.startSeparator,
-        after: section.endSeparator,
-        value: shouldShowPlaceholder ? '' : section.value || section.placeholder,
-        placeholder: section.placeholder,
-        'data-sectionindex': sectionIndex,
-        onChange: handleInputChange,
-        onClick: handleInputClick,
-        onFocus: handleInputFocus,
-        onKeyDown: handleInputKeyDown,
-        onMouseUp: handleInputMouseUp,
-        onPaste: handleInputPaste,
-        inputMode: section.contentType === 'letter' ? 'text' : 'numeric',
-        autoComplete: 'off',
-        disabled,
-        readOnly,
+        container: {
+          'data-sectionindex': sectionIndex,
+          style: { margin: 0, display: 'flex', flexDirection: 'row', height: 16 },
+        } as React.HTMLAttributes<HTMLDivElement>,
+        input: {
+          value: shouldShowPlaceholder ? '' : section.value || section.placeholder,
+          placeholder: section.placeholder,
+          onChange: handleInputChange,
+          onClick: handleInputClick,
+          onFocus: handleInputFocus,
+          onKeyDown: handleInputKeyDown,
+          onMouseUp: handleInputMouseUp,
+          onPaste: handleInputPaste,
+          inputMode: section.contentType === 'letter' ? 'text' : 'numeric',
+          autoComplete: 'off',
+          disabled,
+          readOnly,
+          style: {
+            width: `calc(8px + ${(section.value || section.placeholder).length}ch)`,
+            padding: 0,
+            border: 0,
+            height: 16,
+            lineHeight: 16,
+            outline: 'none',
+          },
+        },
+        before: {
+          className: 'before',
+          children: section.startSeparator,
+          style: { height: 16, fontSize: 12 },
+        },
+        after: {
+          className: 'after',
+          children: section.endSeparator,
+          style: { height: 16, fontSize: 12 },
+        },
       })),
     [
       state.sections,

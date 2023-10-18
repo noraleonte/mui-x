@@ -50,7 +50,7 @@ export const buildFieldInteractions = <P extends {}>({
     sectionIndex,
   ) => {
     const inputToClick = container.querySelector<HTMLInputElement>(
-      `input[data-sectionindex="${sectionIndex}"]`,
+      `data[data-sectionindex="${sectionIndex}"] input`,
     )!;
 
     act(() => {

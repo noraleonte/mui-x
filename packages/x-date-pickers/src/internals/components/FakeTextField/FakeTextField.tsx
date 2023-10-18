@@ -1,9 +1,11 @@
 import * as React from 'react';
 import Stack from '@mui/material/Stack';
 
-export interface FakeTextFieldElement extends React.HTMLAttributes<HTMLDivElement> {
-  before: string;
-  after: string;
+export interface FakeTextFieldElement {
+  container: React.HTMLAttributes<HTMLDivElement>;
+  input: React.HTMLAttributes<HTMLDivElement>;
+  before: React.HTMLAttributes<HTMLSpanElement>;
+  after: React.HTMLAttributes<HTMLSpanElement>;
 }
 
 interface FakeTextFieldProps {
@@ -18,12 +20,12 @@ export const FakeTextField = React.forwardRef(function FakeTextField(
 
   return (
     <Stack direction="row" spacing={1} ref={ref}>
-      {elements.map(({ before, after, ...otherElementProps }, elementIndex) => (
-        <React.Fragment key={elementIndex}>
-          {before}
-          <input {...otherElementProps} />
-          {after}
-        </React.Fragment>
+      {elements.map(({ container, input, before, after }, elementIndex) => (
+        <Stack {...container} key={elementIndex}>
+          <span {...before} />
+          <input {...input} />
+          <span {...after} />
+        </Stack>
       ))}
     </Stack>
   );
