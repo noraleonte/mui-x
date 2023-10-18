@@ -339,9 +339,15 @@ export const useField = <
 
     if (selectedSectionIndexes.shouldSelectBoundarySelectors) {
       range.setStart(startSectionBefore, 0);
-      range.setEnd(endSectionAfter, 1);
+      range.setEnd(
+        endSectionAfter,
+        state.sections[selectedSectionIndexes.endIndex].endSeparator ? 1 : 0,
+      );
     } else {
-      range.setStart(startSectionBefore, 1);
+      range.setEnd(
+        startSectionBefore,
+        state.sections[selectedSectionIndexes.startIndex].startSeparator ? 1 : 0,
+      );
       range.setEnd(endSectionAfter, 0);
     }
 
