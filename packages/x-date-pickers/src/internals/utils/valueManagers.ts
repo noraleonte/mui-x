@@ -8,7 +8,7 @@ import {
 import type { FieldValueManager } from '../hooks/useField';
 import { areDatesEqual, getTodayDate, replaceInvalidDateByNull } from './date-utils';
 import { getDefaultReferenceDate } from './getDefaultReferenceDate';
-import { createDateStrForInputFromSections } from '../hooks/useField/useField.utils';
+import { createDateStrForHiddenInputFromSections } from '../hooks/useField/useField.utils';
 
 export type SingleItemPickerValueManager<
   TValue = any,
@@ -53,7 +53,7 @@ export const singleItemFieldValueManager: FieldValueManager<any, any, FieldSecti
 
     return getSectionsFromDate(date);
   },
-  getValueStrFromSections: createDateStrForInputFromSections,
+  getHiddenInputValueFromSections: createDateStrForHiddenInputFromSections,
   getActiveDateManager: (utils, state) => ({
     date: state.value,
     referenceDate: state.referenceValue,

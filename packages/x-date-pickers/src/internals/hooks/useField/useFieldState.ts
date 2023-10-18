@@ -119,15 +119,6 @@ export const useFieldState = <
     ],
   );
 
-  const placeholder = React.useMemo(
-    () =>
-      fieldValueManager.getValueStrFromSections(
-        getSectionsFromValue(valueManager.emptyValue),
-        isRTL,
-      ),
-    [fieldValueManager, getSectionsFromValue, valueManager.emptyValue, isRTL],
-  );
-
   const [state, setState] = React.useState<UseFieldState<TValue, TSection>>(() => {
     const sections = getSectionsFromValue(valueFromTheOutside);
     validateSections(sections, valueType);
@@ -433,7 +424,6 @@ export const useFieldState = <
     setSectionTempValueStr,
     resetSectionsTempValueStr: resetSectionsTempValueStrFromState,
     sectionsValueBoundaries,
-    placeholder,
     timezone,
   };
 };

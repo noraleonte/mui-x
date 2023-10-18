@@ -124,6 +124,8 @@ export const useField = <
   const handleContainerPaste = useEventCallback((event: React.ClipboardEvent<HTMLInputElement>) => {
     onPaste?.(event);
 
+    console.log('AAAAAAAAAAAA');
+
     if (readOnly) {
       event.preventDefault();
       return;
@@ -466,11 +468,22 @@ export const useField = <
     ],
   );
 
+  const handleValueStrChange = useEventCallback((event: React.ChangeEvent<HTMLInputElement>) =>
+    updateValueFromValueStr(event.target.value),
+  );
+
+  const valueStr = React.useMemo(
+    () => fieldValueManager.getHiddenInputValueFromSections(state.sections),
+    [state.sections, fieldValueManager],
+  );
+
   return {
     disabled,
     ...otherForwardedProps,
     elements: textFieldElements,
     readOnly,
+    valueStr,
+    onValueStrChange: handleValueStrChange,
     onBlur: handleContainerBlur,
     onPaste: handleContainerPaste,
     onClear: handleClearValue,

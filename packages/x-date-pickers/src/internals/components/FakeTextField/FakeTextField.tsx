@@ -10,16 +10,37 @@ export interface FakeTextFieldElement {
 
 interface FakeTextFieldProps {
   elements: FakeTextFieldElement[];
+  valueStr: string;
+  onValueStrChange: React.ChangeEventHandler<HTMLInputElement>;
+  error: boolean;
+  id?: string;
+  InputProps: any;
+  inputProps: any;
+  disabled?: boolean;
+  autoFocus?: boolean;
+  ownerState?: any;
 }
 
 export const FakeTextField = React.forwardRef(function FakeTextField(
   props: FakeTextFieldProps,
   ref: React.Ref<HTMLDivElement>,
 ) {
-  const { elements } = props;
+  const {
+    elements,
+    valueStr,
+    onValueStrChange,
+    id,
+    error,
+    InputProps,
+    inputProps,
+    autoFocus,
+    disabled,
+    ownerState,
+    ...other
+  } = props;
 
   return (
-    <Stack direction="row" spacing={1} ref={ref}>
+    <Stack direction="row" spacing={1} ref={ref} {...other}>
       {elements.map(({ container, input, before, after }, elementIndex) => (
         <Stack {...container} key={elementIndex}>
           <span {...before} />
@@ -27,6 +48,7 @@ export const FakeTextField = React.forwardRef(function FakeTextField(
           <span {...after} />
         </Stack>
       ))}
+      <input type="hidden" value={valueStr} onChange={onValueStrChange} id={id} />
     </Stack>
   );
 });

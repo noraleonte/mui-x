@@ -650,26 +650,14 @@ export const getDateFromDateSections = <TDate>(
   return utils.parse(dateWithoutSeparatorStr, formatWithoutSeparator)!;
 };
 
-export const createDateStrForInputFromSections = (sections: FieldSection[], isRTL: boolean) => {
-  const formattedSections = sections.map((section) => {
-    const dateValue = getSectionVisibleValue(section, isRTL ? 'input-rtl' : 'input-ltr');
-
-    return `${section.startSeparator}${dateValue}${section.endSeparator}`;
-  });
-
-  const dateStr = formattedSections.join('');
-
-  if (!isRTL) {
-    return dateStr;
-  }
-
-  // \u2066: start left-to-right isolation
-  // \u2067: start right-to-left isolation
-  // \u2068: start first strong character isolation
-  // \u2069: pop isolation
-  // wrap into an isolated group such that separators can split the string in smaller ones by adding \u2069\u2068
-  return `\u2066${dateStr}\u2069`;
-};
+export const createDateStrForHiddenInputFromSections = (sections: FieldSection[]) =>
+  sections
+    .map((section) => {
+      return `${section.startSeparator}${section.value || section.placeholder}${
+        section.endSeparator
+      }`;
+    })
+    .join('');
 
 export const getSectionsBoundaries = <TDate>(
   utils: MuiPickersAdapter<TDate>,

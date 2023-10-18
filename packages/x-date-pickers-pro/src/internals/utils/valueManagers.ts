@@ -2,7 +2,7 @@ import {
   PickerValueManager,
   replaceInvalidDateByNull,
   FieldValueManager,
-  createDateStrForInputFromSections,
+  createDateStrForHiddenInputFromSections,
   areDatesEqual,
   getTodayDate,
   getDefaultReferenceDate,
@@ -130,12 +130,12 @@ export const rangeFieldValueManager: FieldValueManager<DateRange<any>, any, Rang
       ...getSections(end, separatedFallbackSections.endDate, 'end'),
     ];
   },
-  getValueStrFromSections: (sections, isRTL) => {
+  getHiddenInputValueFromSections: (sections) => {
     const dateRangeSections = splitDateRangeSections(sections);
-    return createDateStrForInputFromSections(
-      [...dateRangeSections.startDate, ...dateRangeSections.endDate],
-      isRTL,
-    );
+    return createDateStrForHiddenInputFromSections([
+      ...dateRangeSections.startDate,
+      ...dateRangeSections.endDate,
+    ]);
   },
   parseValueStr: (valueStr, referenceValue, parseDate) => {
     // TODO: Improve because it would not work if the date format has `–` as a separator.

@@ -168,6 +168,8 @@ export type UseFieldResponse<TForwardedProps extends UseFieldForwardedProps> = O
   keyof UseFieldForwardedProps
 > &
   Required<UseFieldForwardedProps> & {
+    valueStr: string;
+    onValueStrChange: React.ChangeEventHandler<HTMLInputElement>;
     ref: React.Ref<HTMLInputElement>;
     error: boolean;
     readOnly: boolean;
@@ -257,10 +259,9 @@ export interface FieldValueManager<TValue, TDate, TSection extends FieldSection>
    * Creates the string value to render in the input based on the current section list.
    * @template TSection
    * @param {TSection[]} sections The current section list.
-   * @param {boolean} isRTL `true` if the current orientation is "right to left"
    * @returns {string} The string value to render in the input.
    */
-  getValueStrFromSections: (sections: TSection[], isRTL: boolean) => string;
+  getHiddenInputValueFromSections: (sections: TSection[]) => string;
   /**
    * Returns the manager of the active date.
    * @template TValue, TDate, TSection

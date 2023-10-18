@@ -54,7 +54,7 @@ export { DAY_MARGIN, DIALOG_WIDTH } from './constants/dimensions';
 
 export { useControlledValueWithTimezone } from './hooks/useValueWithTimezone';
 export type { DesktopOnlyPickerProps } from './hooks/useDesktopPicker';
-export { useField, createDateStrForInputFromSections } from './hooks/useField';
+export { useField, createDateStrForHiddenInputFromSections } from './hooks/useField';
 export type {
   UseFieldInternalProps,
   UseFieldParams,
