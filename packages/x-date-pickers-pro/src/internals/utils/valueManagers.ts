@@ -137,6 +137,18 @@ export const rangeFieldValueManager: FieldValueManager<DateRange<any>, any, Rang
       isRTL,
     );
   },
+  parseValueStr: (valueStr, referenceValue, parseDate) => {
+    // TODO: Improve because it would not work if the date format has `–` as a separator.
+    const [startStr, endStr] = valueStr.split('–');
+
+    return [startStr, endStr].map((dateStr, index) => {
+      if (dateStr == null) {
+        return null;
+      }
+
+      return parseDate(dateStr.trim(), referenceValue[index]);
+    }) as DateRange<any>;
+  },
   getActiveDateManager: (utils, state, activeSection) => {
     const index = activeSection.dateName === 'start' ? 0 : 1;
 

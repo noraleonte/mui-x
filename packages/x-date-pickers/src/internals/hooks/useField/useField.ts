@@ -44,6 +44,7 @@ export const useField = <
     clearValue,
     clearActiveSection,
     updateSectionValue,
+    updateValueFromValueStr,
     setSectionTempValueStr,
     resetSectionsTempValueStr,
     sectionsValueBoundaries,
@@ -55,6 +56,7 @@ export const useField = <
     internalProps: { readOnly = false, unstableFieldRef, minutesStep },
     forwardedProps: {
       onBlur,
+      onPaste,
       error,
       clearable,
       onClear,
@@ -119,28 +121,43 @@ export const useField = <
     setSelectedSections(null);
   });
 
-  const handleInputPaste = useEventCallback((event: React.ClipboardEvent<HTMLInputElement>) => {
+  const handleContainerPaste = useEventCallback((event: React.ClipboardEvent<HTMLInputElement>) => {
+    onPaste?.(event);
+
     if (readOnly) {
       event.preventDefault();
       return;
     }
 
-    // TODO: Check behavior
-    const activeSectionIndex = getSectionIndexFromDOMElement(event.target as HTMLInputElement)!;
-    const activeSection = state.sections[activeSectionIndex];
-
     const pastedValue = event.clipboardData.getData('text');
-    const lettersOnly = /^[a-zA-Z]+$/.test(pastedValue);
-    const digitsOnly = /^[0-9]+$/.test(pastedValue);
-    const digitsAndLetterOnly = /^(([a-zA-Z]+)|)([0-9]+)(([a-zA-Z]+)|)$/.test(pastedValue);
-    const isValidPastedValue =
-      (activeSection.contentType === 'letter' && lettersOnly) ||
-      (activeSection.contentType === 'digit' && digitsOnly) ||
-      (activeSection.contentType === 'digit-with-letter' && digitsAndLetterOnly);
-    if (!isValidPastedValue) {
-      // We skip the `onChange` call to avoid invalid values
-      event.preventDefault();
+    if (
+      selectedSectionIndexes &&
+      selectedSectionIndexes.startIndex === selectedSectionIndexes.endIndex
+    ) {
+      const activeSection = state.sections[selectedSectionIndexes.startIndex];
+
+      const lettersOnly = /^[a-zA-Z]+$/.test(pastedValue);
+      const digitsOnly = /^[0-9]+$/.test(pastedValue);
+      const digitsAndLetterOnly = /^(([a-zA-Z]+)|)([0-9]+)(([a-zA-Z]+)|)$/.test(pastedValue);
+      const isValidPastedValue =
+        (activeSection.contentType === 'letter' && lettersOnly) ||
+        (activeSection.contentType === 'digit' && digitsOnly) ||
+        (activeSection.contentType === 'digit-with-letter' && digitsAndLetterOnly);
+      if (isValidPastedValue) {
+        // Early return to let the paste update section, value
+        return;
+      }
+      if (lettersOnly || digitsOnly) {
+        // The pasted value correspond to a single section but not the expected type
+        // skip the modification
+        event.preventDefault();
+        return;
+      }
     }
+
+    event.preventDefault();
+    resetCharacterQuery();
+    updateValueFromValueStr(pastedValue);
   });
 
   const handleInputChange = useEventCallback((event: React.ChangeEvent<HTMLInputElement>) => {
@@ -149,7 +166,7 @@ export const useField = <
     }
 
     const keyPressed = event.target.value;
-    if (targetValue === '') {
+    if (keyPressed === '') {
       resetCharacterQuery();
       clearValue();
       return;
@@ -176,14 +193,14 @@ export const useField = <
   const handleInputKeyDown = useEventCallback((event: React.KeyboardEvent) => {
     // eslint-disable-next-line default-case
     switch (true) {
-      // // Select all
-      // case event.key === 'a' && (event.ctrlKey || event.metaKey): {
-      //   // prevent default to make sure that the next line "select all" while updating
-      //   // the internal state at the same time.
-      //   event.preventDefault();
-      //   setSelectedSections('all');
-      //   break;
-      // }
+      // Select all
+      case event.key === 'a' && (event.ctrlKey || event.metaKey): {
+        // prevent default to make sure that the next line "select all" while updating
+        // the internal state at the same time.
+        event.preventDefault();
+        setSelectedSections('all');
+        break;
+      }
 
       // Move selection to next section
       case event.key === 'ArrowRight': {
@@ -282,23 +299,7 @@ export const useField = <
       return;
     }
 
-    const selection = document.getSelection();
-    if (!selection) {
-      return;
-    }
-
-    // const range = new Range();
-    // const start = containerRef.current.querySelector('div[data-sectionindex="0"] .before')!;
-    // const end = containerRef.current.querySelector('div[data-sectionindex="2"] .after')!;
-    //
-    // range.setStart(start, 0);
-    // range.setEnd(end, 0);
-    //
-    // selection.removeAllRanges();
-    // selection.addRange(range);
-    //
-    // return;
-
+    // Focus no section
     if (selectedSectionIndexes == null) {
       if (isFocusInsideContainer(containerRef)) {
         containerRef.current.blur();
@@ -306,18 +307,47 @@ export const useField = <
       return;
     }
 
-    const inputToFocus = containerRef.current.querySelector<HTMLInputElement>(
-      `div[data-sectionindex="${selectedSectionIndexes}"] input`,
-    );
-    if (!inputToFocus) {
+    // Focus one section
+    if (selectedSectionIndexes.startIndex === selectedSectionIndexes.endIndex) {
+      const inputToFocus = containerRef.current.querySelector<HTMLInputElement>(
+        `div[data-sectionindex="${selectedSectionIndexes.startIndex}"] input`,
+      );
+      if (!inputToFocus) {
+        return;
+      }
+
+      // Fix scroll jumping on iOS browser: https://github.com/mui/mui-x/issues/8321
+      const currentScrollTop = inputToFocus.scrollTop;
+      inputToFocus.select();
+      // Even reading this variable seems to do the trick, but also setting it just to make use of it
+      inputToFocus.scrollTop = currentScrollTop;
       return;
     }
 
-    // Fix scroll jumping on iOS browser: https://github.com/mui/mui-x/issues/8321
-    const currentScrollTop = inputToFocus.scrollTop;
-    inputToFocus.select();
-    // Even reading this variable seems to do the trick, but also setting it just to make use of it
-    inputToFocus.scrollTop = currentScrollTop;
+    // Focus several sections
+    const selection = document.getSelection();
+    if (!selection) {
+      return;
+    }
+
+    const range = new Range();
+    const startSectionBefore = containerRef.current.querySelector(
+      `div[data-sectionindex="${selectedSectionIndexes.startIndex}"] .before`,
+    )!;
+    const endSectionAfter = containerRef.current.querySelector(
+      `div[data-sectionindex="${selectedSectionIndexes.endIndex}"] .after`,
+    )!;
+
+    if (selectedSectionIndexes.shouldSelectBoundarySelectors) {
+      range.setStart(startSectionBefore, 0);
+      range.setEnd(endSectionAfter, 1);
+    } else {
+      range.setStart(startSectionBefore, 1);
+      range.setEnd(endSectionAfter, 0);
+    }
+
+    selection.removeAllRanges();
+    selection.addRange(range);
   });
 
   const validationError = useValidation(
@@ -346,7 +376,7 @@ export const useField = <
   React.useEffect(() => {
     // Select the right section when focused on mount (`autoFocus = true` on the input)
     if (containerRef.current && containerRef.current.contains(getActiveElement(document))) {
-      setSelectedSections(0);
+      setSelectedSections('all');
     }
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -399,7 +429,6 @@ export const useField = <
           onFocus: handleInputFocus,
           onKeyDown: handleInputKeyDown,
           onMouseUp: handleInputMouseUp,
-          onPaste: handleInputPaste,
           inputMode: section.contentType === 'letter' ? 'text' : 'numeric',
           autoComplete: 'off',
           disabled,
@@ -416,12 +445,12 @@ export const useField = <
         before: {
           className: 'before',
           children: section.startSeparator,
-          style: { height: 16, fontSize: 12 },
+          style: { height: 16, fontSize: 12, whiteSpace: 'pre' },
         },
         after: {
           className: 'after',
           children: section.endSeparator,
-          style: { height: 16, fontSize: 12 },
+          style: { height: 16, fontSize: 12, whiteSpace: 'pre' },
         },
       })),
     [
@@ -432,7 +461,6 @@ export const useField = <
       handleInputChange,
       handleInputClick,
       handleInputMouseUp,
-      handleInputPaste,
       disabled,
       readOnly,
     ],
@@ -444,6 +472,7 @@ export const useField = <
     elements: textFieldElements,
     readOnly,
     onBlur: handleContainerBlur,
+    onPaste: handleContainerPaste,
     onClear: handleClearValue,
     error: inputError,
     ref: handleRef,

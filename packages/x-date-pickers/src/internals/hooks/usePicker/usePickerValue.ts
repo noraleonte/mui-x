@@ -417,7 +417,7 @@ export const usePickerValue = <
   const fieldResponse: UsePickerValueFieldResponse<TValue, TSection, TError> = {
     value: dateState.draft,
     onChange: handleChangeFromField,
-    selectedSections: selectedSections,
+    selectedSections,
     onSelectedSectionsChange: handleFieldSelectedSectionsChange,
   };
 

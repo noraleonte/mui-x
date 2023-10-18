@@ -278,6 +278,41 @@ export const useFieldState = <
     }
   };
 
+  const updateValueFromValueStr = (valueStr: string) => {
+    const parseDateStr = (dateStr: string, referenceDate: TDate) => {
+      const date = utils.parse(dateStr, format);
+      if (date == null || !utils.isValid(date)) {
+        return null;
+      }
+
+      const sections = splitFormatIntoSections(
+        utils,
+        timezone,
+        localeText,
+        format,
+        date,
+        formatDensity,
+        shouldRespectLeadingZeros,
+        isRTL,
+      );
+      return mergeDateIntoReferenceDate(utils, timezone, date, sections, referenceDate, false);
+    };
+
+    const newValue = fieldValueManager.parseValueStr(valueStr, state.referenceValue, parseDateStr);
+
+    const newReferenceValue = fieldValueManager.updateReferenceValue(
+      utils,
+      newValue,
+      state.referenceValue,
+    );
+
+    publishValue({
+      value: newValue,
+      referenceValue: newReferenceValue,
+      sections: getSectionsFromValue(newValue, state.sections),
+    });
+  };
+
   const updateSectionValue = ({
     activeSection,
     newSectionValue,
@@ -394,6 +429,7 @@ export const useFieldState = <
     clearValue,
     clearActiveSection,
     updateSectionValue,
+    updateValueFromValueStr,
     setSectionTempValueStr,
     resetSectionsTempValueStr: resetSectionsTempValueStrFromState,
     sectionsValueBoundaries,
