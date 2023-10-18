@@ -187,9 +187,9 @@
       "typeDescriptions": { "rangePosition": "The new range position." }
     },
     "onSelectedSectionsChange": {
-      "description": "Callback fired when the selected section changes.",
+      "description": "Callback fired when the selected sections change.",
       "deprecated": "",
-      "typeDescriptions": { "newValue": "The new selected section." }
+      "typeDescriptions": { "newValue": "The new selected sections." }
     },
     "open": {
       "description": "Control the popup or dialog open state.",

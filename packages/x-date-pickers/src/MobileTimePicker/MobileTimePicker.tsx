@@ -235,8 +235,8 @@ MobileTimePicker.propTypes = {
    */
   onOpen: PropTypes.func,
   /**
-   * Callback fired when the selected section changes.
-   * @param {FieldSelectedSections} newValue The new selected section.
+   * Callback fired when the selected sections change.
+   * @param {FieldSelectedSections} newValue The new selected sections.
    */
   onSelectedSectionsChange: PropTypes.func,
   /**
