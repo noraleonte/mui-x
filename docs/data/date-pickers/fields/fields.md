@@ -40,13 +40,15 @@ Those sections are independent, pressing <kbd class="key">ArrowUp</kbd> while fo
 
 ### Control the selected sections
 
-Use the `selectedSection` and `onSelectedSectionChange` props to control which sections are currently being selected.
+Use the `selectedSections` and `onSelectedSectionsChange` props to control which sections are currently being selected.
 
 This prop accepts the following formats:
 
 1. If a number is provided, the section at this index will be selected.
-2. If a string of type `FieldSectionType` is provided, the first section with that name will be selected.
-3. If `null` is provided, no section will be selected
+2. If `"all"` is provided, all the sections will be selected.
+3. If an object with a `startIndex` and `endIndex` fields are provided, the sections between those two indexes will be selected.
+4. If a string of type `FieldSectionType` is provided, the first section with that name will be selected.
+5. If `null` is provided, no section will be selected
 
 :::warning
 You need to make sure the input is focused before imperatively updating the selected sections.

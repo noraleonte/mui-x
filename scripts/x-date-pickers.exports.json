@@ -112,7 +112,7 @@
   { "name": "FieldSection", "kind": "Interface" },
   { "name": "FieldSectionContentType", "kind": "TypeAlias" },
   { "name": "FieldSectionType", "kind": "TypeAlias" },
-  { "name": "FieldSelectedSection", "kind": "TypeAlias" },
+  { "name": "FieldSelectedSections", "kind": "TypeAlias" },
   { "name": "FieldValueType", "kind": "TypeAlias" },
   { "name": "fiFI", "kind": "Variable" },
   { "name": "frFR", "kind": "Variable" },

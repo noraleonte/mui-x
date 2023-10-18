@@ -165,7 +165,7 @@ export const usePickerViews = <
   TExternalProps,
   TAdditionalProps
 >): UsePickerViewsResponse<TView> => {
-  const { onChange, open, onSelectedSectionChange, onClose } = propsFromPickerValue;
+  const { onChange, open, onSelectedSectionsChange, onClose } = propsFromPickerValue;
   const { views, openTo, onViewChange, disableOpenPicker, viewRenderers, timezone } = props;
   const { className, sx, ...propsToForwardToView } = props;
 
@@ -231,9 +231,9 @@ export const usePickerViews = <
       onClose();
       setTimeout(() => {
         // focusing the input before the range selection is done
-        // calling `onSelectedSectionChange` outside of timeout results in an inconsistent behavior between Safari And Chrome
+        // calling `onSelectedSectionsChange` outside of timeout results in an inconsistent behavior between Safari And Chrome
         inputRef?.current!.focus();
-        onSelectedSectionChange(view);
+        onSelectedSectionsChange(view);
       });
     }
   }, [view]); // eslint-disable-line react-hooks/exhaustive-deps

@@ -5,7 +5,7 @@ import { useOpenState } from '../useOpenState';
 import { useLocalizationContext, useUtils } from '../useUtils';
 import { FieldChangeHandlerContext } from '../useField';
 import { InferError, useValidation } from '../useValidation';
-import { FieldSection, FieldSelectedSection, PickerChangeHandlerContext } from '../../../models';
+import { FieldSection, FieldSelectedSections, PickerChangeHandlerContext } from '../../../models';
 import {
   PickerShortcutChangeImportance,
   PickersShortcutsItemContext,
@@ -169,8 +169,8 @@ export const usePickerValue = <
     value: inValue,
     defaultValue: inDefaultValue,
     closeOnSelect = wrapperVariant === 'desktop',
-    selectedSection: selectedSectionProp,
-    onSelectedSectionChange,
+    selectedSections: selectedSectionProp,
+    onSelectedSectionsChange,
     timezone: timezoneProp,
   } = props;
 
@@ -212,11 +212,11 @@ export const usePickerValue = <
   const utils = useUtils<TDate>();
   const adapter = useLocalizationContext<TDate>();
 
-  const [selectedSection, setSelectedSection] = useControlled({
+  const [selectedSections, setSelectedSections] = useControlled({
     controlled: selectedSectionProp,
     default: null,
     name: 'usePickerValue',
-    state: 'selectedSection',
+    state: 'selectedSections',
   });
 
   const { isOpen, setIsOpen } = useOpenState(props);
@@ -397,10 +397,10 @@ export const usePickerValue = <
       updateDate({ name: 'setValueFromField', value: newValue, context }),
   );
 
-  const handleFieldSelectedSectionChange = useEventCallback(
-    (newSelectedSections: FieldSelectedSection) => {
-      setSelectedSection(newSelectedSections);
-      onSelectedSectionChange?.(newSelectedSections);
+  const handleFieldSelectedSectionsChange = useEventCallback(
+    (newSelectedSections: FieldSelectedSections) => {
+      setSelectedSections(newSelectedSections);
+      onSelectedSectionsChange?.(newSelectedSections);
     },
   );
 
@@ -417,8 +417,8 @@ export const usePickerValue = <
   const fieldResponse: UsePickerValueFieldResponse<TValue, TSection, TError> = {
     value: dateState.draft,
     onChange: handleChangeFromField,
-    selectedSection,
-    onSelectedSectionChange: handleFieldSelectedSectionChange,
+    selectedSections: selectedSections,
+    onSelectedSectionsChange: handleFieldSelectedSectionsChange,
   };
 
   const viewValue = React.useMemo(
@@ -431,7 +431,7 @@ export const usePickerValue = <
     onChange: handleChange,
     onClose: handleClose,
     open: isOpen,
-    onSelectedSectionChange: handleFieldSelectedSectionChange,
+    onSelectedSectionsChange: handleFieldSelectedSectionsChange,
   };
 
   const isValid = (testedValue: TValue) => {

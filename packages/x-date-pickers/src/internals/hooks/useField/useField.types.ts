@@ -5,7 +5,7 @@ import { ClearIcon } from '../../../icons';
 import {
   FieldSectionType,
   FieldSection,
-  FieldSelectedSection,
+  FieldSelectedSections,
   MuiPickersAdapter,
   TimezoneProps,
   FieldSectionContentType,
@@ -108,12 +108,12 @@ export interface UseFieldInternalProps<TValue, TDate, TSection extends FieldSect
    * 4. If `null` is provided, no section will be selected
    * If not provided, the selected sections will be handled internally.
    */
-  selectedSection?: FieldSelectedSection;
+  selectedSections?: FieldSelectedSections;
   /**
    * Callback fired when the selected section changes.
-   * @param {FieldSelectedSection} newValue The new selected section.
+   * @param {FieldSelectedSections} newValue The new selected section.
    */
-  onSelectedSectionChange?: (newValue: FieldSelectedSection) => void;
+  onSelectedSectionsChange?: (newValue: FieldSelectedSections) => void;
   /**
    * The ref object used to imperatively interact with the field.
    */
@@ -148,9 +148,9 @@ export interface FieldRef<TSection extends FieldSection> {
   getActiveSectionIndex: () => number | null;
   /**
    * Updates the selected sections.
-   * @param {FieldSelectedSection} selectedSection The sections to select.
+   * @param {FieldSelectedSections} selectedSection The sections to select.
    */
-  setSelectedSections: (selectedSection: FieldSelectedSection) => void;
+  setSelectedSections: (selectedSection: FieldSelectedSections) => void;
 }
 
 export interface UseFieldForwardedProps {
@@ -224,6 +224,16 @@ interface FieldActiveDateManager<TValue, TDate, TSection extends FieldSection> {
     newActiveDate: TDate | null,
   ) => Pick<UseFieldState<TValue, any>, 'value' | 'referenceValue'>;
 }
+
+export type FieldSelectedSectionsIndexes = {
+  startIndex: number;
+  endIndex: number;
+  /**
+   * If `true`, the selectors at the very beginning and very end of the input will be selected.
+   * @default false
+   */
+  shouldSelectBoundarySelectors?: boolean;
+};
 
 export interface FieldValueManager<TValue, TDate, TSection extends FieldSection> {
   /**

@@ -6,7 +6,7 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import {
   FieldSectionType,
-  FieldSelectedSection,
+  FieldSelectedSections,
   FieldRef,
   RangeFieldSection,
   RangePosition,
@@ -15,7 +15,7 @@ import { SingleInputDateRangeField } from '@mui/x-date-pickers-pro/SingleInputDa
 
 export default function ControlledSelectedSectionsSingleInputRangeField() {
   const [selectedSection, setSelectedSection] =
-    React.useState<FieldSelectedSection>(null);
+    React.useState<FieldSelectedSections>(null);
   const inputRef = React.useRef<HTMLInputElement>(null);
   const fieldRef = React.useRef<FieldRef<RangeFieldSection>>(null);
 
@@ -64,8 +64,8 @@ export default function ControlledSelectedSectionsSingleInputRangeField() {
           sx={{ minWidth: 300 }}
           unstableFieldRef={fieldRef}
           inputRef={inputRef}
-          selectedSection={selectedSection}
-          onSelectedSectionChange={setSelectedSection}
+          selectedSections={selectedSection}
+          onSelectedSectionsChange={setSelectedSection}
         />
       </Stack>
     </LocalizationProvider>

@@ -31,8 +31,8 @@ export default function ControlledSelectedSections() {
         </Stack>
         <DateField
           inputRef={inputRef}
-          selectedSection={selectedSection}
-          onSelectedSectionChange={setSelectedSection}
+          selectedSections={selectedSection}
+          onSelectedSectionsChange={setSelectedSection}
         />
       </Stack>
     </LocalizationProvider>

@@ -211,8 +211,8 @@ const JoyMultiInputDateRangeField = React.forwardRef((props, ref) => {
     maxDate,
     disableFuture,
     disablePast,
-    selectedSection,
-    onSelectedSectionChange,
+    selectedSections,
+    onSelectedSectionsChange,
     className,
   } = props;
 
@@ -245,8 +245,8 @@ const JoyMultiInputDateRangeField = React.forwardRef((props, ref) => {
       maxDate,
       disableFuture,
       disablePast,
-      selectedSection,
-      onSelectedSectionChange,
+      selectedSections,
+      onSelectedSectionsChange,
     },
     startTextFieldProps,
     endTextFieldProps,

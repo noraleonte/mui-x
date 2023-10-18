@@ -254,9 +254,9 @@ DateTimePicker.propTypes = {
   onOpen: PropTypes.func,
   /**
    * Callback fired when the selected section changes.
-   * @param {FieldSelectedSection} newValue The new selected section.
+   * @param {FieldSelectedSections} newValue The new selected section.
    */
-  onSelectedSectionChange: PropTypes.func,
+  onSelectedSectionsChange: PropTypes.func,
   /**
    * Callback fired on view change.
    * @template TView
@@ -310,9 +310,23 @@ DateTimePicker.propTypes = {
    * 4. If `null` is provided, no section will be selected
    * If not provided, the selected sections will be handled internally.
    */
-  selectedSection: PropTypes.oneOfType([
-    PropTypes.oneOf(['day', 'hours', 'meridiem', 'minutes', 'month', 'seconds', 'weekDay', 'year']),
+  selectedSections: PropTypes.oneOfType([
+    PropTypes.oneOf([
+      'all',
+      'day',
+      'hours',
+      'meridiem',
+      'minutes',
+      'month',
+      'seconds',
+      'weekDay',
+      'year',
+    ]),
     PropTypes.number,
+    PropTypes.shape({
+      endIndex: PropTypes.number.isRequired,
+      startIndex: PropTypes.number.isRequired,
+    }),
   ]),
   /**
    * Disable specific clock time.

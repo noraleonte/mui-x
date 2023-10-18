@@ -46,10 +46,10 @@
         "describedArgs": ["error", "value"]
       }
     },
-    "onSelectedSectionChange": {
+    "onSelectedSectionsChange": {
       "type": { "name": "func" },
       "signature": {
-        "type": "function(newValue: FieldSelectedSection) => void",
+        "type": "function(newValue: FieldSelectedSections) => void",
         "describedArgs": ["newValue"]
       }
     },
@@ -58,10 +58,10 @@
       "type": { "name": "any" },
       "default": "The closest valid date using the validation props, except callbacks such as `shouldDisableDate`. Value is rounded to the most granular section used."
     },
-    "selectedSection": {
+    "selectedSections": {
       "type": {
         "name": "union",
-        "description": "'day'<br>&#124;&nbsp;'hours'<br>&#124;&nbsp;'meridiem'<br>&#124;&nbsp;'minutes'<br>&#124;&nbsp;'month'<br>&#124;&nbsp;'seconds'<br>&#124;&nbsp;'weekDay'<br>&#124;&nbsp;'year'<br>&#124;&nbsp;number"
+        "description": "'all'<br>&#124;&nbsp;'day'<br>&#124;&nbsp;'hours'<br>&#124;&nbsp;'meridiem'<br>&#124;&nbsp;'minutes'<br>&#124;&nbsp;'month'<br>&#124;&nbsp;'seconds'<br>&#124;&nbsp;'weekDay'<br>&#124;&nbsp;'year'<br>&#124;&nbsp;number<br>&#124;&nbsp;{ endIndex: number, startIndex: number }"
       }
     },
     "shouldDisableDate": {

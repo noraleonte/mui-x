@@ -39,8 +39,8 @@ export const useField = <
 
   const {
     state,
-    selectedSectionIndex,
-    setSelectedSection,
+    selectedSectionIndexes,
+    setSelectedSections,
     clearValue,
     clearActiveSection,
     updateSectionValue,
@@ -87,12 +87,12 @@ export const useField = <
 
   const syncSelectionFromDOM = () => {
     if (readOnly) {
-      setSelectedSection(null);
+      setSelectedSections(null);
       return;
     }
 
     const browserActiveSectionIndex = getActiveSectionIndexFromDOM(containerRef);
-    setSelectedSection(browserActiveSectionIndex);
+    setSelectedSections(browserActiveSectionIndex);
   };
 
   const handleInputClick = useEventCallback((event: React.MouseEvent) => {
@@ -116,7 +116,7 @@ export const useField = <
 
   const handleContainerBlur = useEventCallback((...args) => {
     onBlur?.(...(args as []));
-    setSelectedSection(null);
+    setSelectedSections(null);
   });
 
   const handleInputPaste = useEventCallback((event: React.ClipboardEvent<HTMLInputElement>) => {
@@ -189,12 +189,15 @@ export const useField = <
       case event.key === 'ArrowRight': {
         event.preventDefault();
 
-        if (selectedSectionIndex == null) {
-          setSelectedSection(sectionOrder.startIndex);
+        if (selectedSectionIndexes == null) {
+          setSelectedSections(sectionOrder.startIndex);
+        } else if (selectedSectionIndexes.startIndex !== selectedSectionIndexes.endIndex) {
+          setSelectedSections(selectedSectionIndexes.endIndex);
         } else {
-          const nextSectionIndex = sectionOrder.neighbors[selectedSectionIndex].rightIndex;
+          const nextSectionIndex =
+            sectionOrder.neighbors[selectedSectionIndexes.startIndex].rightIndex;
           if (nextSectionIndex !== null) {
-            setSelectedSection(nextSectionIndex);
+            setSelectedSections(nextSectionIndex);
           }
         }
         break;
@@ -204,12 +207,15 @@ export const useField = <
       case event.key === 'ArrowLeft': {
         event.preventDefault();
 
-        if (selectedSectionIndex == null) {
-          setSelectedSection(sectionOrder.endIndex);
+        if (selectedSectionIndexes == null) {
+          setSelectedSections(sectionOrder.endIndex);
+        } else if (selectedSectionIndexes.startIndex !== selectedSectionIndexes.endIndex) {
+          setSelectedSections(selectedSectionIndexes.startIndex);
         } else {
-          const nextSectionIndex = sectionOrder.neighbors[selectedSectionIndex].leftIndex;
+          const nextSectionIndex =
+            sectionOrder.neighbors[selectedSectionIndexes.startIndex].leftIndex;
           if (nextSectionIndex !== null) {
-            setSelectedSection(nextSectionIndex);
+            setSelectedSections(nextSectionIndex);
           }
         }
         break;
@@ -223,7 +229,15 @@ export const useField = <
           break;
         }
 
-        clearActiveSection();
+        if (
+          selectedSectionIndexes == null ||
+          (selectedSectionIndexes.startIndex === 0 &&
+            selectedSectionIndexes.endIndex === state.sections.length - 1)
+        ) {
+          clearValue();
+        } else {
+          clearActiveSection();
+        }
         resetCharacterQuery();
         break;
       }
@@ -232,11 +246,11 @@ export const useField = <
       case ['ArrowUp', 'ArrowDown', 'Home', 'End', 'PageUp', 'PageDown'].includes(event.key): {
         event.preventDefault();
 
-        if (readOnly || selectedSectionIndex == null) {
+        if (readOnly || selectedSectionIndexes == null) {
           break;
         }
 
-        const activeSection = state.sections[selectedSectionIndex];
+        const activeSection = state.sections[selectedSectionIndexes.startIndex];
         const activeDateManager = fieldValueManager.getActiveDateManager(
           utils,
           state,
@@ -273,19 +287,19 @@ export const useField = <
       return;
     }
 
-    const range = new Range();
-    const start = containerRef.current.querySelector('div[data-sectionindex="0"] .before')!;
-    const end = containerRef.current.querySelector('div[data-sectionindex="2"] .after')!;
+    // const range = new Range();
+    // const start = containerRef.current.querySelector('div[data-sectionindex="0"] .before')!;
+    // const end = containerRef.current.querySelector('div[data-sectionindex="2"] .after')!;
+    //
+    // range.setStart(start, 0);
+    // range.setEnd(end, 0);
+    //
+    // selection.removeAllRanges();
+    // selection.addRange(range);
+    //
+    // return;
 
-    range.setStart(start, 0);
-    range.setEnd(end, 0);
-
-    selection.removeAllRanges();
-    selection.addRange(range);
-
-    return;
-
-    if (selectedSectionIndex == null) {
+    if (selectedSectionIndexes == null) {
       if (isFocusInsideContainer(containerRef)) {
         containerRef.current.blur();
       }
@@ -293,7 +307,7 @@ export const useField = <
     }
 
     const inputToFocus = containerRef.current.querySelector<HTMLInputElement>(
-      `div[data-sectionindex="${selectedSectionIndex}"] input`,
+      `div[data-sectionindex="${selectedSectionIndexes}"] input`,
     );
     if (!inputToFocus) {
       return;
@@ -324,15 +338,15 @@ export const useField = <
   }, [valueManager, validationError, error]);
 
   React.useEffect(() => {
-    if (!inputError && selectedSectionIndex == null) {
+    if (!inputError && selectedSectionIndexes == null) {
       resetCharacterQuery();
     }
-  }, [state.referenceValue, selectedSectionIndex, inputError]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [state.referenceValue, selectedSectionIndexes, inputError]); // eslint-disable-line react-hooks/exhaustive-deps
 
   React.useEffect(() => {
     // Select the right section when focused on mount (`autoFocus = true` on the input)
     if (containerRef.current && containerRef.current.contains(getActiveElement(document))) {
-      setSelectedSection(0);
+      setSelectedSections(0);
     }
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -344,7 +358,7 @@ export const useField = <
     const sectionWithTempValueStr = state.sections.findIndex(
       (section) => section.tempValueStr != null,
     );
-    if (sectionWithTempValueStr > -1 && selectedSectionIndex != null) {
+    if (sectionWithTempValueStr > -1 && selectedSectionIndexes != null) {
       resetCharacterQuery();
       clearActiveSection();
     }
@@ -360,14 +374,14 @@ export const useField = <
   React.useImperativeHandle(unstableFieldRef, () => ({
     getSections: () => state.sections,
     getActiveSectionIndex: () => getActiveSectionIndexFromDOM(containerRef),
-    setSelectedSections: (activeSectionIndex) => setSelectedSection(activeSectionIndex),
+    setSelectedSections: (activeSectionIndex) => setSelectedSections(activeSectionIndex),
   }));
 
   const handleClearValue = useEventCallback((event: React.MouseEvent, ...args) => {
     event.preventDefault();
     onClear?.(event, ...(args as []));
     clearValue();
-    setSelectedSection(0);
+    setSelectedSections(0);
   });
 
   const textFieldElements = React.useMemo<FakeTextFieldElement[]>(

@@ -6,14 +6,14 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import {
   FieldSectionType,
-  FieldSelectedSection,
+  FieldSelectedSections,
   RangePosition,
 } from '@mui/x-date-pickers-pro';
 import { MultiInputDateRangeField } from '@mui/x-date-pickers-pro/MultiInputDateRangeField';
 
 export default function ControlledSelectedSectionsMultiInputRangeField() {
   const [selectedSection, setSelectedSection] =
-    React.useState<FieldSelectedSection>(null);
+    React.useState<FieldSelectedSections>(null);
   const startInputRef = React.useRef<HTMLInputElement>(null);
   const endInputRef = React.useRef<HTMLInputElement>(null);
 
@@ -61,8 +61,8 @@ export default function ControlledSelectedSectionsMultiInputRangeField() {
                 ownerState.position === 'start' ? startInputRef : endInputRef,
             }),
           }}
-          selectedSection={selectedSection}
-          onSelectedSectionChange={setSelectedSection}
+          selectedSections={selectedSection}
+          onSelectedSectionsChange={setSelectedSection}
         />
       </Stack>
     </LocalizationProvider>

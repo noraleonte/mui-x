@@ -53,8 +53,8 @@ export default function ControlledSelectedSectionsMultiInputRangeField() {
                 ownerState.position === 'start' ? startInputRef : endInputRef,
             }),
           }}
-          selectedSection={selectedSection}
-          onSelectedSectionChange={setSelectedSection}
+          selectedSections={selectedSection}
+          onSelectedSectionsChange={setSelectedSection}
         />
       </Stack>
     </LocalizationProvider>

@@ -4,7 +4,7 @@ import { UseFieldValidationProps } from '../useField/useField.types';
 import { WrapperVariant } from '../../models/common';
 import {
   FieldSection,
-  FieldSelectedSection,
+  FieldSelectedSections,
   FieldValueType,
   TimezoneProps,
   MuiPickersAdapter,
@@ -251,7 +251,7 @@ export interface UsePickerValueBaseProps<TValue, TError> {
 export interface UsePickerValueNonStaticProps<TValue, TSection extends FieldSection>
   extends Pick<
     UseFieldInternalProps<TValue, unknown, TSection, unknown>,
-    'selectedSection' | 'onSelectedSectionChange'
+    'selectedSections' | 'onSelectedSectionsChange'
   > {
   /**
    * If `true`, the popover or modal will close after submitting the full date.
@@ -314,7 +314,7 @@ export interface UsePickerValueActions {
 export type UsePickerValueFieldResponse<TValue, TSection extends FieldSection, TError> = Required<
   Pick<
     UseFieldInternalProps<TValue, unknown, TSection, TError>,
-    'value' | 'onChange' | 'selectedSection' | 'onSelectedSectionChange'
+    'value' | 'onChange' | 'selectedSections' | 'onSelectedSectionsChange'
   >
 >;
 
@@ -326,7 +326,7 @@ export interface UsePickerValueViewsResponse<TValue> {
   onChange: (value: TValue, selectionState?: PickerSelectionState) => void;
   open: boolean;
   onClose: () => void;
-  onSelectedSectionChange: (newValue: FieldSelectedSection) => void;
+  onSelectedSectionsChange: (newValue: FieldSelectedSections) => void;
 }
 
 /**

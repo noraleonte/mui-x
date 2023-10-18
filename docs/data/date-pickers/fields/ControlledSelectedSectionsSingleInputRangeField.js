@@ -54,8 +54,8 @@ export default function ControlledSelectedSectionsSingleInputRangeField() {
           sx={{ minWidth: 300 }}
           unstableFieldRef={fieldRef}
           inputRef={inputRef}
-          selectedSection={selectedSection}
-          onSelectedSectionChange={setSelectedSection}
+          selectedSections={selectedSection}
+          onSelectedSectionsChange={setSelectedSection}
         />
       </Stack>
     </LocalizationProvider>
