@@ -123,9 +123,6 @@ export const useField = <
 
   const handleContainerPaste = useEventCallback((event: React.ClipboardEvent<HTMLInputElement>) => {
     onPaste?.(event);
-
-    console.log('AAAAAAAAAAAA');
-
     if (readOnly) {
       event.preventDefault();
       return;
