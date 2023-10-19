@@ -931,15 +931,6 @@ export const getSectionIndexFromDOMElement = (element: HTMLElement | undefined) 
   return sectionIndex === -1 ? null : sectionIndex;
 };
 
-export const getActiveSectionIndexFromDOM = (containerRef: React.RefObject<HTMLDivElement>) => {
-  const activeElement = getActiveElement(document) as HTMLElement | undefined;
-  if (!activeElement || !containerRef.current || !containerRef.current.contains(activeElement)) {
-    return null;
-  }
-
-  return getSectionIndexFromDOMElement(getActiveElement(document) as HTMLInputElement | undefined);
-};
-
 export const isFocusInsideContainer = (
   containerRef: React.RefObject<HTMLDivElement>,
 ): containerRef is { current: HTMLDivElement } => {

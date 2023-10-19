@@ -16,7 +16,6 @@ import {
   adjustSectionValue,
   isAndroid,
   getSectionOrder,
-  getActiveSectionIndexFromDOM,
   isFocusInsideContainer,
   getSectionIndexFromDOMElement,
 } from './useField.utils';
@@ -87,33 +86,29 @@ export const useField = <
     [state.sections, isRTL],
   );
 
-  const syncSelectionFromDOM = () => {
-    if (readOnly) {
-      setSelectedSections(null);
-      return;
-    }
+  const getElementContainerClickHandler = useEventCallback(
+    (sectionIndex: number) => (event: React.MouseEvent<HTMLDivElement>) => {
+      // The click event on the clear button would propagate to the input, trigger this handler and result in a wrong section selection.
+      // We avoid this by checking if the call to this function is actually intended, or a side effect.
+      if (event.isDefaultPrevented() || readOnly) {
+        return;
+      }
 
-    const browserActiveSectionIndex = getActiveSectionIndexFromDOM(containerRef);
-    setSelectedSections(browserActiveSectionIndex);
-  };
-
-  const handleInputClick = useEventCallback((event: React.MouseEvent) => {
-    // The click event on the clear button would propagate to the input, trigger this handler and result in a wrong section selection.
-    // We avoid this by checking if the call of `handleInputClick` is actually intended, or a side effect.
-    if (event.isDefaultPrevented()) {
-      return;
-    }
-
-    syncSelectionFromDOM();
-  });
+      setSelectedSections(sectionIndex);
+    },
+  );
 
   const handleInputMouseUp = useEventCallback((event: React.MouseEvent) => {
     // Without this, the browser will remove the selected when clicking inside an already-selected section.
     event.preventDefault();
   });
 
-  const handleInputFocus = useEventCallback(() => {
-    syncSelectionFromDOM();
+  const getInputFocusHandler = useEventCallback((sectionIndex: number) => () => {
+    if (readOnly) {
+      return;
+    }
+
+    setSelectedSections(sectionIndex);
   });
 
   const handleContainerBlur = useEventCallback((...args) => {
@@ -408,7 +403,20 @@ export const useField = <
 
   React.useImperativeHandle(unstableFieldRef, () => ({
     getSections: () => state.sections,
-    getActiveSectionIndex: () => getActiveSectionIndexFromDOM(containerRef),
+    getActiveSectionIndex: () => {
+      const activeElement = getActiveElement(document) as HTMLElement | undefined;
+      if (
+        !activeElement ||
+        !containerRef.current ||
+        !containerRef.current.contains(activeElement)
+      ) {
+        return null;
+      }
+
+      return getSectionIndexFromDOMElement(
+        getActiveElement(document) as HTMLInputElement | undefined,
+      );
+    },
     setSelectedSections: (activeSectionIndex) => setSelectedSections(activeSectionIndex),
   }));
 
@@ -425,13 +433,13 @@ export const useField = <
         container: {
           'data-sectionindex': sectionIndex,
           style: { margin: 0, display: 'flex', flexDirection: 'row', height: 16 },
+          onClick: getElementContainerClickHandler(sectionIndex),
         } as React.HTMLAttributes<HTMLDivElement>,
         input: {
           value: shouldShowPlaceholder ? '' : section.value || section.placeholder,
           placeholder: section.placeholder,
           onChange: handleInputChange,
-          onClick: handleInputClick,
-          onFocus: handleInputFocus,
+          onFocus: getInputFocusHandler(sectionIndex),
           onKeyDown: handleInputKeyDown,
           onMouseUp: handleInputMouseUp,
           inputMode: section.contentType === 'letter' ? 'text' : 'numeric',
@@ -461,10 +469,10 @@ export const useField = <
     [
       state.sections,
       shouldShowPlaceholder,
-      handleInputFocus,
+      getInputFocusHandler,
       handleInputKeyDown,
       handleInputChange,
-      handleInputClick,
+      getElementContainerClickHandler,
       handleInputMouseUp,
       disabled,
       readOnly,

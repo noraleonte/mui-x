@@ -40,13 +40,13 @@ export const FakeTextField = React.forwardRef(function FakeTextField(
   } = props;
 
   return (
-    <Stack direction="row" spacing={1} ref={ref} {...other}>
+    <Stack direction="row" ref={ref} {...other}>
       {elements.map(({ container, input, before, after }, elementIndex) => (
-        <Stack {...container} key={elementIndex}>
+        <div {...container} key={elementIndex}>
           <span {...before} />
           <input {...input} />
           <span {...after} />
-        </Stack>
+        </div>
       ))}
       <input type="hidden" value={valueStr} onChange={onValueStrChange} id={id} />
     </Stack>
