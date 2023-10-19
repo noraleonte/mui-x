@@ -103,9 +103,9 @@ export interface UseFieldInternalProps<TValue, TDate, TSection extends FieldSect
    * The currently selected sections.
    * This prop accept four formats:
    * 1. If a number is provided, the section at this index will be selected.
-   * 2. If an object with a `startIndex` and `endIndex` properties are provided, the sections between those two indexes will be selected.
-   * 3. If a string of type `FieldSectionType` is provided, the first section with that name will be selected.
-   * 4. If `null` is provided, no section will be selected
+   * 2. If a string of type `FieldSectionType` is provided, the first section with that name will be selected.
+   * 3. If `"all"` is provided, all the sections will be selected.
+   * 4. If `null` is provided, no section will be selected.
    * If not provided, the selected sections will be handled internally.
    */
   selectedSections?: FieldSelectedSections;
@@ -228,15 +228,7 @@ interface FieldActiveDateManager<TValue, TDate, TSection extends FieldSection> {
   ) => Pick<UseFieldState<TValue, any>, 'value' | 'referenceValue'>;
 }
 
-export type FieldSelectedSectionsIndexes = {
-  startIndex: number;
-  endIndex: number;
-  /**
-   * If `true`, the selectors at the very beginning and very end of the input will be selected.
-   * @default false
-   */
-  shouldSelectBoundarySelectors?: boolean;
-};
+export type FieldParsedSelectedSections = number | 'all';
 
 export interface FieldValueManager<TValue, TDate, TSection extends FieldSection> {
   /**

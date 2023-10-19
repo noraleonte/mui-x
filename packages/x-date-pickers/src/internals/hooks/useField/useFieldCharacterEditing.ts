@@ -388,13 +388,15 @@ export const useFieldCharacterEditing = <TDate, TSection extends FieldSection>({
     const response = isNumericEditing ? applyNumericEditing(params) : applyLetterEditing(params);
     if (response == null) {
       resetSectionsTempValueStr();
-    } else {
-      updateSectionValue({
-        activeSection,
-        newSectionValue: response.sectionValue,
-        shouldGoToNextSection: response.shouldGoToNextSection,
-      });
+      return false;
     }
+
+    updateSectionValue({
+      activeSection,
+      newSectionValue: response.sectionValue,
+      shouldGoToNextSection: response.shouldGoToNextSection,
+    });
+    return true;
   });
 
   return {

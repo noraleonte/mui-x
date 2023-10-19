@@ -2,8 +2,8 @@ import * as React from 'react';
 import Box from '@mui/material/Box';
 
 export interface FakeTextFieldElement {
-  container: React.HTMLAttributes<HTMLDivElement>;
-  content: React.HTMLAttributes<HTMLDivElement>;
+  container: React.HTMLAttributes<HTMLSpanElement>;
+  content: React.HTMLAttributes<HTMLSpanElement>;
   before: React.HTMLAttributes<HTMLSpanElement>;
   after: React.HTMLAttributes<HTMLSpanElement>;
 }
@@ -19,6 +19,7 @@ interface FakeTextFieldProps {
   disabled?: boolean;
   autoFocus?: boolean;
   ownerState?: any;
+  valueType: 'value' | 'placeholder';
 }
 
 export const FakeTextField = React.forwardRef(function FakeTextField(
@@ -35,6 +36,7 @@ export const FakeTextField = React.forwardRef(function FakeTextField(
     inputProps,
     autoFocus,
     disabled,
+    valueType,
     ownerState,
     ...other
   } = props;
@@ -48,6 +50,8 @@ export const FakeTextField = React.forwardRef(function FakeTextField(
         border: '1px solid black',
         borderRadius: 4,
         padding: '2px 4px',
+        width: '200px',
+        color: valueType === 'placeholder' ? 'grey' : 'black',
       }}
     >
       {elements.map(({ container, content, before, after }, elementIndex) => (

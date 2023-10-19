@@ -38,7 +38,8 @@ export const useField = <
 
   const {
     state,
-    selectedSectionIndexes,
+    activeSectionIndex,
+    parsedSelectedSections,
     setSelectedSections,
     clearValue,
     clearActiveSection,
@@ -118,55 +119,61 @@ export const useField = <
 
   const handleContainerPaste = useEventCallback((event: React.ClipboardEvent<HTMLInputElement>) => {
     onPaste?.(event);
-    if (readOnly) {
+    if (readOnly || parsedSelectedSections !== 'all') {
       event.preventDefault();
       return;
     }
 
     const pastedValue = event.clipboardData.getData('text');
-    if (
-      selectedSectionIndexes &&
-      selectedSectionIndexes.startIndex === selectedSectionIndexes.endIndex
-    ) {
-      const activeSection = state.sections[selectedSectionIndexes.startIndex];
-
-      const lettersOnly = /^[a-zA-Z]+$/.test(pastedValue);
-      const digitsOnly = /^[0-9]+$/.test(pastedValue);
-      const digitsAndLetterOnly = /^(([a-zA-Z]+)|)([0-9]+)(([a-zA-Z]+)|)$/.test(pastedValue);
-      const isValidPastedValue =
-        (activeSection.contentType === 'letter' && lettersOnly) ||
-        (activeSection.contentType === 'digit' && digitsOnly) ||
-        (activeSection.contentType === 'digit-with-letter' && digitsAndLetterOnly);
-      if (isValidPastedValue) {
-        // Early return to let the paste update section, value
-        return;
-      }
-      if (lettersOnly || digitsOnly) {
-        // The pasted value correspond to a single section but not the expected type
-        // skip the modification
-        event.preventDefault();
-        return;
-      }
-    }
-
     event.preventDefault();
     resetCharacterQuery();
     updateValueFromValueStr(pastedValue);
   });
 
-  const handleInputChange = useEventCallback((event: React.ChangeEvent<HTMLInputElement>) => {
-    if (readOnly) {
+  const handleInputPaste = useEventCallback((event: React.ClipboardEvent<HTMLInputElement>) => {
+    if (readOnly || typeof parsedSelectedSections !== 'number') {
+      event.preventDefault();
       return;
     }
 
-    const keyPressed = event.target.value;
+    const activeSection = state.sections[parsedSelectedSections];
+    const pastedValue = event.clipboardData.getData('text');
+    const lettersOnly = /^[a-zA-Z]+$/.test(pastedValue);
+    const digitsOnly = /^[0-9]+$/.test(pastedValue);
+    const digitsAndLetterOnly = /^(([a-zA-Z]+)|)([0-9]+)(([a-zA-Z]+)|)$/.test(pastedValue);
+    const isValidPastedValue =
+      (activeSection.contentType === 'letter' && lettersOnly) ||
+      (activeSection.contentType === 'digit' && digitsOnly) ||
+      (activeSection.contentType === 'digit-with-letter' && digitsAndLetterOnly);
+    if (isValidPastedValue) {
+      updateSectionValue({
+        activeSection,
+        newSectionValue: pastedValue,
+        shouldGoToNextSection: true,
+      });
+    }
+    if (lettersOnly || digitsOnly) {
+      // The pasted value correspond to a single section but not the expected type
+      // skip the modification
+      event.preventDefault();
+    }
+  });
+
+  const handleInputChange = useEventCallback((event: React.FormEvent<HTMLSpanElement>) => {
+    if (readOnly || !containerRef.current) {
+      return;
+    }
+
+    const target = event.target as HTMLSpanElement;
+
+    const keyPressed = target.innerHTML;
     if (keyPressed === '') {
       resetCharacterQuery();
       clearValue();
       return;
     }
 
-    const sectionIndex = getSectionIndexFromDOMElement(event.target)!;
+    const sectionIndex = getSectionIndexFromDOMElement(target)!;
 
     if (keyPressed.length === 0) {
       if (isAndroid()) {
@@ -178,13 +185,20 @@ export const useField = <
       return;
     }
 
-    applyCharacterEditing({
+    const isValid = applyCharacterEditing({
       keyPressed,
       sectionIndex,
     });
+
+    // Without this, the span will contain the newly typed character.
+    if (!isValid) {
+      containerRef.current.querySelector(
+        `span[data-sectionindex="${sectionIndex}"] .content`,
+      )!.innerHTML = state.sections[sectionIndex].value || state.sections[sectionIndex].placeholder;
+    }
   });
 
-  const handleInputKeyDown = useEventCallback((event: React.KeyboardEvent) => {
+  const handleContainerKeyDown = useEventCallback((event: React.KeyboardEvent<HTMLSpanElement>) => {
     // eslint-disable-next-line default-case
     switch (true) {
       // Select all
@@ -200,13 +214,12 @@ export const useField = <
       case event.key === 'ArrowRight': {
         event.preventDefault();
 
-        if (selectedSectionIndexes == null) {
+        if (parsedSelectedSections == null) {
           setSelectedSections(sectionOrder.startIndex);
-        } else if (selectedSectionIndexes.startIndex !== selectedSectionIndexes.endIndex) {
-          setSelectedSections(selectedSectionIndexes.endIndex);
+        } else if (parsedSelectedSections === 'all') {
+          setSelectedSections(state.sections.length - 1);
         } else {
-          const nextSectionIndex =
-            sectionOrder.neighbors[selectedSectionIndexes.startIndex].rightIndex;
+          const nextSectionIndex = sectionOrder.neighbors[parsedSelectedSections].rightIndex;
           if (nextSectionIndex !== null) {
             setSelectedSections(nextSectionIndex);
           }
@@ -218,13 +231,12 @@ export const useField = <
       case event.key === 'ArrowLeft': {
         event.preventDefault();
 
-        if (selectedSectionIndexes == null) {
+        if (parsedSelectedSections == null) {
           setSelectedSections(sectionOrder.endIndex);
-        } else if (selectedSectionIndexes.startIndex !== selectedSectionIndexes.endIndex) {
-          setSelectedSections(selectedSectionIndexes.startIndex);
+        } else if (parsedSelectedSections === 'all') {
+          setSelectedSections(0);
         } else {
-          const nextSectionIndex =
-            sectionOrder.neighbors[selectedSectionIndexes.startIndex].leftIndex;
+          const nextSectionIndex = sectionOrder.neighbors[parsedSelectedSections].leftIndex;
           if (nextSectionIndex !== null) {
             setSelectedSections(nextSectionIndex);
           }
@@ -240,11 +252,7 @@ export const useField = <
           break;
         }
 
-        if (
-          selectedSectionIndexes == null ||
-          (selectedSectionIndexes.startIndex === 0 &&
-            selectedSectionIndexes.endIndex === state.sections.length - 1)
-        ) {
+        if (parsedSelectedSections == null || parsedSelectedSections === 'all') {
           clearValue();
         } else {
           clearActiveSection();
@@ -257,11 +265,11 @@ export const useField = <
       case ['ArrowUp', 'ArrowDown', 'Home', 'End', 'PageUp', 'PageDown'].includes(event.key): {
         event.preventDefault();
 
-        if (readOnly || selectedSectionIndexes == null) {
+        if (readOnly || activeSectionIndex == null) {
           break;
         }
 
-        const activeSection = state.sections[selectedSectionIndexes.startIndex];
+        const activeSection = state.sections[activeSectionIndex];
         const activeDateManager = fieldValueManager.getActiveDateManager(
           utils,
           state,
@@ -294,7 +302,7 @@ export const useField = <
     }
 
     // Focus no section
-    if (selectedSectionIndexes == null) {
+    if (parsedSelectedSections == null) {
       if (isFocusInsideContainer(containerRef)) {
         containerRef.current.blur();
       }
@@ -308,25 +316,14 @@ export const useField = <
     }
 
     const range = new Range();
-    const startSectionBefore = containerRef.current.querySelector(
-      `span[data-sectionindex="${selectedSectionIndexes.startIndex}"] .before`,
-    )!;
-    const endSectionAfter = containerRef.current.querySelector(
-      `span[data-sectionindex="${selectedSectionIndexes.endIndex}"] .after`,
-    )!;
-
-    if (selectedSectionIndexes.shouldSelectBoundarySelectors) {
-      range.setStart(startSectionBefore, 0);
-      range.setEnd(
-        endSectionAfter,
-        state.sections[selectedSectionIndexes.endIndex].endSeparator ? 1 : 0,
-      );
+    if (parsedSelectedSections === 'all') {
+      range.selectNodeContents(containerRef.current);
     } else {
-      range.setStart(
-        startSectionBefore,
-        state.sections[selectedSectionIndexes.startIndex].startSeparator ? 1 : 0,
+      range.selectNodeContents(
+        containerRef.current.querySelector(
+          `span[data-sectionindex="${parsedSelectedSections}"] .content`,
+        )!,
       );
-      range.setEnd(endSectionAfter, 0);
     }
 
     selection.removeAllRanges();
@@ -351,10 +348,10 @@ export const useField = <
   }, [valueManager, validationError, error]);
 
   React.useEffect(() => {
-    if (!inputError && selectedSectionIndexes == null) {
+    if (!inputError && activeSectionIndex == null) {
       resetCharacterQuery();
     }
-  }, [state.referenceValue, selectedSectionIndexes, inputError]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [state.referenceValue, activeSectionIndex, inputError]); // eslint-disable-line react-hooks/exhaustive-deps
 
   React.useEffect(() => {
     // Select the right section when focused on mount (`autoFocus = true` on the input)
@@ -371,7 +368,7 @@ export const useField = <
     const sectionWithTempValueStr = state.sections.findIndex(
       (section) => section.tempValueStr != null,
     );
-    if (sectionWithTempValueStr > -1 && selectedSectionIndexes != null) {
+    if (sectionWithTempValueStr > -1 && activeSectionIndex != null) {
       resetCharacterQuery();
       clearActiveSection();
     }
@@ -382,7 +379,6 @@ export const useField = <
     state.value,
     valueManager.emptyValue,
   );
-  const shouldShowPlaceholder = !isFocusInsideContainer(containerRef) && areAllSectionsEmpty;
 
   React.useImperativeHandle(unstableFieldRef, () => ({
     getSections: () => state.sections,
@@ -400,7 +396,7 @@ export const useField = <
         getActiveElement(document) as HTMLInputElement | undefined,
       );
     },
-    setSelectedSections: (activeSectionIndex) => setSelectedSections(activeSectionIndex),
+    setSelectedSections: (newActiveSectionIndex) => setSelectedSections(newActiveSectionIndex),
   }));
 
   const handleClearValue = useEventCallback((event: React.MouseEvent, ...args) => {
@@ -416,20 +412,17 @@ export const useField = <
         container: {
           'data-sectionindex': sectionIndex,
           onClick: getElementContainerClickHandler(sectionIndex),
-        } as React.HTMLAttributes<HTMLDivElement>,
+        } as React.HTMLAttributes<HTMLSpanElement>,
         content: {
           className: 'content',
-          contentEditable: true,
+          contentEditable: !disabled && !readOnly && parsedSelectedSections !== 'all',
           role: 'textbox',
           children: section.value || section.placeholder,
           onInput: handleInputChange,
+          onPaste: handleInputPaste,
           onFocus: getInputFocusHandler(sectionIndex),
-          onKeyDown: handleInputKeyDown,
           onMouseUp: handleInputMouseUp,
           inputMode: section.contentType === 'letter' ? 'text' : 'numeric',
-          autoComplete: 'off',
-          disabled,
-          readOnly,
           suppressContentEditableWarning: true,
           style: {
             outline: 'none',
@@ -448,8 +441,9 @@ export const useField = <
       })),
     [
       state.sections,
+      parsedSelectedSections,
       getInputFocusHandler,
-      handleInputKeyDown,
+      handleInputPaste,
       handleInputChange,
       getElementContainerClickHandler,
       handleInputMouseUp,
@@ -472,8 +466,13 @@ export const useField = <
     ...otherForwardedProps,
     elements: textFieldElements,
     readOnly,
+    valueType:
+      !isFocusInsideContainer(containerRef) && areAllSectionsEmpty ? 'placeholder' : 'value',
     valueStr,
     onValueStrChange: handleValueStrChange,
+    contentEditable: !disabled && !readOnly && parsedSelectedSections === 'all',
+    suppressContentEditableWarning: true,
+    onKeyDown: handleContainerKeyDown,
     onBlur: handleContainerBlur,
     onPaste: handleContainerPaste,
     onClear: handleClearValue,
