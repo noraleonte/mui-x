@@ -50,7 +50,6 @@ export const FakeTextField = React.forwardRef(function FakeTextField(
         border: '1px solid black',
         borderRadius: 4,
         padding: '2px 4px',
-        width: '200px',
         color: valueType === 'placeholder' ? 'grey' : 'black',
       }}
     >

@@ -117,7 +117,7 @@ export const useField = <
     setSelectedSections(null);
   });
 
-  const handleContainerPaste = useEventCallback((event: React.ClipboardEvent<HTMLInputElement>) => {
+  const handleContainerPaste = useEventCallback((event: React.ClipboardEvent<HTMLDivElement>) => {
     onPaste?.(event);
     if (readOnly || parsedSelectedSections !== 'all') {
       event.preventDefault();
@@ -130,7 +130,7 @@ export const useField = <
     updateValueFromValueStr(pastedValue);
   });
 
-  const handleInputPaste = useEventCallback((event: React.ClipboardEvent<HTMLInputElement>) => {
+  const handleInputPaste = useEventCallback((event: React.ClipboardEvent<HTMLSpanElement>) => {
     if (readOnly || typeof parsedSelectedSections !== 'number') {
       event.preventDefault();
       return;
@@ -157,6 +157,11 @@ export const useField = <
       // skip the modification
       event.preventDefault();
     }
+  });
+
+  const handleInputDragOver = useEventCallback((event: React.DragEvent<HTMLSpanElement>) => {
+    event.preventDefault();
+    event.dataTransfer.dropEffect = 'none';
   });
 
   const handleInputChange = useEventCallback((event: React.FormEvent<HTMLSpanElement>) => {
@@ -393,7 +398,7 @@ export const useField = <
       }
 
       return getSectionIndexFromDOMElement(
-        getActiveElement(document) as HTMLInputElement | undefined,
+        getActiveElement(document) as HTMLSpanElement | undefined,
       );
     },
     setSelectedSections: (newActiveSectionIndex) => setSelectedSections(newActiveSectionIndex),
@@ -421,6 +426,7 @@ export const useField = <
           onInput: handleInputChange,
           onPaste: handleInputPaste,
           onFocus: getInputFocusHandler(sectionIndex),
+          onDragOver: handleInputDragOver,
           onMouseUp: handleInputMouseUp,
           inputMode: section.contentType === 'letter' ? 'text' : 'numeric',
           suppressContentEditableWarning: true,
@@ -444,6 +450,7 @@ export const useField = <
       parsedSelectedSections,
       getInputFocusHandler,
       handleInputPaste,
+      handleInputDragOver,
       handleInputChange,
       getElementContainerClickHandler,
       handleInputMouseUp,

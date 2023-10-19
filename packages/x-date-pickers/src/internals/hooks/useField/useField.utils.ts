@@ -923,7 +923,7 @@ export const getSectionOrder = (sections: FieldSection[], isRTL: boolean): Secti
   return { neighbors, startIndex: rtl2ltr[0], endIndex: rtl2ltr[sections.length - 1] };
 };
 
-export const getSectionIndexFromDOMElement = (element: HTMLElement | undefined) => {
+export const getSectionIndexFromDOMElement = (element: HTMLSpanElement | undefined) => {
   const sectionIndex = Number(
     (element === undefined ? undefined : element.parentElement)?.dataset.sectionindex ?? '-1',
   );

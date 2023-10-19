@@ -153,6 +153,8 @@ export const useFieldState = <
   });
 
   const setSelectedSections = (newSelectedSections: FieldSelectedSections) => {
+    // console.log('AAAAAAAAAAA', newSelectedSections)
+    // console.trace();
     innerSetSelectedSections(newSelectedSections);
     onSelectedSectionsChange?.(newSelectedSections);
 
