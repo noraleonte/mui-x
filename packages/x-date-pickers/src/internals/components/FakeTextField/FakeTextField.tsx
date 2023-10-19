@@ -1,9 +1,9 @@
 import * as React from 'react';
-import Stack from '@mui/material/Stack';
+import Box from '@mui/material/Box';
 
 export interface FakeTextFieldElement {
   container: React.HTMLAttributes<HTMLDivElement>;
-  input: React.HTMLAttributes<HTMLDivElement>;
+  content: React.HTMLAttributes<HTMLDivElement>;
   before: React.HTMLAttributes<HTMLSpanElement>;
   after: React.HTMLAttributes<HTMLSpanElement>;
 }
@@ -40,15 +40,24 @@ export const FakeTextField = React.forwardRef(function FakeTextField(
   } = props;
 
   return (
-    <Stack direction="row" ref={ref} {...other}>
-      {elements.map(({ container, input, before, after }, elementIndex) => (
-        <div {...container} key={elementIndex}>
+    <Box
+      ref={ref}
+      {...other}
+      style={{
+        display: 'inline-block',
+        border: '1px solid black',
+        borderRadius: 4,
+        padding: '2px 4px',
+      }}
+    >
+      {elements.map(({ container, content, before, after }, elementIndex) => (
+        <span {...container} key={elementIndex}>
           <span {...before} />
-          <input {...input} />
+          <span {...content} />
           <span {...after} />
-        </div>
+        </span>
       ))}
       <input type="hidden" value={valueStr} onChange={onValueStrChange} id={id} />
-    </Stack>
+    </Box>
   );
 });

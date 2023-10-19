@@ -301,23 +301,6 @@ export const useField = <
       return;
     }
 
-    // Focus one section
-    if (selectedSectionIndexes.startIndex === selectedSectionIndexes.endIndex) {
-      const inputToFocus = containerRef.current.querySelector<HTMLInputElement>(
-        `div[data-sectionindex="${selectedSectionIndexes.startIndex}"] input`,
-      );
-      if (!inputToFocus) {
-        return;
-      }
-
-      // Fix scroll jumping on iOS browser: https://github.com/mui/mui-x/issues/8321
-      const currentScrollTop = inputToFocus.scrollTop;
-      inputToFocus.select();
-      // Even reading this variable seems to do the trick, but also setting it just to make use of it
-      inputToFocus.scrollTop = currentScrollTop;
-      return;
-    }
-
     // Focus several sections
     const selection = document.getSelection();
     if (!selection) {
@@ -326,10 +309,10 @@ export const useField = <
 
     const range = new Range();
     const startSectionBefore = containerRef.current.querySelector(
-      `div[data-sectionindex="${selectedSectionIndexes.startIndex}"] .before`,
+      `span[data-sectionindex="${selectedSectionIndexes.startIndex}"] .before`,
     )!;
     const endSectionAfter = containerRef.current.querySelector(
-      `div[data-sectionindex="${selectedSectionIndexes.endIndex}"] .after`,
+      `span[data-sectionindex="${selectedSectionIndexes.endIndex}"] .after`,
     )!;
 
     if (selectedSectionIndexes.shouldSelectBoundarySelectors) {
@@ -339,7 +322,7 @@ export const useField = <
         state.sections[selectedSectionIndexes.endIndex].endSeparator ? 1 : 0,
       );
     } else {
-      range.setEnd(
+      range.setStart(
         startSectionBefore,
         state.sections[selectedSectionIndexes.startIndex].startSeparator ? 1 : 0,
       );
@@ -432,13 +415,14 @@ export const useField = <
       state.sections.map((section, sectionIndex) => ({
         container: {
           'data-sectionindex': sectionIndex,
-          style: { margin: 0, display: 'flex', flexDirection: 'row', height: 16 },
           onClick: getElementContainerClickHandler(sectionIndex),
         } as React.HTMLAttributes<HTMLDivElement>,
-        input: {
-          value: shouldShowPlaceholder ? '' : section.value || section.placeholder,
-          placeholder: section.placeholder,
-          onChange: handleInputChange,
+        content: {
+          className: 'content',
+          contentEditable: true,
+          role: 'textbox',
+          children: section.value || section.placeholder,
+          onInput: handleInputChange,
           onFocus: getInputFocusHandler(sectionIndex),
           onKeyDown: handleInputKeyDown,
           onMouseUp: handleInputMouseUp,
@@ -446,12 +430,8 @@ export const useField = <
           autoComplete: 'off',
           disabled,
           readOnly,
+          suppressContentEditableWarning: true,
           style: {
-            width: `calc(8px + ${(section.value || section.placeholder).length}ch)`,
-            padding: 0,
-            border: 0,
-            height: 16,
-            lineHeight: 16,
             outline: 'none',
           },
         },
@@ -468,7 +448,6 @@ export const useField = <
       })),
     [
       state.sections,
-      shouldShowPlaceholder,
       getInputFocusHandler,
       handleInputKeyDown,
       handleInputChange,
