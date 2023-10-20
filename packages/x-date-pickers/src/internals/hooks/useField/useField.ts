@@ -14,7 +14,6 @@ import {
 } from './useField.types';
 import {
   adjustSectionValue,
-  isAndroid,
   getSectionOrder,
   isFocusInsideContainer,
   getSectionIndexFromDOMElement,
@@ -23,7 +22,7 @@ import { useFieldState } from './useFieldState';
 import { useFieldCharacterEditing } from './useFieldCharacterEditing';
 import { getActiveElement } from '../../utils/utils';
 import { FieldSection } from '../../../models';
-import type { FakeTextFieldElement } from '../../components/FakeTextField/FakeTextField';
+import { useFieldElements } from './useFieldElements';
 
 export const useField = <
   TValue,
@@ -82,35 +81,24 @@ export const useField = <
   const theme = useTheme();
   const isRTL = theme.direction === 'rtl';
 
+  const elements = useFieldElements({
+    ...params,
+    applyCharacterEditing,
+    resetCharacterQuery,
+    setSelectedSections,
+    parsedSelectedSections,
+    state,
+    clearValue,
+    clearActiveSection,
+    setSectionTempValueStr,
+    updateSectionValue,
+    containerRef,
+  });
+
   const sectionOrder = React.useMemo(
     () => getSectionOrder(state.sections, isRTL),
     [state.sections, isRTL],
   );
-
-  const getElementContainerClickHandler = useEventCallback(
-    (sectionIndex: number) => (event: React.MouseEvent<HTMLDivElement>) => {
-      // The click event on the clear button would propagate to the input, trigger this handler and result in a wrong section selection.
-      // We avoid this by checking if the call to this function is actually intended, or a side effect.
-      if (event.isDefaultPrevented() || readOnly) {
-        return;
-      }
-
-      setSelectedSections(sectionIndex);
-    },
-  );
-
-  const handleInputMouseUp = useEventCallback((event: React.MouseEvent) => {
-    // Without this, the browser will remove the selected when clicking inside an already-selected section.
-    event.preventDefault();
-  });
-
-  const getInputFocusHandler = useEventCallback((sectionIndex: number) => () => {
-    if (readOnly) {
-      return;
-    }
-
-    setSelectedSections(sectionIndex);
-  });
 
   const handleContainerBlur = useEventCallback((...args) => {
     onBlur?.(...(args as []));
@@ -128,79 +116,6 @@ export const useField = <
     event.preventDefault();
     resetCharacterQuery();
     updateValueFromValueStr(pastedValue);
-  });
-
-  const handleInputPaste = useEventCallback((event: React.ClipboardEvent<HTMLSpanElement>) => {
-    if (readOnly || typeof parsedSelectedSections !== 'number') {
-      event.preventDefault();
-      return;
-    }
-
-    const activeSection = state.sections[parsedSelectedSections];
-    const pastedValue = event.clipboardData.getData('text');
-    const lettersOnly = /^[a-zA-Z]+$/.test(pastedValue);
-    const digitsOnly = /^[0-9]+$/.test(pastedValue);
-    const digitsAndLetterOnly = /^(([a-zA-Z]+)|)([0-9]+)(([a-zA-Z]+)|)$/.test(pastedValue);
-    const isValidPastedValue =
-      (activeSection.contentType === 'letter' && lettersOnly) ||
-      (activeSection.contentType === 'digit' && digitsOnly) ||
-      (activeSection.contentType === 'digit-with-letter' && digitsAndLetterOnly);
-    if (isValidPastedValue) {
-      updateSectionValue({
-        activeSection,
-        newSectionValue: pastedValue,
-        shouldGoToNextSection: true,
-      });
-    }
-    if (lettersOnly || digitsOnly) {
-      // The pasted value correspond to a single section but not the expected type
-      // skip the modification
-      event.preventDefault();
-    }
-  });
-
-  const handleInputDragOver = useEventCallback((event: React.DragEvent<HTMLSpanElement>) => {
-    event.preventDefault();
-    event.dataTransfer.dropEffect = 'none';
-  });
-
-  const handleInputChange = useEventCallback((event: React.FormEvent<HTMLSpanElement>) => {
-    if (readOnly || !containerRef.current) {
-      return;
-    }
-
-    const target = event.target as HTMLSpanElement;
-
-    const keyPressed = target.innerHTML;
-    if (keyPressed === '') {
-      resetCharacterQuery();
-      clearValue();
-      return;
-    }
-
-    const sectionIndex = getSectionIndexFromDOMElement(target)!;
-
-    if (keyPressed.length === 0) {
-      if (isAndroid()) {
-        setSectionTempValueStr(sectionIndex, keyPressed);
-      } else {
-        resetCharacterQuery();
-        clearActiveSection();
-      }
-      return;
-    }
-
-    const isValid = applyCharacterEditing({
-      keyPressed,
-      sectionIndex,
-    });
-
-    // Without this, the span will contain the newly typed character.
-    if (!isValid) {
-      containerRef.current.querySelector(
-        `span[data-sectionindex="${sectionIndex}"] .content`,
-      )!.innerHTML = state.sections[sectionIndex].value || state.sections[sectionIndex].placeholder;
-    }
   });
 
   const handleContainerKeyDown = useEventCallback((event: React.KeyboardEvent<HTMLSpanElement>) => {
@@ -299,6 +214,17 @@ export const useField = <
         break;
       }
     }
+  });
+
+  const handleContainerInput = useEventCallback((event: React.FormEvent<HTMLDivElement>) => {
+    if (readOnly || !containerRef.current) {
+      return;
+    }
+
+    const target = event.target as HTMLDivElement;
+    const keyPressed = target.innerText;
+
+    console.log(target.innerText);
   });
 
   useEnhancedEffect(() => {
@@ -411,54 +337,6 @@ export const useField = <
     setSelectedSections(0);
   });
 
-  const textFieldElements = React.useMemo<FakeTextFieldElement[]>(
-    () =>
-      state.sections.map((section, sectionIndex) => ({
-        container: {
-          'data-sectionindex': sectionIndex,
-          onClick: getElementContainerClickHandler(sectionIndex),
-        } as React.HTMLAttributes<HTMLSpanElement>,
-        content: {
-          className: 'content',
-          contentEditable: !disabled && !readOnly && parsedSelectedSections !== 'all',
-          role: 'textbox',
-          children: section.value || section.placeholder,
-          onInput: handleInputChange,
-          onPaste: handleInputPaste,
-          onFocus: getInputFocusHandler(sectionIndex),
-          onDragOver: handleInputDragOver,
-          onMouseUp: handleInputMouseUp,
-          inputMode: section.contentType === 'letter' ? 'text' : 'numeric',
-          suppressContentEditableWarning: true,
-          style: {
-            outline: 'none',
-          },
-        },
-        before: {
-          className: 'before',
-          children: section.startSeparator,
-          style: { height: 16, fontSize: 12, whiteSpace: 'pre' },
-        },
-        after: {
-          className: 'after',
-          children: section.endSeparator,
-          style: { height: 16, fontSize: 12, whiteSpace: 'pre' },
-        },
-      })),
-    [
-      state.sections,
-      parsedSelectedSections,
-      getInputFocusHandler,
-      handleInputPaste,
-      handleInputDragOver,
-      handleInputChange,
-      getElementContainerClickHandler,
-      handleInputMouseUp,
-      disabled,
-      readOnly,
-    ],
-  );
-
   const handleValueStrChange = useEventCallback((event: React.ChangeEvent<HTMLInputElement>) =>
     updateValueFromValueStr(event.target.value),
   );
@@ -471,14 +349,12 @@ export const useField = <
   return {
     disabled,
     ...otherForwardedProps,
-    elements: textFieldElements,
+    elements,
     readOnly,
     valueType:
       !isFocusInsideContainer(containerRef) && areAllSectionsEmpty ? 'placeholder' : 'value',
     valueStr,
     onValueStrChange: handleValueStrChange,
-    contentEditable: !disabled && !readOnly && parsedSelectedSections === 'all',
-    suppressContentEditableWarning: true,
     onKeyDown: handleContainerKeyDown,
     onBlur: handleContainerBlur,
     onPaste: handleContainerPaste,

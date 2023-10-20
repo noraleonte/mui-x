@@ -9,6 +9,7 @@ import {
   UseFieldState,
   FieldParsedSelectedSections,
   FieldChangeHandlerContext,
+  FieldSectionsValueBoundaries,
 } from './useField.types';
 import {
   splitFormatIntoSections,
@@ -19,7 +20,7 @@ import {
   resetSectionsTempValueStr,
 } from './useField.utils';
 import { InferError } from '../useValidation';
-import { FieldSection, FieldSelectedSections } from '../../../models';
+import { FieldSection, FieldSelectedSections, PickersTimezone } from '../../../models';
 import { useValueWithTimezone } from '../useValueWithTimezone';
 import {
   GetDefaultReferenceDateProps,
@@ -41,6 +42,21 @@ export interface UpdateSectionValueParams<TSection extends FieldSection> {
   shouldGoToNextSection: boolean;
 }
 
+export interface UseFieldStateResponse<TValue, TDate, TSection extends FieldSection> {
+  state: UseFieldState<TValue, TSection>;
+  activeSectionIndex: number | null;
+  parsedSelectedSections: FieldParsedSelectedSections;
+  setSelectedSections: (sections: FieldSelectedSections) => void;
+  clearValue: () => void;
+  clearActiveSection: () => void;
+  updateSectionValue: (params: UpdateSectionValueParams<TSection>) => void;
+  updateValueFromValueStr: (valueStr: string) => void;
+  setSectionTempValueStr: (sectionIndex: number, tempValueStr: string) => void;
+  resetSectionsTempValueStr: () => void;
+  sectionsValueBoundaries: FieldSectionsValueBoundaries<TDate>;
+  timezone: PickersTimezone;
+}
+
 export const useFieldState = <
   TValue,
   TDate,
@@ -49,7 +65,7 @@ export const useFieldState = <
   TInternalProps extends UseFieldInternalProps<any, any, any, any>,
 >(
   params: UseFieldParams<TValue, TDate, TSection, TForwardedProps, TInternalProps>,
-) => {
+): UseFieldStateResponse<TValue, TDate, TSection> => {
   const utils = useUtils<TDate>();
   const localeText = useLocaleText<TDate>();
   const adapter = useLocalizationContext<TDate>();
@@ -164,7 +180,7 @@ export const useFieldState = <
     }));
   };
 
-  const parsedSelectedSections = React.useMemo<FieldParsedSelectedSections | null>(() => {
+  const parsedSelectedSections = React.useMemo<FieldParsedSelectedSections>(() => {
     if (selectedSections == null) {
       return null;
     }

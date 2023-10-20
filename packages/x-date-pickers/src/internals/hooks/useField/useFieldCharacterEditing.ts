@@ -19,17 +19,22 @@ interface CharacterEditingQuery {
   sectionType: FieldSectionType;
 }
 
-interface ApplyCharacterEditingParams {
+export interface ApplyCharacterEditingParams {
   keyPressed: string;
   sectionIndex: number;
 }
 
-interface UseFieldEditingParams<TDate, TSection extends FieldSection> {
+interface UseFieldCharacterEditingParams<TDate, TSection extends FieldSection> {
   sections: TSection[];
   updateSectionValue: (params: UpdateSectionValueParams<TSection>) => void;
   sectionsValueBoundaries: FieldSectionsValueBoundaries<TDate>;
   resetSectionsTempValueStr: () => void;
   timezone: PickersTimezone;
+}
+
+export interface UseFieldCharacterEditingResponse {
+  applyCharacterEditing: (params: ApplyCharacterEditingParams) => boolean;
+  resetCharacterQuery: () => void;
 }
 
 /**
@@ -80,7 +85,7 @@ export const useFieldCharacterEditing = <TDate, TSection extends FieldSection>({
   sectionsValueBoundaries,
   resetSectionsTempValueStr,
   timezone,
-}: UseFieldEditingParams<TDate, TSection>) => {
+}: UseFieldCharacterEditingParams<TDate, TSection>): UseFieldCharacterEditingResponse => {
   const utils = useUtils<TDate>();
 
   const [query, setQuery] = React.useState<CharacterEditingQuery | null>(null);

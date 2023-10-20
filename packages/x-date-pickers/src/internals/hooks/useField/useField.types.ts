@@ -228,7 +228,7 @@ interface FieldActiveDateManager<TValue, TDate, TSection extends FieldSection> {
   ) => Pick<UseFieldState<TValue, any>, 'value' | 'referenceValue'>;
 }
 
-export type FieldParsedSelectedSections = number | 'all';
+export type FieldParsedSelectedSections = number | 'all' | null;
 
 export interface FieldValueManager<TValue, TDate, TSection extends FieldSection> {
   /**
