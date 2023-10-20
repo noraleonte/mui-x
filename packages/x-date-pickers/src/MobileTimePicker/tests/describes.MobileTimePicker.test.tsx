@@ -9,7 +9,7 @@ import {
   createPickerRenderer,
   wrapPickerMount,
   adapterToUse,
-  expectInputValue,
+  expectFieldValue,
   expectInputPlaceholder,
   openPicker,
   getClockTouchEvent,
@@ -76,7 +76,7 @@ describe('<MobileTimePicker /> - Describes', () => {
         ? adapterToUse.format(expectedValue, hasMeridiem ? 'fullTime12h' : 'fullTime24h')
         : '';
 
-      expectInputValue(input, expectedValueStr);
+      expectFieldValue(input, expectedValueStr);
     },
     setNewValue: (value, { isOpened, applySameValue }) => {
       if (!isOpened) {

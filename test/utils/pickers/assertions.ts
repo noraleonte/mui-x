@@ -2,12 +2,13 @@ import { expect } from 'chai';
 import { SinonSpy } from 'sinon';
 import { cleanText } from 'test/utils/pickers';
 
-export const expectInputValue = (
-  input: HTMLInputElement,
+export const expectFieldValue = (
+  fieldContainer: HTMLDivElement,
   expectedValue: string,
   specialCase?: 'singleDigit' | 'RTL',
 ) => {
-  const value = cleanText(input.value, specialCase);
+  // TODO fields: The cleaning of RTL chars is no longer needed
+  const value = cleanText(fieldContainer.innerText, specialCase);
   return expect(value).to.equal(expectedValue);
 };
 

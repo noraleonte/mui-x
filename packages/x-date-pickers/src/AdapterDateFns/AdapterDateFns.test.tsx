@@ -7,7 +7,7 @@ import { expect } from 'chai';
 import {
   createPickerRenderer,
   expectInputPlaceholder,
-  expectInputValue,
+  expectFieldValue,
   describeGregorianAdapter,
   TEST_DATE_ISO_STRING,
 } from 'test/utils/pickers';
@@ -138,7 +138,7 @@ describe('<AdapterDateFns />', () => {
         it('should have well formatted value', () => {
           render(<DateTimePicker value={adapter.date(testDate)} />);
 
-          expectInputValue(screen.getByRole('textbox'), localizedTexts[localeKey].value);
+          expectFieldValue(screen.getByRole('textbox'), localizedTexts[localeKey].value);
         });
       });
     });

@@ -2,7 +2,7 @@ import { screen, userEvent, fireTouchChangedEvent } from '@mui-internal/test-uti
 import {
   createPickerRenderer,
   adapterToUse,
-  expectInputValue,
+  expectFieldValue,
   expectInputPlaceholder,
   openPicker,
   getClockTouchEvent,
@@ -53,7 +53,7 @@ describe('<MobileDateTimePicker /> - Describes', () => {
           )
         : '';
 
-      expectInputValue(input, expectedValueStr);
+      expectFieldValue(input, expectedValueStr);
     },
     setNewValue: (value, { isOpened, applySameValue }) => {
       if (!isOpened) {

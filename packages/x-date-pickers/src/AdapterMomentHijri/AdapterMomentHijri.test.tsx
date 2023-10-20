@@ -8,7 +8,7 @@ import { screen } from '@mui-internal/test-utils/createRenderer';
 import {
   createPickerRenderer,
   expectInputPlaceholder,
-  expectInputValue,
+  expectFieldValue,
   describeHijriAdapter,
 } from 'test/utils/pickers';
 import 'moment/locale/ar';
@@ -86,7 +86,7 @@ describe('<AdapterMomentHijri />', () => {
         it('should have well formatted value', () => {
           render(<DateTimePicker value={adapter.date(testDate)} />);
 
-          expectInputValue(screen.getByRole('textbox'), localizedTexts[localeKey].value);
+          expectFieldValue(screen.getByRole('textbox'), localizedTexts[localeKey].value);
         });
       });
     });

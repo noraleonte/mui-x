@@ -8,7 +8,7 @@ import { screen } from '@mui-internal/test-utils/createRenderer';
 import {
   createPickerRenderer,
   expectInputPlaceholder,
-  expectInputValue,
+  expectFieldValue,
   describeJalaliAdapter,
 } from 'test/utils/pickers';
 import { AdapterFormats } from '@mui/x-date-pickers/models';
@@ -93,7 +93,7 @@ describe('<AdapterMomentJalaali />', () => {
         it('should have well formatted value', () => {
           render(<DateTimePicker value={adapter.date(testDate)} />);
 
-          expectInputValue(screen.getByRole('textbox'), localizedTexts[localeKey].value);
+          expectFieldValue(screen.getByRole('textbox'), localizedTexts[localeKey].value);
         });
       });
     });

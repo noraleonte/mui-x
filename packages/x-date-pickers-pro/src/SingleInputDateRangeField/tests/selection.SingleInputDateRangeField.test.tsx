@@ -8,7 +8,7 @@ import {
   getCleanedSelectedContent,
   getTextbox,
   createPickerRenderer,
-  expectInputValue,
+  expectFieldValue,
 } from 'test/utils/pickers';
 
 describe('<SingleInputDateRangeField /> - Selection', () => {
@@ -24,7 +24,7 @@ describe('<SingleInputDateRangeField /> - Selection', () => {
       render(<SingleInputDateRangeField autoFocus />);
       const input = getTextbox();
 
-      expectInputValue(input, 'MM/DD/YYYY – MM/DD/YYYY');
+      expectFieldValue(input, 'MM/DD/YYYY – MM/DD/YYYY');
       expect(getCleanedSelectedContent(input)).to.equal('MM/DD/YYYY – MM/DD/YYYY');
     });
 
@@ -38,7 +38,7 @@ describe('<SingleInputDateRangeField /> - Selection', () => {
       clock.runToLast();
       input.select();
 
-      expectInputValue(input, 'MM/DD/YYYY – MM/DD/YYYY');
+      expectFieldValue(input, 'MM/DD/YYYY – MM/DD/YYYY');
       expect(getCleanedSelectedContent(input)).to.equal('MM/DD/YYYY – MM/DD/YYYY');
     });
   });

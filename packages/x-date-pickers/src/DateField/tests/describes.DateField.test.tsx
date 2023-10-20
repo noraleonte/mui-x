@@ -5,7 +5,7 @@ import { DateField } from '@mui/x-date-pickers/DateField';
 import {
   createPickerRenderer,
   wrapPickerMount,
-  expectInputValue,
+  expectFieldValue,
   expectInputPlaceholder,
   adapterToUse,
   getTextbox,
@@ -52,7 +52,7 @@ describe('<DateField /> - Describes', () => {
       if (!expectedValue) {
         expectInputPlaceholder(input, 'MM/DD/YYYY');
       }
-      expectInputValue(
+      expectFieldValue(
         input,
         expectedValue ? adapterToUse.format(expectedValue, 'keyboardDate') : '',
       );

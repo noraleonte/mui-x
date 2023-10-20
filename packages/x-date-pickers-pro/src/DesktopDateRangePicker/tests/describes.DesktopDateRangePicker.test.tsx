@@ -6,7 +6,7 @@ import {
   wrapPickerMount,
   getTextbox,
   expectInputPlaceholder,
-  expectInputValue,
+  expectFieldValue,
   describePicker,
   describeValue,
   describeRangeValidation,
@@ -69,7 +69,7 @@ describe('<DesktopDateRangePicker /> - Describes', () => {
         if (!value) {
           expectInputPlaceholder(input, 'MM/DD/YYYY');
         }
-        expectInputValue(input, value ? adapterToUse.format(value, 'keyboardDate') : '');
+        expectFieldValue(input, value ? adapterToUse.format(value, 'keyboardDate') : '');
       });
     },
     setNewValue: (value, { isOpened, applySameValue, setEndDate = false, selectSection }) => {
@@ -129,7 +129,7 @@ describe('<DesktopDateRangePicker /> - Describes', () => {
         expectInputPlaceholder(input, expectedValueStr);
       }
 
-      expectInputValue(input, isEmpty ? '' : expectedValueStr);
+      expectFieldValue(input, isEmpty ? '' : expectedValueStr);
     },
     setNewValue: (value, { isOpened, applySameValue, setEndDate = false, selectSection }) => {
       let newValue: any[];

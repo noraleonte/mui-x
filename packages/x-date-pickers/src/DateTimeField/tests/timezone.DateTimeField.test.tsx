@@ -5,7 +5,7 @@ import { userEvent } from '@mui-internal/test-utils';
 import { DateTimeField } from '@mui/x-date-pickers/DateTimeField';
 import {
   createPickerRenderer,
-  expectInputValue,
+  expectFieldValue,
   getTextbox,
   describeAdapters,
 } from 'test/utils/pickers';
@@ -57,7 +57,7 @@ describe('<DateTimeField /> - Timezone', () => {
       const expectedDate = fillEmptyValue(input, 'default');
 
       // Check the rendered value (uses default timezone, e.g: UTC, see TZ env variable)
-      expectInputValue(input, '12/31/2022 23');
+      expectFieldValue(input, '12/31/2022 23');
 
       // Check the `onChange` value (uses default timezone, e.g: UTC, see TZ env variable)
       const actualDate = onChange.lastCall.firstArg;
@@ -77,7 +77,7 @@ describe('<DateTimeField /> - Timezone', () => {
           const expectedDate = fillEmptyValue(input, timezone);
 
           // Check the rendered value (uses timezone prop)
-          expectInputValue(input, '12/31/2022 23');
+          expectFieldValue(input, '12/31/2022 23');
 
           // Check the `onChange` value (uses timezone prop)
           const actualDate = onChange.lastCall.firstArg;
@@ -100,7 +100,7 @@ describe('<DateTimeField /> - Timezone', () => {
           userEvent.keyPress(input, { key: 'ArrowDown' });
 
           // Check the rendered value (uses America/Chicago timezone)
-          expectInputValue(input, '05/14/2022 19');
+          expectFieldValue(input, '05/14/2022 19');
 
           // Check the `onChange` value (uses timezone prop)
           const expectedDate = adapter.addMonths(adapter.dateWithTimezone(undefined, timezone), -1);
@@ -122,11 +122,11 @@ describe('<DateTimeField /> - Timezone', () => {
       const date = adapter.date(new Date('2020-06-18T14:30:10.000Z')).setZone('UTC');
       setProps({ value: date });
 
-      expectInputValue(input, '06/18/2020 02:30 PM');
+      expectFieldValue(input, '06/18/2020 02:30 PM');
 
       setProps({ value: date.setZone('America/Los_Angeles') });
 
-      expectInputValue(input, '06/18/2020 07:30 AM');
+      expectFieldValue(input, '06/18/2020 07:30 AM');
     });
   });
 });

@@ -9,7 +9,7 @@ import {
   createPickerRenderer,
   adapterToUse,
   openPicker,
-  expectInputValue,
+  expectFieldValue,
   getTextbox,
 } from 'test/utils/pickers';
 
@@ -30,7 +30,7 @@ describe('<DesktopDatePicker />', () => {
       },
     });
 
-    expectInputValue(input, '10/11/2018');
+    expectFieldValue(input, '10/11/2018');
     expect(handleChange.callCount).to.equal(1);
   });
 

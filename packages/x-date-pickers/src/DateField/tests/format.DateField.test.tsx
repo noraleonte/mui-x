@@ -1,7 +1,7 @@
 import * as React from 'react';
 import {
   expectInputPlaceholder,
-  expectInputValue,
+  expectFieldValue,
   getTextbox,
   describeAdapters,
 } from 'test/utils/pickers';
@@ -18,7 +18,7 @@ describeAdapters('<DateField /> - Format', DateField, ({ render, adapter }) => {
     expectInputPlaceholder(input, 'Escaped YYYY');
 
     setProps({ value: adapter.date(new Date(2019, 0, 1)) });
-    expectInputValue(input, 'Escaped 2019');
+    expectFieldValue(input, 'Escaped 2019');
   });
 
   it('should support escaped characters between sections separator', () => {
@@ -33,7 +33,7 @@ describeAdapters('<DateField /> - Format', DateField, ({ render, adapter }) => {
     expectInputPlaceholder(input, 'MMMM Escaped YYYY');
 
     setProps({ value: adapter.date(new Date(2019, 0, 1)) });
-    expectInputValue(input, 'January Escaped 2019');
+    expectFieldValue(input, 'January Escaped 2019');
   });
 
   it('should support nested escaped characters', function test() {
@@ -54,7 +54,7 @@ describeAdapters('<DateField /> - Format', DateField, ({ render, adapter }) => {
     expectInputPlaceholder(input, 'MMMM Escaped [ YYYY');
 
     setProps({ value: adapter.date(new Date(2019, 0, 1)) });
-    expectInputValue(input, 'January Escaped [ 2019');
+    expectFieldValue(input, 'January Escaped [ 2019');
   });
 
   it('should support several escaped parts', function test() {
@@ -70,7 +70,7 @@ describeAdapters('<DateField /> - Format', DateField, ({ render, adapter }) => {
     expectInputPlaceholder(input, 'Escaped MMMM Escaped YYYY');
 
     setProps({ value: adapter.date(new Date(2019, 0, 1)) });
-    expectInputValue(input, 'Escaped January Escaped 2019');
+    expectFieldValue(input, 'Escaped January Escaped 2019');
   });
 
   it('should add spaces around `/` when `formatDensity = "spacious"`', () => {
@@ -79,7 +79,7 @@ describeAdapters('<DateField /> - Format', DateField, ({ render, adapter }) => {
     expectInputPlaceholder(input, 'MM / DD / YYYY');
 
     setProps({ value: adapter.date(new Date(2019, 0, 1)) });
-    expectInputValue(input, '01 / 01 / 2019');
+    expectFieldValue(input, '01 / 01 / 2019');
   });
 
   it('should add spaces around `.` when `formatDensity = "spacious"`', () => {
@@ -93,7 +93,7 @@ describeAdapters('<DateField /> - Format', DateField, ({ render, adapter }) => {
     expectInputPlaceholder(input, 'MM . DD . YYYY');
 
     setProps({ value: adapter.date(new Date(2019, 0, 1)) });
-    expectInputValue(input, '01 . 01 . 2019');
+    expectFieldValue(input, '01 . 01 . 2019');
   });
 
   it('should add spaces around `-` when `formatDensity = "spacious"`', () => {
@@ -107,6 +107,6 @@ describeAdapters('<DateField /> - Format', DateField, ({ render, adapter }) => {
     expectInputPlaceholder(input, 'MM - DD - YYYY');
 
     setProps({ value: adapter.date(new Date(2019, 0, 1)) });
-    expectInputValue(input, '01 - 01 - 2019');
+    expectFieldValue(input, '01 - 01 - 2019');
   });
 });

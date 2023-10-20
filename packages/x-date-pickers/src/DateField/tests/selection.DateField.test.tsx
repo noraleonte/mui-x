@@ -4,7 +4,7 @@ import { DateField } from '@mui/x-date-pickers/DateField';
 import { act, userEvent } from '@mui-internal/test-utils';
 import {
   createPickerRenderer,
-  expectInputValue,
+  expectFieldValue,
   getCleanedSelectedContent,
   getTextbox,
   buildFieldInteractions,
@@ -20,7 +20,7 @@ describe('<DateField /> - Selection', () => {
       render(<DateField autoFocus />);
       const input = getTextbox();
 
-      expectInputValue(input, 'MM/DD/YYYY');
+      expectFieldValue(input, 'MM/DD/YYYY');
       expect(getCleanedSelectedContent(input)).to.equal('MM/DD/YYYY');
     });
 
@@ -28,7 +28,7 @@ describe('<DateField /> - Selection', () => {
       render(<DateField autoFocus format={`- ${adapterToUse.formats.year}`} />);
       const input = getTextbox();
 
-      expectInputValue(input, '- YYYY');
+      expectFieldValue(input, '- YYYY');
       expect(getCleanedSelectedContent(input)).to.equal('- YYYY');
     });
 
@@ -42,7 +42,7 @@ describe('<DateField /> - Selection', () => {
       clock.runToLast();
       input.select();
 
-      expectInputValue(input, 'MM/DD/YYYY');
+      expectFieldValue(input, 'MM/DD/YYYY');
       expect(getCleanedSelectedContent(input)).to.equal('MM/DD/YYYY');
     });
 
@@ -56,7 +56,7 @@ describe('<DateField /> - Selection', () => {
       clock.runToLast();
       input.select();
 
-      expectInputValue(input, '- YYYY');
+      expectFieldValue(input, '- YYYY');
       expect(getCleanedSelectedContent(input)).to.equal('- YYYY');
     });
 
@@ -68,7 +68,7 @@ describe('<DateField /> - Selection', () => {
         input.focus();
       });
       clock.runToLast();
-      expectInputValue(input, 'MM/DD/YYYY');
+      expectFieldValue(input, 'MM/DD/YYYY');
 
       input.setSelectionRange(3, 5);
       expect(input.selectionStart).to.equal(3);
@@ -81,7 +81,7 @@ describe('<DateField /> - Selection', () => {
 
       selectSection('day');
 
-      expectInputValue(input, 'MM/DD/YYYY');
+      expectFieldValue(input, 'MM/DD/YYYY');
       expect(getCleanedSelectedContent(input)).to.equal('DD');
     });
   });

@@ -5,7 +5,7 @@ import {
   createPickerRenderer,
   buildFieldInteractions,
   getTextbox,
-  expectInputValue,
+  expectFieldValue,
   expectInputPlaceholder,
   adapterToUse,
   describeAdapters,
@@ -35,13 +35,13 @@ describe('<DesktopDatePicker /> - Field', () => {
       clickOnField(input, 0);
 
       fireEvent.change(input, { target: { value: 'N DD' } }); // Press "1"
-      expectInputValue(input, 'November DD');
+      expectFieldValue(input, 'November DD');
 
       fireEvent.change(input, { target: { value: 'November 4' } }); // Press "1"
-      expectInputValue(input, 'November 04');
+      expectFieldValue(input, 'November 04');
 
       fireEvent.change(input, { target: { value: 'November ' } });
-      expectInputValue(input, 'November DD');
+      expectFieldValue(input, 'November DD');
     });
 
     it('should adapt the default field format based on the props of the picker', () => {
@@ -78,11 +78,11 @@ describe('<DesktopDatePicker /> - Field', () => {
       render(<WrappedDesktopDatePicker />);
 
       const input = getTextbox();
-      expectInputValue(input, 'June 2022');
+      expectFieldValue(input, 'June 2022');
       clickOnField(input, 0);
 
       fireEvent.change(input, { target: { value: ' 2022' } });
-      expectInputValue(input, 'MMMM 2022');
+      expectFieldValue(input, 'MMMM 2022');
     });
   });
 });

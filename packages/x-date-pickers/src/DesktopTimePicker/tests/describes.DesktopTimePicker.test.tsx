@@ -4,7 +4,7 @@ import {
   createPickerRenderer,
   wrapPickerMount,
   adapterToUse,
-  expectInputValue,
+  expectFieldValue,
   expectInputPlaceholder,
   getTextbox,
   describeValidation,
@@ -66,7 +66,7 @@ describe('<DesktopTimePicker /> - Describes', () => {
       if (!expectedValue) {
         expectInputPlaceholder(input, hasMeridiem ? 'hh:mm aa' : 'hh:mm');
       }
-      expectInputValue(
+      expectFieldValue(
         input,
         expectedValue
           ? adapterToUse.format(expectedValue, hasMeridiem ? 'fullTime12h' : 'fullTime24h')

@@ -2,7 +2,7 @@ import { expect } from 'chai';
 import { spy } from 'sinon';
 import { SingleInputDateRangeField } from '@mui/x-date-pickers-pro/SingleInputDateRangeField';
 import { userEvent, fireEvent } from '@mui-internal/test-utils';
-import { expectInputValue, describeAdapters } from 'test/utils/pickers';
+import { expectFieldValue, describeAdapters } from 'test/utils/pickers';
 
 describe('<SingleInputDateRangeField /> - Editing', () => {
   describeAdapters(`key: Delete`, SingleInputDateRangeField, ({ adapter, renderWithProps }) => {
@@ -18,7 +18,7 @@ describe('<SingleInputDateRangeField /> - Editing', () => {
       userEvent.keyPress(input, { key: 'a', ctrlKey: true });
 
       userEvent.keyPress(input, { key: 'Delete' });
-      expectInputValue(input, 'MMMM YYYY – MMMM YYYY');
+      expectFieldValue(input, 'MMMM YYYY – MMMM YYYY');
     });
 
     it('should clear all the sections when all sections are selected and not all sections are completed', () => {
@@ -32,13 +32,13 @@ describe('<SingleInputDateRangeField /> - Editing', () => {
       fireEvent.change(input, {
         target: { value: 'j YYYY – MMMM YYYY' },
       }); // Press "j"
-      expectInputValue(input, 'January YYYY – MMMM YYYY');
+      expectFieldValue(input, 'January YYYY – MMMM YYYY');
 
       // Select all sections
       userEvent.keyPress(input, { key: 'a', ctrlKey: true });
 
       userEvent.keyPress(input, { key: 'Delete' });
-      expectInputValue(input, 'MMMM YYYY – MMMM YYYY');
+      expectFieldValue(input, 'MMMM YYYY – MMMM YYYY');
     });
 
     it('should not call `onChange` when clearing all sections and both dates are already empty', () => {

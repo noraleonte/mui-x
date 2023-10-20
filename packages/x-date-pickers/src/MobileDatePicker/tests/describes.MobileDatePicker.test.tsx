@@ -2,7 +2,7 @@ import { screen, userEvent } from '@mui-internal/test-utils';
 import {
   createPickerRenderer,
   adapterToUse,
-  expectInputValue,
+  expectFieldValue,
   expectInputPlaceholder,
   openPicker,
   getTextbox,
@@ -37,7 +37,7 @@ describe('<MobileDatePicker /> - Describes', () => {
       if (!expectedValue) {
         expectInputPlaceholder(input, 'MM/DD/YYYY');
       }
-      expectInputValue(
+      expectFieldValue(
         input,
         expectedValue ? adapterToUse.format(expectedValue, 'keyboardDate') : '',
       );

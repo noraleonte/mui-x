@@ -2,7 +2,7 @@ import { expect } from 'chai';
 import { spy } from 'sinon';
 import { TimeField } from '@mui/x-date-pickers/TimeField';
 import { userEvent, fireEvent } from '@mui-internal/test-utils';
-import { expectInputValue, getCleanedSelectedContent, describeAdapters } from 'test/utils/pickers';
+import { expectFieldValue, getCleanedSelectedContent, describeAdapters } from 'test/utils/pickers';
 
 describe('<TimeField /> - Editing', () => {
   describeAdapters('key: ArrowDown', TimeField, ({ adapter, testFieldKeyPress }) => {
@@ -252,7 +252,7 @@ describe('<TimeField /> - Editing', () => {
 
       // Press "2"
       fireEvent.change(input, { target: { value: '2:mm aa' } });
-      expectInputValue(input, '02:mm aa');
+      expectFieldValue(input, '02:mm aa');
       expect(getCleanedSelectedContent(input)).to.equal('mm');
     });
 
@@ -263,12 +263,12 @@ describe('<TimeField /> - Editing', () => {
 
       // Press "1"
       fireEvent.change(input, { target: { value: '1:mm aa' } });
-      expectInputValue(input, '01:mm aa');
+      expectFieldValue(input, '01:mm aa');
       expect(getCleanedSelectedContent(input)).to.equal('01');
 
       // Press "3"
       fireEvent.change(input, { target: { value: '3:mm aa' } });
-      expectInputValue(input, '03:mm aa');
+      expectFieldValue(input, '03:mm aa');
       expect(getCleanedSelectedContent(input)).to.equal('mm');
     });
   });
@@ -369,11 +369,11 @@ describe('<TimeField /> - Editing', () => {
         userEvent.keyPress(input, { key: 'ArrowLeft' });
 
         fireEvent.change(input, { target: { value: '3:mm' } }); // Press "3"
-        expectInputValue(input, '03:mm');
+        expectFieldValue(input, '03:mm');
 
         userEvent.keyPress(input, { key: 'ArrowRight' });
         fireEvent.change(input, { target: { value: '03:4' } }); // Press "3"
-        expectInputValue(input, '03:04');
+        expectFieldValue(input, '03:04');
         expect(onChange.lastCall.firstArg).toEqualDateTime(new Date(2010, 3, 3, 3, 4, 3));
       });
 

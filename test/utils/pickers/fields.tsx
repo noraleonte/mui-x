@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { createRenderer, screen, userEvent, act, fireEvent } from '@mui-internal/test-utils';
 import { FieldRef, FieldSection, FieldSectionType } from '@mui/x-date-pickers/models';
-import { expectInputValue } from './assertions';
+import { expectFieldValue } from './assertions';
 
 interface BuildFieldInteractionsParams<P extends {}> {
   // TODO: Export `Clock` from monorepo
@@ -9,6 +9,12 @@ interface BuildFieldInteractionsParams<P extends {}> {
   render: ReturnType<typeof createRenderer>['render'];
   Component: React.FunctionComponent<P>;
 }
+
+export type FieldSectionKeySetter = (params: {
+  section: FieldSectionType | undefined;
+  index?: 'first' | 'last';
+  key: string;
+}) => void;
 
 export type FieldSectionSelector = (
   selectedSection: FieldSectionType | undefined,
@@ -22,7 +28,9 @@ export interface BuildFieldInteractionsResponse<P extends {}> {
     componentFamily?: 'picker' | 'field',
   ) => ReturnType<ReturnType<typeof createRenderer>['render']> & {
     input: HTMLInputElement;
+    setKeyOnSection: FieldSectionKeySetter;
     selectSection: FieldSectionSelector;
+    fieldContainer: HTMLDivElement;
   };
   clickOnField: (container: HTMLDivElement, sectionIndex: number) => void;
   testFieldKeyPress: (
@@ -68,10 +76,13 @@ export const buildFieldInteractions = <P extends {}>({
     componentFamily = 'field',
   ) => {
     let fieldRef: React.RefObject<FieldRef<FieldSection>> = { current: null };
+    let fieldContainerRef: React.RefObject<HTMLDivElement> = { current: null };
 
     function WrappedComponent() {
       fieldRef = React.useRef<FieldRef<FieldSection>>(null);
+      fieldContainerRef = React.useRef<HTMLDivElement>(null);
       const hookResult = hook?.(props);
+
       const allProps = {
         ...props,
         ...hookResult,
@@ -79,6 +90,7 @@ export const buildFieldInteractions = <P extends {}>({
 
       if (componentFamily === 'field') {
         allProps.unstableFieldRef = fieldRef;
+        allProps.ref = fieldContainerRef;
       } else {
         if (!allProps.slotProps) {
           allProps.slotProps = {};
@@ -97,6 +109,8 @@ export const buildFieldInteractions = <P extends {}>({
         } else {
           allProps.slotProps.field.unstableFieldRef = fieldRef;
         }
+
+        allProps.slotProps.field.ref = fieldContainerRef;
       }
 
       return <Component {...(allProps as P)} />;
@@ -105,6 +119,25 @@ export const buildFieldInteractions = <P extends {}>({
     const result = render(<WrappedComponent />);
 
     const input = screen.queryAllByRole<HTMLInputElement>('textbox')[0];
+
+    const getSectionIndex = (
+      selectedSection: FieldSectionType | undefined,
+      index: 'first' | 'last',
+    ) => {
+      let sectionIndex: number;
+      if (selectedSection) {
+        const sections = fieldRef.current!.getSections();
+        const cleanSections = index === 'first' ? sections : [...sections].reverse();
+        sectionIndex = cleanSections.findIndex((section) => section.type === selectedSection);
+        if (sectionIndex === -1) {
+          throw new Error(`No section of type ${selectedSection}`);
+        }
+
+        return sectionIndex;
+      }
+
+      return 0;
+    };
 
     const selectSection: FieldSectionSelector = (selectedSection, index = 'first') => {
       if (document.activeElement !== input) {
@@ -116,22 +149,35 @@ export const buildFieldInteractions = <P extends {}>({
         clock.runToLast();
       }
 
-      let sectionIndex: number;
-      if (selectedSection) {
-        const sections = fieldRef.current!.getSections();
-        const cleanSections = index === 'first' ? sections : [...sections].reverse();
-        sectionIndex = cleanSections.findIndex((section) => section.type === selectedSection);
-        if (sectionIndex === -1) {
-          throw new Error(`No section of type ${selectedSection}`);
-        }
-      } else {
-        sectionIndex = 0;
-      }
-
+      const sectionIndex = getSectionIndex(selectedSection, index);
       clickOnField(input, sectionIndex);
     };
 
-    return { input, selectSection, ...result };
+    const setKeyOnSection: FieldSectionKeySetter = ({ section, key, index = 'first' }) => {
+      const sectionIndex = getSectionIndex(section, index);
+      const sectionContent = fieldContainerRef.current!.querySelector<HTMLSpanElement>(
+        `span[data-sectionindex="${sectionIndex}"] .content`,
+      )!;
+
+      if (document.activeElement !== input) {
+        // focus input to trigger setting placeholder as value if no value is present
+        act(() => {
+          sectionContent.focus();
+        });
+        // make sure the value of the input is rendered before proceeding
+        clock.runToLast();
+      }
+
+      userEvent.keyPress(sectionContent, { key });
+    };
+
+    return {
+      input,
+      selectSection,
+      setKeyOnSection,
+      fieldContainer: fieldContainerRef.current!,
+      ...result,
+    };
   };
 
   const testFieldKeyPress: BuildFieldInteractionsResponse<P>['testFieldKeyPress'] = ({
@@ -140,11 +186,10 @@ export const buildFieldInteractions = <P extends {}>({
     selectedSection,
     ...props
   }) => {
-    const { input, selectSection } = renderWithProps(props as any as P);
-    selectSection(selectedSection);
+    const { setKeyOnSection, fieldContainer } = renderWithProps(props as any as P);
 
-    userEvent.keyPress(input, { key });
-    expectInputValue(input, expectedValue);
+    setKeyOnSection({ section: selectedSection, key });
+    expectFieldValue(fieldContainer, expectedValue);
   };
 
   const testFieldChange: BuildFieldInteractionsResponse<P>['testFieldChange'] = ({
@@ -157,7 +202,7 @@ export const buildFieldInteractions = <P extends {}>({
 
     keyStrokes.forEach((keyStroke) => {
       fireEvent.change(input, { target: { value: keyStroke.value } });
-      expectInputValue(
+      expectFieldValue(
         input,
         keyStroke.expected,
         (props as any).shouldRespectLeadingZeros ? 'singleDigit' : undefined,

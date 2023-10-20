@@ -3,7 +3,7 @@ import {
   adapterToUse,
   createPickerRenderer,
   expectInputPlaceholder,
-  expectInputValue,
+  expectFieldValue,
   getTextbox,
   describeValidation,
   describeValue,
@@ -35,7 +35,7 @@ describe('<TimeField /> - Describes', () => {
       const expectedValueStr = expectedValue
         ? adapterToUse.format(expectedValue, hasMeridiem ? 'fullTime12h' : 'fullTime24h')
         : '';
-      expectInputValue(input, expectedValueStr);
+      expectFieldValue(input, expectedValueStr);
     },
     setNewValue: (value, { selectSection }) => {
       const newValue = adapterToUse.addHours(value, 1);

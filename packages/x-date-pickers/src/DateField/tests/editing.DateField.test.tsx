@@ -3,10 +3,10 @@ import { expect } from 'chai';
 import { spy } from 'sinon';
 import { DateField } from '@mui/x-date-pickers/DateField';
 import { act, userEvent, fireEvent } from '@mui-internal/test-utils';
-import { expectInputValue, getTextbox, describeAdapters } from 'test/utils/pickers';
+import { expectFieldValue, getTextbox, describeAdapters } from 'test/utils/pickers';
 
 describe('<DateField /> - Editing', () => {
-  describeAdapters('key: ArrowDown', DateField, ({ adapter, testFieldKeyPress }) => {
+  describeAdapters.only('key: ArrowDown', DateField, ({ adapter, testFieldKeyPress }) => {
     it("should set the year to today's value when no value is provided (ArrowDown)", () => {
       testFieldKeyPress({
         format: adapter.formats.year,
@@ -217,10 +217,10 @@ describe('<DateField /> - Editing', () => {
       fireEvent.change(input, {
         target: { value: 'j YYYY' },
       }); // press "j"
-      expectInputValue(input, 'January YYYY');
+      expectFieldValue(input, 'January YYYY');
 
       userEvent.keyPress(input, { key: 'Delete' });
-      expectInputValue(input, 'MMMM YYYY');
+      expectFieldValue(input, 'MMMM YYYY');
     });
 
     it('should clear the selected section when all sections are completed', () => {
@@ -244,7 +244,7 @@ describe('<DateField /> - Editing', () => {
       userEvent.keyPress(input, { key: 'a', ctrlKey: true });
 
       userEvent.keyPress(input, { key: 'Delete' });
-      expectInputValue(input, 'MMMM YYYY');
+      expectFieldValue(input, 'MMMM YYYY');
     });
 
     it('should clear all the sections when all sections are selected and not all sections are completed', () => {
@@ -258,13 +258,13 @@ describe('<DateField /> - Editing', () => {
       fireEvent.change(input, {
         target: { value: 'j YYYY' },
       }); // Press "j"
-      expectInputValue(input, 'January YYYY');
+      expectFieldValue(input, 'January YYYY');
 
       // Select all sections
       userEvent.keyPress(input, { key: 'a', ctrlKey: true });
 
       userEvent.keyPress(input, { key: 'Delete' });
-      expectInputValue(input, 'MMMM YYYY');
+      expectFieldValue(input, 'MMMM YYYY');
     });
 
     it('should not keep query after typing again on a cleared section', () => {
@@ -275,13 +275,13 @@ describe('<DateField /> - Editing', () => {
       selectSection('year');
 
       fireEvent.change(input, { target: { value: '2' } }); // press "2"
-      expectInputValue(input, '0002');
+      expectFieldValue(input, '0002');
 
       userEvent.keyPress(input, { key: 'Delete' });
-      expectInputValue(input, 'YYYY');
+      expectFieldValue(input, 'YYYY');
 
       fireEvent.change(input, { target: { value: '2' } }); // press "2"
-      expectInputValue(input, '0002');
+      expectFieldValue(input, '0002');
     });
 
     it('should not clear the sections when props.readOnly = true', () => {
@@ -819,7 +819,7 @@ describe('<DateField /> - Editing', () => {
       userEvent.keyPress(input, { key: 'a', ctrlKey: true });
 
       firePasteEvent(input, 'Some invalid content');
-      expectInputValue(input, 'MM/DD/YYYY');
+      expectFieldValue(input, 'MM/DD/YYYY');
     });
 
     it('should set the date when all sections are selected and the format contains escaped characters', () => {
@@ -868,11 +868,11 @@ describe('<DateField /> - Editing', () => {
 
       selectSection('month');
 
-      expectInputValue(input, 'MM/DD/YYYY');
+      expectFieldValue(input, 'MM/DD/YYYY');
       firePasteEvent(input, '12');
 
       expect(onChange.callCount).to.equal(1);
-      expectInputValue(input, '12/DD/YYYY');
+      expectFieldValue(input, '12/DD/YYYY');
     });
 
     it('should set the section when one section is selected, the pasted value has the correct type and value is provided', () => {
@@ -885,9 +885,9 @@ describe('<DateField /> - Editing', () => {
 
       selectSection('month');
 
-      expectInputValue(input, '01/13/2018');
+      expectFieldValue(input, '01/13/2018');
       firePasteEvent(input, '12');
-      expectInputValue(input, '12/13/2018');
+      expectFieldValue(input, '12/13/2018');
       expect(onChange.callCount).to.equal(1);
       expect(onChange.lastCall.firstArg).toEqualDateTime(new Date(2018, 11, 13));
     });
@@ -902,9 +902,9 @@ describe('<DateField /> - Editing', () => {
 
       selectSection('month');
 
-      expectInputValue(input, '01/13/2018');
+      expectFieldValue(input, '01/13/2018');
       firePasteEvent(input, 'Jun');
-      expectInputValue(input, '01/13/2018');
+      expectFieldValue(input, '01/13/2018');
       expect(onChange.callCount).to.equal(0);
     });
 
@@ -919,13 +919,13 @@ describe('<DateField /> - Editing', () => {
       selectSection('day');
 
       fireEvent.change(input, { target: { value: '12/2/2018' } }); // Press 2
-      expectInputValue(input, '12/02/2018');
+      expectFieldValue(input, '12/02/2018');
 
       firePasteEvent(input, '09/16/2022');
-      expectInputValue(input, '09/16/2022');
+      expectFieldValue(input, '09/16/2022');
 
       fireEvent.change(input, { target: { value: '09/2/2022' } }); // Press 2
-      expectInputValue(input, '09/02/2022'); // If internal state is not reset it would be 22 instead of 02
+      expectFieldValue(input, '09/02/2022'); // If internal state is not reset it would be 22 instead of 02
     });
   });
 
@@ -961,20 +961,20 @@ describe('<DateField /> - Editing', () => {
         userEvent.keyPress(input, { key: 'ArrowLeft' });
 
         fireEvent.change(input, { target: { value: '1/DD/YYYY' } }); // Press "1"
-        expectInputValue(input, '01/DD/YYYY');
+        expectFieldValue(input, '01/DD/YYYY');
 
         fireEvent.change(input, { target: { value: '11/DD/YYYY' } }); // Press "1"
-        expectInputValue(input, '11/DD/YYYY');
+        expectFieldValue(input, '11/DD/YYYY');
 
         fireEvent.change(input, { target: { value: '11/2/YYYY' } }); // Press "2"
         fireEvent.change(input, { target: { value: '11/5/YYYY' } }); // Press "5"
-        expectInputValue(input, '11/25/YYYY');
+        expectFieldValue(input, '11/25/YYYY');
 
         fireEvent.change(input, { target: { value: '11/25/2' } }); // Press "2"
         fireEvent.change(input, { target: { value: '11/25/0' } }); // Press "0"
         fireEvent.change(input, { target: { value: '11/25/0' } }); // Press "0"
         fireEvent.change(input, { target: { value: '11/25/9' } }); // Press "9"
-        expectInputValue(input, '11/25/2009');
+        expectFieldValue(input, '11/25/2009');
         expect(onChange.lastCall.firstArg).toEqualDateTime(new Date(2009, 10, 25, 3, 3, 3));
       });
 
@@ -1046,12 +1046,12 @@ describe('<DateField /> - Editing', () => {
     it('should be able to reset the value from the outside', () => {
       const { setProps } = render(<DateField value={adapter.date(new Date(2022, 10, 23))} />);
       const input = getTextbox();
-      expectInputValue(input, '11/23/2022');
+      expectFieldValue(input, '11/23/2022');
 
       setProps({ value: null });
 
       clickOnField(input, 0);
-      expectInputValue(input, 'MM/DD/YYYY');
+      expectFieldValue(input, 'MM/DD/YYYY');
     });
 
     it('should reset the input query state on an unfocused field', () => {
@@ -1061,25 +1061,25 @@ describe('<DateField /> - Editing', () => {
       clickOnField(input, 0);
 
       fireEvent.change(input, { target: { value: '1/DD/YYYY' } }); // Press "1"
-      expectInputValue(input, '01/DD/YYYY');
+      expectFieldValue(input, '01/DD/YYYY');
 
       fireEvent.change(input, { target: { value: '11/DD/YYYY' } }); // Press "1"
-      expectInputValue(input, '11/DD/YYYY');
+      expectFieldValue(input, '11/DD/YYYY');
 
       fireEvent.change(input, { target: { value: '11/2/YYYY' } }); // Press "2"
       fireEvent.change(input, { target: { value: '11/5/YYYY' } }); // Press "5"
-      expectInputValue(input, '11/25/YYYY');
+      expectFieldValue(input, '11/25/YYYY');
 
       fireEvent.change(input, { target: { value: '11/25/2' } }); // Press "2"
       fireEvent.change(input, { target: { value: '11/25/0' } }); // Press "0"
-      expectInputValue(input, '11/25/0020');
+      expectFieldValue(input, '11/25/0020');
 
       act(() => {
         input.blur();
       });
 
       setProps({ value: adapter.date(new Date(2022, 10, 23)) });
-      expectInputValue(input, '11/23/2022');
+      expectFieldValue(input, '11/23/2022');
 
       // not using clickOnField here because it will call `runLast` on the fake timer
       act(() => {
@@ -1090,9 +1090,9 @@ describe('<DateField /> - Editing', () => {
       });
 
       fireEvent.change(input, { target: { value: '11/23/2' } }); // Press "2"
-      expectInputValue(input, '11/23/0002');
+      expectFieldValue(input, '11/23/0002');
       fireEvent.change(input, { target: { value: '11/23/1' } }); // Press "0"
-      expectInputValue(input, '11/23/0021');
+      expectFieldValue(input, '11/23/0021');
     });
   });
 
@@ -1143,7 +1143,7 @@ describe('<DateField /> - Editing', () => {
           fireEvent.change(input, { target: { value: initialValueStr.replace('23', '1') } });
         });
 
-        expectInputValue(input, '11/21/2022');
+        expectFieldValue(input, '11/21/2022');
       });
 
       it('should support letter editing', () => {
@@ -1170,7 +1170,7 @@ describe('<DateField /> - Editing', () => {
           fireEvent.change(input, { target: { value: 'u 2022' } });
         });
 
-        expectInputValue(input, 'June 2022');
+        expectFieldValue(input, 'June 2022');
       });
     },
   );
@@ -1186,7 +1186,7 @@ describe('<DateField /> - Editing', () => {
       // When all sections are selected, the value only contains the key pressed
       fireEvent.change(input, { target: { value: '9' } });
 
-      expectInputValue(input, '09/DD/YYYY');
+      expectFieldValue(input, '09/DD/YYYY');
     });
   });
 });
