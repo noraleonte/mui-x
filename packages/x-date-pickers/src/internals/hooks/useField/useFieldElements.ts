@@ -19,7 +19,6 @@ interface UseFieldElementsParams<
       | 'setSelectedSections'
       | 'parsedSelectedSections'
       | 'state'
-      | 'clearValue'
       | 'clearActiveSection'
       | 'setSectionTempValueStr'
       | 'updateSectionValue'
@@ -44,7 +43,6 @@ export const useFieldElements = <
     setSelectedSections,
     parsedSelectedSections,
     state,
-    clearValue,
     clearActiveSection,
     setSectionTempValueStr,
     updateSectionValue,
@@ -179,7 +177,6 @@ export const useFieldElements = <
       })),
     [
       state.sections,
-      parsedSelectedSections,
       getContentFocusHandler,
       handleContentPaste,
       handleContentDragOver,
