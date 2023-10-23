@@ -6,7 +6,7 @@ import { act, userEvent, fireEvent } from '@mui-internal/test-utils';
 import { expectFieldValue, getTextbox, describeAdapters } from 'test/utils/pickers';
 
 describe('<DateField /> - Editing', () => {
-  describeAdapters.only('key: ArrowDown', DateField, ({ adapter, testFieldKeyPress }) => {
+  describeAdapters('key: ArrowDown', DateField, ({ adapter, testFieldKeyPress }) => {
     it("should set the year to today's value when no value is provided (ArrowDown)", () => {
       testFieldKeyPress({
         format: adapter.formats.year,
@@ -352,7 +352,7 @@ describe('<DateField /> - Editing', () => {
   });
 
   describeAdapters('Digit editing', DateField, ({ adapter, testFieldChange }) => {
-    it('should set the day to the digit pressed when no digit no value is provided', () => {
+    it.only('should set the day to the digit pressed when no digit no value is provided', () => {
       testFieldChange({
         format: adapter.formats.dayOfMonth,
         keyStrokes: [{ value: '1', expected: '01' }],

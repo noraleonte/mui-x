@@ -46,8 +46,12 @@ function innerDescribeValue<TValue, C extends PickerComponentFamily>(
       return {
         ...response,
         input: null as any,
+        fieldContainer: null as any,
         selectSection: () => {
-          throw new Error('You can only select a section on components that render a field');
+          throw new Error('You can only use `selectSection` on components that render a field');
+        },
+        setKeyOnSection: () => {
+          throw new Error('You can only use `setKeyOnSection` on components that render a field');
         },
       };
     };

@@ -88,7 +88,6 @@ export const useField = <
     setSelectedSections,
     parsedSelectedSections,
     state,
-    clearValue,
     clearActiveSection,
     setSectionTempValueStr,
     updateSectionValue,
@@ -214,17 +213,6 @@ export const useField = <
         break;
       }
     }
-  });
-
-  const handleContainerInput = useEventCallback((event: React.FormEvent<HTMLDivElement>) => {
-    if (readOnly || !containerRef.current) {
-      return;
-    }
-
-    const target = event.target as HTMLDivElement;
-    const keyPressed = target.innerText;
-
-    console.log(target.innerText);
   });
 
   useEnhancedEffect(() => {

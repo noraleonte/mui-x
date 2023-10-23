@@ -10,16 +10,10 @@ interface BuildFieldInteractionsParams<P extends {}> {
   Component: React.FunctionComponent<P>;
 }
 
-export type FieldSectionKeySetter = (params: {
-  section: FieldSectionType | undefined;
-  index?: 'first' | 'last';
-  key: string;
-}) => void;
-
 export type FieldSectionSelector = (
   selectedSection: FieldSectionType | undefined,
   index?: 'first' | 'last',
-) => void;
+) => { sectionContent: HTMLSpanElement };
 
 export interface BuildFieldInteractionsResponse<P extends {}> {
   renderWithProps: (
@@ -27,8 +21,6 @@ export interface BuildFieldInteractionsResponse<P extends {}> {
     hook?: (props: P) => Record<string, any>,
     componentFamily?: 'picker' | 'field',
   ) => ReturnType<ReturnType<typeof createRenderer>['render']> & {
-    input: HTMLInputElement;
-    setKeyOnSection: FieldSectionKeySetter;
     selectSection: FieldSectionSelector;
     fieldContainer: HTMLDivElement;
   };
@@ -118,8 +110,6 @@ export const buildFieldInteractions = <P extends {}>({
 
     const result = render(<WrappedComponent />);
 
-    const input = screen.queryAllByRole<HTMLInputElement>('textbox')[0];
-
     const getSectionIndex = (
       selectedSection: FieldSectionType | undefined,
       index: 'first' | 'last',
@@ -140,26 +130,12 @@ export const buildFieldInteractions = <P extends {}>({
     };
 
     const selectSection: FieldSectionSelector = (selectedSection, index = 'first') => {
-      if (document.activeElement !== input) {
-        // focus input to trigger setting placeholder as value if no value is present
-        act(() => {
-          input.focus();
-        });
-        // make sure the value of the input is rendered before proceeding
-        clock.runToLast();
-      }
-
       const sectionIndex = getSectionIndex(selectedSection, index);
-      clickOnField(input, sectionIndex);
-    };
-
-    const setKeyOnSection: FieldSectionKeySetter = ({ section, key, index = 'first' }) => {
-      const sectionIndex = getSectionIndex(section, index);
       const sectionContent = fieldContainerRef.current!.querySelector<HTMLSpanElement>(
         `span[data-sectionindex="${sectionIndex}"] .content`,
       )!;
 
-      if (document.activeElement !== input) {
+      if (document.activeElement !== fieldContainerRef.current) {
         // focus input to trigger setting placeholder as value if no value is present
         act(() => {
           sectionContent.focus();
@@ -168,13 +144,11 @@ export const buildFieldInteractions = <P extends {}>({
         clock.runToLast();
       }
 
-      userEvent.keyPress(sectionContent, { key });
+      return { sectionContent };
     };
 
     return {
-      input,
       selectSection,
-      setKeyOnSection,
       fieldContainer: fieldContainerRef.current!,
       ...result,
     };
@@ -186,9 +160,9 @@ export const buildFieldInteractions = <P extends {}>({
     selectedSection,
     ...props
   }) => {
-    const { setKeyOnSection, fieldContainer } = renderWithProps(props as any as P);
-
-    setKeyOnSection({ section: selectedSection, key });
+    const { selectSection, fieldContainer } = renderWithProps(props as any as P);
+    const { sectionContent } = selectSection(selectedSection);
+    userEvent.keyPress(sectionContent, { key });
     expectFieldValue(fieldContainer, expectedValue);
   };
 
@@ -197,13 +171,13 @@ export const buildFieldInteractions = <P extends {}>({
     selectedSection,
     ...props
   }) => {
-    const { input, selectSection } = renderWithProps(props as any as P);
-    selectSection(selectedSection);
+    const { selectSection, fieldContainer } = renderWithProps(props as any as P);
+    const { sectionContent } = selectSection(selectedSection);
 
     keyStrokes.forEach((keyStroke) => {
-      fireEvent.change(input, { target: { value: keyStroke.value } });
+      fireEvent.input(sectionContent, { target: { innerText: keyStroke.value } });
       expectFieldValue(
-        input,
+        fieldContainer,
         keyStroke.expected,
         (props as any).shouldRespectLeadingZeros ? 'singleDigit' : undefined,
       );
