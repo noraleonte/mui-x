@@ -150,7 +150,7 @@ export interface FieldRef<TSection extends FieldSection> {
    * Updates the selected sections.
    * @param {FieldSelectedSections} selectedSections The sections to select.
    */
-  setSelectedSections: (selectedSection: FieldSelectedSections) => void;
+  setSelectedSections: (selectedSections: FieldSelectedSections) => void;
 }
 
 export interface UseFieldForwardedProps {
@@ -251,9 +251,17 @@ export interface FieldValueManager<TValue, TDate, TSection extends FieldSection>
    * Creates the string value to render in the input based on the current section list.
    * @template TSection
    * @param {TSection[]} sections The current section list.
+   * @param {boolean} isRTL `true` if the current orientation is "right to left"
    * @returns {string} The string value to render in the input.
    */
-  getHiddenInputValueFromSections: (sections: TSection[]) => string;
+  getV6InputValueFromSections: (sections: TSection[], isRTL: boolean) => string;
+  /**
+   * Creates the string value to render in the input based on the current section list.
+   * @template TSection
+   * @param {TSection[]} sections The current section list.
+   * @returns {string} The string value to render in the input.
+   */
+  getV7HiddenInputValueFromSections: (sections: TSection[]) => string;
   /**
    * Returns the manager of the active date.
    * @template TValue, TDate, TSection
@@ -305,6 +313,25 @@ export interface UseFieldState<TValue, TSection extends FieldSection> {
    */
   referenceValue: TValue;
   sections: TSection[];
+  /**
+   * Android `onChange` behavior when the input selection is not empty is quite different from a desktop behavior.
+   * There are two `onChange` calls:
+   * 1. A call with the selected content removed.
+   * 2. A call with the key pressed added to the value.
+   **
+   * For instance, if the input value equals `month / day / year` and `day` is selected.
+   * The pressing `1` will have the following behavior:
+   * 1. A call with `month /  / year`.
+   * 2. A call with `month / 1 / year`.
+   *
+   * But if you don't update the input with the value passed on the first `onChange`.
+   * Then the second `onChange` will add the key press at the beginning of the selected value.
+   * 1. A call with `month / / year` that we don't set into state.
+   * 2. A call with `month / 1day / year`.
+   *
+   * The property below allows us to set the first `onChange` value into state waiting for the second one.
+   */
+  tempValueStrAndroid: string | null;
 }
 
 export type UseFieldValidationProps<
@@ -380,4 +407,5 @@ export interface UseFieldTextFieldInteractions {
    * @returns {number | null} The index of the active section.
    */
   getActiveSectionIndexFromDOM: () => number | null;
+  isFocused: () => boolean;
 }

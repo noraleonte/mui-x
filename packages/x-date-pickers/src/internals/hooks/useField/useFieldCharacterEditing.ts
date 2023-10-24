@@ -28,7 +28,7 @@ interface UseFieldCharacterEditingParams<TDate, TSection extends FieldSection> {
   sections: TSection[];
   updateSectionValue: (params: UpdateSectionValueParams<TSection>) => void;
   sectionsValueBoundaries: FieldSectionsValueBoundaries<TDate>;
-  resetSectionsTempValueStr: () => void;
+  setTempAndroidValueStr: (tempAndroidValueStr: string | null) => void;
   timezone: PickersTimezone;
 }
 
@@ -83,7 +83,7 @@ export const useFieldCharacterEditing = <TDate, TSection extends FieldSection>({
   sections,
   updateSectionValue,
   sectionsValueBoundaries,
-  resetSectionsTempValueStr,
+  setTempAndroidValueStr,
   timezone,
 }: UseFieldCharacterEditingParams<TDate, TSection>): UseFieldCharacterEditingResponse => {
   const utils = useUtils<TDate>();
@@ -392,7 +392,7 @@ export const useFieldCharacterEditing = <TDate, TSection extends FieldSection>({
     const isNumericEditing = !Number.isNaN(Number(params.keyPressed));
     const response = isNumericEditing ? applyNumericEditing(params) : applyLetterEditing(params);
     if (response == null) {
-      resetSectionsTempValueStr();
+      setTempAndroidValueStr(null);
       return false;
     }
 

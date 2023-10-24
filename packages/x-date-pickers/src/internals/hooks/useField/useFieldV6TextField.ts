@@ -1,4 +1,6 @@
 import * as React from 'react';
+import { useTheme } from '@mui/material/styles';
+import useEventCallback from '@mui/utils/useEventCallback';
 import {
   UseFieldForwardedProps,
   UseFieldInternalProps,
@@ -9,6 +11,7 @@ import { UseFieldStateResponse } from './useFieldState';
 import { UseFieldCharacterEditingResponse } from './useFieldCharacterEditing';
 import { FieldSection } from '../../../models';
 import { getActiveElement } from '../../utils/utils';
+import { getSectionVisibleValue, isAndroid } from './useField.utils';
 
 interface UseFieldV6TextFieldParams<
   TValue,
@@ -22,6 +25,66 @@ interface UseFieldV6TextFieldParams<
   inputRef: React.RefObject<HTMLInputElement>;
 }
 
+type FieldSectionWithPositions<TSection> = TSection & {
+  /**
+   * Start index of the section in the format
+   */
+  start: number;
+  /**
+   * End index of the section in the format
+   */
+  end: number;
+  /**
+   * Start index of the section value in the input.
+   * Takes into account invisible unicode characters such as \u2069 but does not include them
+   */
+  startInInput: number;
+  /**
+   * End index of the section value in the input.
+   * Takes into account invisible unicode characters such as \u2069 but does not include them
+   */
+  endInInput: number;
+};
+
+const cleanString = (dirtyString: string) => dirtyString.replace(/[\u2066\u2067\u2068\u2069]/g, '');
+
+export const addPositionPropertiesToSections = <TSection extends FieldSection>(
+  sections: TSection[],
+  isRTL: boolean,
+): FieldSectionWithPositions<TSection>[] => {
+  let position = 0;
+  let positionInInput = isRTL ? 1 : 0;
+  const newSections: FieldSectionWithPositions<TSection>[] = [];
+
+  for (let i = 0; i < sections.length; i += 1) {
+    const section = sections[i];
+    const renderedValue = getSectionVisibleValue(section, isRTL ? 'input-rtl' : 'input-ltr');
+    const sectionStr = `${section.startSeparator}${renderedValue}${section.endSeparator}`;
+
+    const sectionLength = cleanString(sectionStr).length;
+    const sectionLengthInInput = sectionStr.length;
+
+    // The ...InInput values consider the unicode characters but do include them in their indexes
+    const cleanedValue = cleanString(renderedValue);
+    const startInInput =
+      positionInInput + renderedValue.indexOf(cleanedValue[0]) + section.startSeparator.length;
+    const endInInput = startInInput + cleanedValue.length;
+
+    newSections.push({
+      ...section,
+      start: position,
+      end: position + sectionLength,
+      startInInput,
+      endInInput,
+    });
+    position += sectionLength;
+    // Move position to the end of string associated to the current section
+    positionInInput += sectionLengthInInput;
+  }
+
+  return newSections;
+};
+
 export const useFieldV6TextField = <
   TValue,
   TDate,
@@ -31,7 +94,28 @@ export const useFieldV6TextField = <
 >(
   params: UseFieldV6TextFieldParams<TValue, TDate, TSection, TForwardedProps, TInternalProps>,
 ) => {
-  const { parsedSelectedSections, state, inputRef } = params;
+  const theme = useTheme();
+  const isRTL = theme.direction === 'rtl';
+
+  const {
+    internalProps: { readOnly },
+    parsedSelectedSections,
+    activeSectionIndex,
+    state,
+    inputRef,
+    fieldValueManager,
+    applyCharacterEditing,
+    resetCharacterQuery,
+    updateValueFromValueStr,
+    clearActiveSection,
+    clearValue,
+    setTempAndroidValueStr,
+  } = params;
+
+  const sections = React.useMemo(
+    () => addPositionPropertiesToSections(state.sections, isRTL),
+    [state.sections, isRTL],
+  );
 
   const interactions = React.useMemo<UseFieldTextFieldInteractions>(
     () => ({
@@ -63,7 +147,7 @@ export const useFieldV6TextField = <
         if (parsedSelectedSections === 'all') {
           inputRef.current.select();
         } else {
-          const selectedSection = state.sections[parsedSelectedSections];
+          const selectedSection = sections[parsedSelectedSections];
 
           if (
             selectedSection.startInInput !== inputRef.current.selectionStart ||
@@ -89,17 +173,105 @@ export const useFieldV6TextField = <
         }
 
         const nextSectionIndex =
-          browserStartIndex <= state.sections[0].startInInput
+          browserStartIndex <= sections[0].startInInput
             ? 1 // Special case if browser index is in invisible characters at the beginning.
-            : state.sections.findIndex(
+            : sections.findIndex(
                 (section) =>
                   section.startInInput - section.startSeparator.length > browserStartIndex,
               );
-        return nextSectionIndex === -1 ? state.sections.length - 1 : nextSectionIndex - 1;
+        return nextSectionIndex === -1 ? sections.length - 1 : nextSectionIndex - 1;
       },
+      isFocused: () => !!inputRef.current && inputRef.current === getActiveElement(document),
     }),
-    [inputRef, parsedSelectedSections, state.sections],
+    [inputRef, parsedSelectedSections, sections],
   );
 
-  return { interactions };
+  const handleInputChange = useEventCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+    if (readOnly) {
+      return;
+    }
+
+    const targetValue = event.target.value;
+    if (targetValue === '') {
+      resetCharacterQuery();
+      clearValue();
+      return;
+    }
+
+    const eventData = (event.nativeEvent as InputEvent).data;
+    // Calling `.fill(04/11/2022)` in playwright will trigger a change event with the requested content to insert in `event.nativeEvent.data`
+    // usual changes have only the currently typed character in the `event.nativeEvent.data`
+    const shouldUseEventData = eventData && eventData.length > 1;
+    const valueStr = shouldUseEventData ? eventData : targetValue;
+    const cleanValueStr = cleanString(valueStr);
+
+    // If no section is selected or eventData should be used, we just try to parse the new value
+    // This line is mostly triggered by imperative code / application tests.
+    if (activeSectionIndex == null || shouldUseEventData) {
+      updateValueFromValueStr(shouldUseEventData ? eventData : cleanValueStr);
+      return;
+    }
+
+    let keyPressed: string;
+    if (parsedSelectedSections === 'all' && cleanValueStr.length === 1) {
+      keyPressed = cleanValueStr;
+    } else {
+      const prevValueStr = cleanString(
+        fieldValueManager.getV6InputValueFromSections(state.sections, isRTL),
+      );
+
+      let startOfDiffIndex = -1;
+      let endOfDiffIndex = -1;
+      for (let i = 0; i < prevValueStr.length; i += 1) {
+        if (startOfDiffIndex === -1 && prevValueStr[i] !== cleanValueStr[i]) {
+          startOfDiffIndex = i;
+        }
+
+        if (
+          endOfDiffIndex === -1 &&
+          prevValueStr[prevValueStr.length - i - 1] !== cleanValueStr[cleanValueStr.length - i - 1]
+        ) {
+          endOfDiffIndex = i;
+        }
+      }
+
+      const activeSection = sections[activeSectionIndex];
+
+      const hasDiffOutsideOfActiveSection =
+        startOfDiffIndex < activeSection.start ||
+        prevValueStr.length - endOfDiffIndex - 1 > activeSection.end;
+
+      if (hasDiffOutsideOfActiveSection) {
+        // TODO: Support if the new date is valid
+        return;
+      }
+
+      // The active section being selected, the browser has replaced its value with the key pressed by the user.
+      const activeSectionEndRelativeToNewValue =
+        cleanValueStr.length -
+        prevValueStr.length +
+        activeSection.end -
+        cleanString(activeSection.endSeparator || '').length;
+
+      keyPressed = cleanValueStr.slice(
+        activeSection.start + cleanString(activeSection.startSeparator || '').length,
+        activeSectionEndRelativeToNewValue,
+      );
+    }
+
+    if (keyPressed.length === 0) {
+      if (isAndroid()) {
+        setTempAndroidValueStr(valueStr);
+      } else {
+        resetCharacterQuery();
+        clearActiveSection();
+      }
+
+      return;
+    }
+
+    applyCharacterEditing({ keyPressed, sectionIndex: activeSectionIndex });
+  });
+
+  return { interactions, returnedValue: { onChange: handleInputChange } };
 };

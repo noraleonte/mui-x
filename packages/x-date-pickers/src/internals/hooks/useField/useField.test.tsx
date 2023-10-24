@@ -11,7 +11,6 @@ const COMMON_PROPERTIES = {
   hasLeadingZeros: true,
   hasLeadingZerosInFormat: true,
   maxLength: 4,
-  tempValueStr: null,
 } as const;
 
 describe('useField utility functions', () => {

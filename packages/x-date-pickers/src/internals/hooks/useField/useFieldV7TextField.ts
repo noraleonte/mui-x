@@ -1,4 +1,5 @@
 import * as React from 'react';
+import useForkRef from '@mui/utils/useForkRef';
 import useEventCallback from '@mui/utils/useEventCallback';
 import { getSectionIndexFromDOMElement, isAndroid, isFocusInsideContainer } from './useField.utils';
 import {
@@ -11,7 +12,7 @@ import { UseFieldStateResponse } from './useFieldState';
 import { UseFieldCharacterEditingResponse } from './useFieldCharacterEditing';
 import { FakeTextFieldElement } from '../../components/FakeTextField/FakeTextField';
 import { FieldSection } from '../../../models';
-import { getActiveElement } from '@mui/x-date-pickers/internals';
+import { getActiveElement } from '../../utils/utils';
 
 interface UseFieldV7TextFieldParams<
   TValue,
@@ -22,7 +23,7 @@ interface UseFieldV7TextFieldParams<
 > extends UseFieldParams<TValue, TDate, TSection, TForwardedProps, TInternalProps>,
     UseFieldStateResponse<TValue, TDate, TSection>,
     UseFieldCharacterEditingResponse {
-  containerRef: React.RefObject<HTMLDivElement>;
+  areAllSectionsEmpty: boolean;
 }
 
 export const useFieldV7TextField = <
@@ -36,6 +37,7 @@ export const useFieldV7TextField = <
 ) => {
   const {
     internalProps: { readOnly, disabled },
+    forwardedProps: { ref: inContainerRef },
     fieldValueManager,
     applyCharacterEditing,
     resetCharacterQuery,
@@ -46,8 +48,11 @@ export const useFieldV7TextField = <
     setSectionTempValueStr,
     updateSectionValue,
     updateValueFromValueStr,
-    containerRef,
+    areAllSectionsEmpty,
   } = params;
+
+  const containerRef = React.useRef<HTMLDivElement>(null);
+  const handleRef = useForkRef(inContainerRef, containerRef);
 
   const getContainerClickHandler = useEventCallback(
     (sectionIndex: number) => (event: React.MouseEvent<HTMLDivElement>) => {
@@ -116,6 +121,8 @@ export const useFieldV7TextField = <
     const target = event.target as HTMLSpanElement;
     const keyPressed = target.innerText;
     const sectionIndex = getSectionIndexFromDOMElement(target)!;
+
+    console.log('INPUT', keyPressed);
 
     if (keyPressed.length === 0) {
       if (isAndroid()) {
@@ -193,7 +200,7 @@ export const useFieldV7TextField = <
   );
 
   const valueStr = React.useMemo(
-    () => fieldValueManager.getHiddenInputValueFromSections(state.sections),
+    () => fieldValueManager.getV7HiddenInputValueFromSections(state.sections),
     [state.sections, fieldValueManager],
   );
 
@@ -245,12 +252,21 @@ export const useFieldV7TextField = <
           getActiveElement(document) as HTMLSpanElement | undefined,
         );
       },
+      isFocused: () =>
+        !!containerRef.current && containerRef.current.contains(getActiveElement(document)),
     }),
     [containerRef, parsedSelectedSections],
   );
 
   return {
     interactions,
-    returnedValue: { elements, valueStr, onValueStrChange: handleValueStrChange, interactions },
+    returnedValue: {
+      elements,
+      ref: handleRef,
+      valueStr,
+      onValueStrChange: handleValueStrChange,
+      valueType:
+        !isFocusInsideContainer(containerRef) && areAllSectionsEmpty ? 'placeholder' : 'value',
+    },
   };
 };

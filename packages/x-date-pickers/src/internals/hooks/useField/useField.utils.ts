@@ -312,9 +312,6 @@ export const getSectionVisibleValue = (
   return value;
 };
 
-export const cleanString = (dirtyString: string) =>
-  dirtyString.replace(/[\u2066\u2067\u2068\u2069]/g, '');
-
 const getSectionPlaceholder = <TDate>(
   utils: MuiPickersAdapter<TDate>,
   timezone: PickersTimezone,
@@ -528,7 +525,6 @@ export const splitFormatIntoSections = <TDate>(
       startSeparator: sections.length === 0 ? startSeparator : '',
       endSeparator: '',
       modified: false,
-      tempValueStr: null,
     });
 
     return null;
@@ -650,7 +646,7 @@ export const getDateFromDateSections = <TDate>(
   return utils.parse(dateWithoutSeparatorStr, formatWithoutSeparator)!;
 };
 
-export const createDateStrForHiddenInputFromSections = (sections: FieldSection[]) =>
+export const createDateStrForV7HiddenInputFromSections = (sections: FieldSection[]) =>
   sections
     .map((section) => {
       return `${section.startSeparator}${section.value || section.placeholder}${
@@ -658,6 +654,27 @@ export const createDateStrForHiddenInputFromSections = (sections: FieldSection[]
       }`;
     })
     .join('');
+
+export const createDateStrForV6InputFromSections = (sections: FieldSection[], isRTL: boolean) => {
+  const formattedSections = sections.map((section) => {
+    const dateValue = getSectionVisibleValue(section, isRTL ? 'input-rtl' : 'input-ltr');
+
+    return `${section.startSeparator}${dateValue}${section.endSeparator}`;
+  });
+
+  const dateStr = formattedSections.join('');
+
+  if (!isRTL) {
+    return dateStr;
+  }
+
+  // \u2066: start left-to-right isolation
+  // \u2067: start right-to-left isolation
+  // \u2068: start first strong character isolation
+  // \u2069: pop isolation
+  // wrap into an isolated group such that separators can split the string in smaller ones by adding \u2069\u2068
+  return `\u2066${dateStr}\u2069`;
+};
 
 export const getSectionsBoundaries = <TDate>(
   utils: MuiPickersAdapter<TDate>,
@@ -939,22 +956,4 @@ export const isFocusInsideContainer = (
   }
 
   return containerRef.current.contains(getActiveElement(document));
-};
-
-export const resetSectionsTempValueStr = <TSection extends FieldSection>(sections: TSection[]) => {
-  let hasChanged = false;
-  const newSections = sections.map((section) => {
-    if (section.tempValueStr != null) {
-      hasChanged = true;
-      return { ...section, tempValueStr: null };
-    }
-
-    return section;
-  });
-
-  if (!hasChanged) {
-    return sections;
-  }
-
-  return newSections;
 };

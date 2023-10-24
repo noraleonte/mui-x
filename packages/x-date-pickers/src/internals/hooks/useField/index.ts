@@ -11,4 +11,7 @@ export type {
   FieldSlotsComponents,
   FieldSlotsComponentsProps,
 } from './useField.types';
-export { splitFormatIntoSections, createDateStrForHiddenInputFromSections } from './useField.utils';
+export {
+  createDateStrForV7HiddenInputFromSections,
+  createDateStrForV6InputFromSections,
+} from './useField.utils';

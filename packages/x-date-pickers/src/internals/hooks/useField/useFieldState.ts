@@ -17,7 +17,6 @@ import {
   getSectionsBoundaries,
   validateSections,
   getDateFromDateSections,
-  resetSectionsTempValueStr,
 } from './useField.utils';
 import { InferError } from '../useValidation';
 import { FieldSection, FieldSelectedSections, PickersTimezone } from '../../../models';
@@ -51,8 +50,7 @@ export interface UseFieldStateResponse<TValue, TDate, TSection extends FieldSect
   clearActiveSection: () => void;
   updateSectionValue: (params: UpdateSectionValueParams<TSection>) => void;
   updateValueFromValueStr: (valueStr: string) => void;
-  setSectionTempValueStr: (sectionIndex: number, tempValueStr: string) => void;
-  resetSectionsTempValueStr: () => void;
+  setTempAndroidValueStr: (tempAndroidValueStr: string | null) => void;
   sectionsValueBoundaries: FieldSectionsValueBoundaries<TDate>;
   timezone: PickersTimezone;
 }
@@ -143,6 +141,7 @@ export const useFieldState = <
       sections,
       value: valueFromTheOutside,
       referenceValue: valueManager.emptyValue,
+      tempValueStrAndroid: null,
     };
 
     const granularity = getSectionTypeGranularity(sections);
@@ -169,8 +168,6 @@ export const useFieldState = <
   });
 
   const setSelectedSections = (newSelectedSections: FieldSelectedSections) => {
-    // console.log('AAAAAAAAAAA', newSelectedSections)
-    // console.trace();
     innerSetSelectedSections(newSelectedSections);
     onSelectedSectionsChange?.(newSelectedSections);
 
@@ -215,9 +212,10 @@ export const useFieldState = <
   }: Pick<UseFieldState<TValue, TSection>, 'value' | 'referenceValue' | 'sections'>) => {
     setState((prevState) => ({
       ...prevState,
-      sections: resetSectionsTempValueStr(sections),
+      sections,
       value,
       referenceValue,
+      tempValueStrAndroid: null,
     }));
 
     if (valueManager.areValuesEqual(utils, state.value, value)) {
@@ -282,7 +280,8 @@ export const useFieldState = <
       setState((prevState) => ({
         ...prevState,
         ...newValues,
-        sections: resetSectionsTempValueStr(newSections),
+        sections: newSections,
+        tempValueStrAndroid: null,
       }));
     }
   };
@@ -379,20 +378,13 @@ export const useFieldState = <
     return setState((prevState) => ({
       ...prevState,
       ...values,
-      sections: resetSectionsTempValueStr(newSections),
+      sections: newSections,
+      tempValueStrAndroid: null,
     }));
   };
 
-  const setSectionTempValueStr = (sectionIndex: number, tempValueStr: string) =>
-    setState((prev) => ({
-      ...prev,
-      sections: prev.sections.map((section, index) =>
-        index === sectionIndex ? { ...section, tempValueStr } : section,
-      ),
-    }));
-
-  const resetSectionsTempValueStrFromState = () =>
-    setState((prev) => ({ ...prev, sections: resetSectionsTempValueStr(prev.sections) }));
+  const setTempAndroidValueStr = (tempValueStrAndroid: string | null) =>
+    setState((prev) => ({ ...prev, tempValueStrAndroid }));
 
   React.useEffect(() => {
     const sections = getSectionsFromValue(state.value);
@@ -436,8 +428,7 @@ export const useFieldState = <
     clearActiveSection,
     updateSectionValue,
     updateValueFromValueStr,
-    setSectionTempValueStr,
-    resetSectionsTempValueStr: resetSectionsTempValueStrFromState,
+    setTempAndroidValueStr,
     sectionsValueBoundaries,
     timezone,
   };

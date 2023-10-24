@@ -1,7 +1,6 @@
 import * as React from 'react';
 import useEnhancedEffect from '@mui/utils/useEnhancedEffect';
 import useEventCallback from '@mui/utils/useEventCallback';
-import useForkRef from '@mui/utils/useForkRef';
 import { useTheme } from '@mui/material/styles';
 import { useValidation } from '../useValidation';
 import { useUtils } from '../useUtils';
@@ -12,15 +11,9 @@ import {
   UseFieldInternalProps,
   AvailableAdjustKeyCode,
 } from './useField.types';
-import {
-  adjustSectionValue,
-  getSectionOrder,
-  isFocusInsideContainer,
-  getSectionIndexFromDOMElement,
-} from './useField.utils';
+import { adjustSectionValue, getSectionOrder } from './useField.utils';
 import { useFieldState } from './useFieldState';
 import { useFieldCharacterEditing } from './useFieldCharacterEditing';
-import { getActiveElement } from '../../utils/utils';
 import { FieldSection } from '../../../models';
 import { useFieldV7TextField } from './useFieldV7TextField';
 
@@ -45,7 +38,6 @@ export const useField = <
       clearable,
       onClear,
       disabled = false,
-      ref: inContainerRef,
       ...otherForwardedProps
     },
     fieldValueManager,
@@ -53,8 +45,6 @@ export const useField = <
     validator,
   } = params;
 
-  const containerRef = React.useRef<HTMLDivElement>(null);
-  const handleRef = useForkRef(inContainerRef, containerRef);
   const theme = useTheme();
   const isRTL = theme.direction === 'rtl';
 
@@ -68,7 +58,7 @@ export const useField = <
     clearActiveSection,
     updateSectionValue,
     updateValueFromValueStr,
-    resetSectionsTempValueStr,
+    setTempAndroidValueStr,
     sectionsValueBoundaries,
     timezone,
   } = stateResponse;
@@ -77,17 +67,23 @@ export const useField = <
     sections: state.sections,
     updateSectionValue,
     sectionsValueBoundaries,
-    resetSectionsTempValueStr,
+    setTempAndroidValueStr,
     timezone,
   });
 
   const { resetCharacterQuery } = characterEditingResponse;
 
+  const areAllSectionsEmpty = valueManager.areValuesEqual(
+    utils,
+    state.value,
+    valueManager.emptyValue,
+  );
+
   const { returnedValue, interactions } = useFieldV7TextField({
     ...params,
     ...stateResponse,
-    containerRef,
     ...characterEditingResponse,
+    areAllSectionsEmpty,
   });
 
   const sectionOrder = React.useMemo(
@@ -239,13 +235,13 @@ export const useField = <
   }, [state.referenceValue, activeSectionIndex, inputError]); // eslint-disable-line react-hooks/exhaustive-deps
 
   React.useEffect(() => {
-    // Select the right section when focused on mount (`autoFocus = true` on the input)
-    if (containerRef.current && containerRef.current.contains(getActiveElement(document))) {
+    // Select the all the sections when focused on mount (`autoFocus = true` on the input)
+    if (interactions.isFocused()) {
       setSelectedSections('all');
     }
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // If `tempValueStr` is still defined for some section when running `useEffect`,
+  // If `tempValueStrAndroid` is still defined for some section when running `useEffect`,
   // Then `onChange` has only been called once, which means the user pressed `Backspace` to reset the section.
   // This causes a small flickering on Android,
   // But we can't use `useEnhancedEffect` which is always called before the second `onChange` call and then would cause false positives.
@@ -258,12 +254,6 @@ export const useField = <
       clearActiveSection();
     }
   }, [state.sections]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  const areAllSectionsEmpty = valueManager.areValuesEqual(
-    utils,
-    state.value,
-    valueManager.emptyValue,
-  );
 
   React.useImperativeHandle(unstableFieldRef, () => ({
     getSections: () => state.sections,
@@ -279,18 +269,15 @@ export const useField = <
   });
 
   return {
+    ...(otherForwardedProps as Omit<TForwardedProps, keyof UseFieldForwardedProps>),
+    ...returnedValue,
     disabled,
-    ...otherForwardedProps,
     readOnly,
-    valueType:
-      !isFocusInsideContainer(containerRef) && areAllSectionsEmpty ? 'placeholder' : 'value',
     onKeyDown: handleContainerKeyDown,
     onBlur: handleContainerBlur,
     onPaste: handleContainerPaste,
     onClear: handleClearValue,
     error: inputError,
-    ref: handleRef,
     clearable: Boolean(clearable && !areAllSectionsEmpty && !readOnly && !disabled),
-    ...returnedValue,
   };
 };
