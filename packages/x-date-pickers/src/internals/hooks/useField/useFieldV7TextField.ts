@@ -1,43 +1,42 @@
 import * as React from 'react';
 import useEventCallback from '@mui/utils/useEventCallback';
+import { getSectionIndexFromDOMElement, isAndroid, isFocusInsideContainer } from './useField.utils';
+import {
+  UseFieldForwardedProps,
+  UseFieldInternalProps,
+  UseFieldParams,
+  UseFieldTextFieldInteractions,
+} from './useField.types';
+import { UseFieldStateResponse } from './useFieldState';
+import { UseFieldCharacterEditingResponse } from './useFieldCharacterEditing';
 import { FakeTextFieldElement } from '../../components/FakeTextField/FakeTextField';
 import { FieldSection } from '../../../models';
-import { getSectionIndexFromDOMElement, isAndroid } from './useField.utils';
-import { UseFieldForwardedProps, UseFieldInternalProps, UseFieldParams } from './useField.types';
-import { UseFieldCharacterEditingResponse } from './useFieldCharacterEditing';
-import { UseFieldStateResponse } from './useFieldState';
+import { getActiveElement } from '@mui/x-date-pickers/internals';
 
-interface UseFieldElementsParams<
+interface UseFieldV7TextFieldParams<
   TValue,
   TDate,
   TSection extends FieldSection,
   TForwardedProps extends UseFieldForwardedProps,
   TInternalProps extends UseFieldInternalProps<any, any, any, any>,
 > extends UseFieldParams<TValue, TDate, TSection, TForwardedProps, TInternalProps>,
-    Pick<
-      UseFieldStateResponse<TValue, TDate, TSection>,
-      | 'setSelectedSections'
-      | 'parsedSelectedSections'
-      | 'state'
-      | 'clearActiveSection'
-      | 'setSectionTempValueStr'
-      | 'updateSectionValue'
-    >,
+    UseFieldStateResponse<TValue, TDate, TSection>,
     UseFieldCharacterEditingResponse {
   containerRef: React.RefObject<HTMLDivElement>;
 }
 
-export const useFieldElements = <
+export const useFieldV7TextField = <
   TValue,
   TDate,
   TSection extends FieldSection,
   TForwardedProps extends UseFieldForwardedProps,
   TInternalProps extends UseFieldInternalProps<any, any, any, any>,
 >(
-  params: UseFieldElementsParams<TValue, TDate, TSection, TForwardedProps, TInternalProps>,
+  params: UseFieldV7TextFieldParams<TValue, TDate, TSection, TForwardedProps, TInternalProps>,
 ) => {
   const {
     internalProps: { readOnly, disabled },
+    fieldValueManager,
     applyCharacterEditing,
     resetCharacterQuery,
     setSelectedSections,
@@ -46,6 +45,7 @@ export const useFieldElements = <
     clearActiveSection,
     setSectionTempValueStr,
     updateSectionValue,
+    updateValueFromValueStr,
     containerRef,
   } = params;
 
@@ -141,7 +141,7 @@ export const useFieldElements = <
     }
   });
 
-  return React.useMemo<FakeTextFieldElement[]>(
+  const elements = React.useMemo<FakeTextFieldElement[]>(
     () =>
       state.sections.map((section, sectionIndex) => ({
         container: {
@@ -187,4 +187,70 @@ export const useFieldElements = <
       readOnly,
     ],
   );
+
+  const handleValueStrChange = useEventCallback((event: React.ChangeEvent<HTMLInputElement>) =>
+    updateValueFromValueStr(event.target.value),
+  );
+
+  const valueStr = React.useMemo(
+    () => fieldValueManager.getHiddenInputValueFromSections(state.sections),
+    [state.sections, fieldValueManager],
+  );
+
+  const interactions = React.useMemo<UseFieldTextFieldInteractions>(
+    () => ({
+      syncSelectionToDOM: () => {
+        if (!containerRef.current) {
+          return;
+        }
+
+        if (parsedSelectedSections == null) {
+          if (isFocusInsideContainer(containerRef)) {
+            containerRef.current.blur();
+          }
+          return;
+        }
+
+        const selection = document.getSelection();
+        if (!selection) {
+          return;
+        }
+
+        const range = new Range();
+
+        if (parsedSelectedSections === 'all') {
+          range.selectNodeContents(containerRef.current);
+        } else {
+          range.selectNodeContents(
+            containerRef.current.querySelector(
+              `span[data-sectionindex="${parsedSelectedSections}"] .content`,
+            )!,
+          );
+        }
+
+        selection.removeAllRanges();
+        selection.addRange(range);
+      },
+      getActiveSectionIndexFromDOM: () => {
+        const activeElement = getActiveElement(document) as HTMLElement | undefined;
+        if (
+          !activeElement ||
+          !containerRef.current ||
+          !containerRef.current.contains(activeElement)
+        ) {
+          return null;
+        }
+
+        return getSectionIndexFromDOMElement(
+          getActiveElement(document) as HTMLSpanElement | undefined,
+        );
+      },
+    }),
+    [containerRef, parsedSelectedSections],
+  );
+
+  return {
+    interactions,
+    returnedValue: { elements, valueStr, onValueStrChange: handleValueStrChange, interactions },
+  };
 };

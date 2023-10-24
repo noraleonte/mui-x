@@ -22,7 +22,7 @@ import { useFieldState } from './useFieldState';
 import { useFieldCharacterEditing } from './useFieldCharacterEditing';
 import { getActiveElement } from '../../utils/utils';
 import { FieldSection } from '../../../models';
-import { useFieldElements } from './useFieldElements';
+import { useFieldV7TextField } from './useFieldV7TextField';
 
 export const useField = <
   TValue,
@@ -34,21 +34,6 @@ export const useField = <
   params: UseFieldParams<TValue, TDate, TSection, TForwardedProps, TInternalProps>,
 ): UseFieldResponse<TForwardedProps> => {
   const utils = useUtils<TDate>();
-
-  const {
-    state,
-    activeSectionIndex,
-    parsedSelectedSections,
-    setSelectedSections,
-    clearValue,
-    clearActiveSection,
-    updateSectionValue,
-    updateValueFromValueStr,
-    setSectionTempValueStr,
-    resetSectionsTempValueStr,
-    sectionsValueBoundaries,
-    timezone,
-  } = useFieldState(params);
 
   const {
     internalProps,
@@ -68,7 +53,27 @@ export const useField = <
     validator,
   } = params;
 
-  const { applyCharacterEditing, resetCharacterQuery } = useFieldCharacterEditing<TDate, TSection>({
+  const containerRef = React.useRef<HTMLDivElement>(null);
+  const handleRef = useForkRef(inContainerRef, containerRef);
+  const theme = useTheme();
+  const isRTL = theme.direction === 'rtl';
+
+  const stateResponse = useFieldState(params);
+  const {
+    state,
+    activeSectionIndex,
+    parsedSelectedSections,
+    setSelectedSections,
+    clearValue,
+    clearActiveSection,
+    updateSectionValue,
+    updateValueFromValueStr,
+    resetSectionsTempValueStr,
+    sectionsValueBoundaries,
+    timezone,
+  } = stateResponse;
+
+  const characterEditingResponse = useFieldCharacterEditing<TDate, TSection>({
     sections: state.sections,
     updateSectionValue,
     sectionsValueBoundaries,
@@ -76,22 +81,13 @@ export const useField = <
     timezone,
   });
 
-  const containerRef = React.useRef<HTMLDivElement>(null);
-  const handleRef = useForkRef(inContainerRef, containerRef);
-  const theme = useTheme();
-  const isRTL = theme.direction === 'rtl';
+  const { resetCharacterQuery } = characterEditingResponse;
 
-  const elements = useFieldElements({
+  const { returnedValue, interactions } = useFieldV7TextField({
     ...params,
-    applyCharacterEditing,
-    resetCharacterQuery,
-    setSelectedSections,
-    parsedSelectedSections,
-    state,
-    clearActiveSection,
-    setSectionTempValueStr,
-    updateSectionValue,
+    ...stateResponse,
     containerRef,
+    ...characterEditingResponse,
   });
 
   const sectionOrder = React.useMemo(
@@ -216,37 +212,7 @@ export const useField = <
   });
 
   useEnhancedEffect(() => {
-    if (!containerRef.current) {
-      return;
-    }
-
-    // Focus no section
-    if (parsedSelectedSections == null) {
-      if (isFocusInsideContainer(containerRef)) {
-        containerRef.current.blur();
-      }
-      return;
-    }
-
-    // Focus several sections
-    const selection = document.getSelection();
-    if (!selection) {
-      return;
-    }
-
-    const range = new Range();
-    if (parsedSelectedSections === 'all') {
-      range.selectNodeContents(containerRef.current);
-    } else {
-      range.selectNodeContents(
-        containerRef.current.querySelector(
-          `span[data-sectionindex="${parsedSelectedSections}"] .content`,
-        )!,
-      );
-    }
-
-    selection.removeAllRanges();
-    selection.addRange(range);
+    interactions.syncSelectionToDOM();
   });
 
   const validationError = useValidation(
@@ -301,20 +267,7 @@ export const useField = <
 
   React.useImperativeHandle(unstableFieldRef, () => ({
     getSections: () => state.sections,
-    getActiveSectionIndex: () => {
-      const activeElement = getActiveElement(document) as HTMLElement | undefined;
-      if (
-        !activeElement ||
-        !containerRef.current ||
-        !containerRef.current.contains(activeElement)
-      ) {
-        return null;
-      }
-
-      return getSectionIndexFromDOMElement(
-        getActiveElement(document) as HTMLSpanElement | undefined,
-      );
-    },
+    getActiveSectionIndex: interactions.getActiveSectionIndexFromDOM,
     setSelectedSections: (newActiveSectionIndex) => setSelectedSections(newActiveSectionIndex),
   }));
 
@@ -325,24 +278,12 @@ export const useField = <
     setSelectedSections(0);
   });
 
-  const handleValueStrChange = useEventCallback((event: React.ChangeEvent<HTMLInputElement>) =>
-    updateValueFromValueStr(event.target.value),
-  );
-
-  const valueStr = React.useMemo(
-    () => fieldValueManager.getHiddenInputValueFromSections(state.sections),
-    [state.sections, fieldValueManager],
-  );
-
   return {
     disabled,
     ...otherForwardedProps,
-    elements,
     readOnly,
     valueType:
       !isFocusInsideContainer(containerRef) && areAllSectionsEmpty ? 'placeholder' : 'value',
-    valueStr,
-    onValueStrChange: handleValueStrChange,
     onKeyDown: handleContainerKeyDown,
     onBlur: handleContainerBlur,
     onPaste: handleContainerPaste,
@@ -350,5 +291,6 @@ export const useField = <
     error: inputError,
     ref: handleRef,
     clearable: Boolean(clearable && !areAllSectionsEmpty && !readOnly && !disabled),
+    ...returnedValue,
   };
 };

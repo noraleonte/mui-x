@@ -148,7 +148,7 @@ export interface FieldRef<TSection extends FieldSection> {
   getActiveSectionIndex: () => number | null;
   /**
    * Updates the selected sections.
-   * @param {FieldSelectedSections} selectedSection The sections to select.
+   * @param {FieldSelectedSections} selectedSections The sections to select.
    */
   setSelectedSections: (selectedSection: FieldSelectedSections) => void;
 }
@@ -367,4 +367,17 @@ export interface FieldSlotsComponents {
 export interface FieldSlotsComponentsProps {
   clearIcon?: SlotComponentProps<typeof ClearIcon, {}, {}>;
   clearButton?: SlotComponentProps<typeof IconButton, {}, {}>;
+}
+
+export interface UseFieldTextFieldInteractions {
+  /**
+   * Select the correct sections in the DOM according to the sections currently selected in state.
+   */
+  syncSelectionToDOM: () => void;
+  /**
+   * Returns the index of the active section (the first focused section).
+   * If no section is active, returns `null`.
+   * @returns {number | null} The index of the active section.
+   */
+  getActiveSectionIndexFromDOM: () => number | null;
 }
