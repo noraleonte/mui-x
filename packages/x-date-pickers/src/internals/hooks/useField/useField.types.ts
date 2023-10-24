@@ -155,6 +155,8 @@ export interface FieldRef<TSection extends FieldSection> {
 
 export interface UseFieldForwardedProps {
   onPaste?: React.ClipboardEventHandler<HTMLDivElement>;
+  onClick?: React.MouseEventHandler;
+  onFocus?: () => void;
   onBlur?: () => void;
   error?: boolean;
   onClear?: React.MouseEventHandler;

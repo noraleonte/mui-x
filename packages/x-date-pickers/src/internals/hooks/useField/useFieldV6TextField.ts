@@ -96,9 +96,11 @@ export const useFieldV6TextField = <
 ) => {
   const theme = useTheme();
   const isRTL = theme.direction === 'rtl';
+  const focusTimeoutRef = React.useRef<NodeJS.Timeout | undefined>(undefined);
 
   const {
     internalProps: { readOnly },
+    forwardedProps: { onFocus, onClick, onPaste },
     parsedSelectedSections,
     activeSectionIndex,
     state,
@@ -110,6 +112,7 @@ export const useFieldV6TextField = <
     clearActiveSection,
     clearValue,
     setTempAndroidValueStr,
+    setSelectedSections,
   } = params;
 
   const sections = React.useMemo(
@@ -186,6 +189,103 @@ export const useFieldV6TextField = <
     [inputRef, parsedSelectedSections, sections],
   );
 
+  const syncSelectionFromDOM = () => {
+    if (readOnly) {
+      setSelectedSections(null);
+      return;
+    }
+    const browserStartIndex = inputRef.current!.selectionStart ?? 0;
+    let nextSectionIndex: number;
+    if (browserStartIndex <= sections[0].startInInput) {
+      // Special case if browser index is in invisible characters at the beginning
+      nextSectionIndex = 1;
+    } else if (browserStartIndex >= sections[sections.length - 1].endInInput) {
+      // If the click is after the last character of the input, then we want to select the 1st section.
+      nextSectionIndex = 1;
+    } else {
+      nextSectionIndex = sections.findIndex(
+        (section) => section.startInInput - section.startSeparator.length > browserStartIndex,
+      );
+    }
+    const sectionIndex = nextSectionIndex === -1 ? sections.length - 1 : nextSectionIndex - 1;
+    setSelectedSections(sectionIndex);
+  };
+
+  const handleInputFocus = useEventCallback((...args) => {
+    onFocus?.(...(args as []));
+    // The ref is guaranteed to be resolved at this point.
+    const input = inputRef.current;
+
+    window.clearTimeout(focusTimeoutRef.current);
+    focusTimeoutRef.current = setTimeout(() => {
+      // The ref changed, the component got remounted, the focus event is no longer relevant.
+      if (!input || input !== inputRef.current) {
+        return;
+      }
+
+      if (activeSectionIndex != null || readOnly) {
+        return;
+      }
+
+      if (
+        // avoid selecting all sections when focusing empty field without value
+        input.value.length &&
+        Number(input.selectionEnd) - Number(input.selectionStart) === input.value.length
+      ) {
+        setSelectedSections('all');
+      } else {
+        syncSelectionFromDOM();
+      }
+    });
+  });
+
+  const handleInputClick = useEventCallback((event: React.MouseEvent, ...args) => {
+    // The click event on the clear button would propagate to the input, trigger this handler and result in a wrong section selection.
+    // We avoid this by checking if the call of `handleInputClick` is actually intended, or a side effect.
+    if (event.isDefaultPrevented()) {
+      return;
+    }
+
+    onClick?.(event, ...(args as []));
+    syncSelectionFromDOM();
+  });
+
+  const handleInputPaste = useEventCallback((event: React.ClipboardEvent<HTMLInputElement>) => {
+    onPaste?.(event);
+
+    if (readOnly) {
+      event.preventDefault();
+      return;
+    }
+
+    const pastedValue = event.clipboardData.getData('text');
+    if (typeof parsedSelectedSections === 'number') {
+      const activeSection = state.sections[parsedSelectedSections];
+
+      const lettersOnly = /^[a-zA-Z]+$/.test(pastedValue);
+      const digitsOnly = /^[0-9]+$/.test(pastedValue);
+      const digitsAndLetterOnly = /^(([a-zA-Z]+)|)([0-9]+)(([a-zA-Z]+)|)$/.test(pastedValue);
+      const isValidPastedValue =
+        (activeSection.contentType === 'letter' && lettersOnly) ||
+        (activeSection.contentType === 'digit' && digitsOnly) ||
+        (activeSection.contentType === 'digit-with-letter' && digitsAndLetterOnly);
+      if (isValidPastedValue) {
+        // Early return to let the paste update section, value
+        return;
+      }
+      if (lettersOnly || digitsOnly) {
+        // The pasted value correspond to a single section but not the expected type
+        // skip the modification
+        event.preventDefault();
+        return;
+      }
+    }
+
+    event.preventDefault();
+    resetCharacterQuery();
+    updateValueFromValueStr(pastedValue);
+  });
+
   const handleInputChange = useEventCallback((event: React.ChangeEvent<HTMLInputElement>) => {
     if (readOnly) {
       return;
@@ -217,7 +317,7 @@ export const useFieldV6TextField = <
       keyPressed = cleanValueStr;
     } else {
       const prevValueStr = cleanString(
-        fieldValueManager.getV6InputValueFromSections(state.sections, isRTL),
+        fieldValueManager.getV6InputValueFromSections(sections, isRTL),
       );
 
       let startOfDiffIndex = -1;
@@ -273,5 +373,17 @@ export const useFieldV6TextField = <
     applyCharacterEditing({ keyPressed, sectionIndex: activeSectionIndex });
   });
 
-  return { interactions, returnedValue: { onChange: handleInputChange } };
+  React.useEffect(() => {
+    return () => window.clearTimeout(focusTimeoutRef.current);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  return {
+    interactions,
+    returnedValue: {
+      onChange: handleInputChange,
+      onFocus: handleInputFocus,
+      onClick: handleInputClick,
+      onPaste: handleInputPaste,
+    },
+  };
 };

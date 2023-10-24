@@ -96,19 +96,6 @@ export const useField = <
     setSelectedSections(null);
   });
 
-  const handleContainerPaste = useEventCallback((event: React.ClipboardEvent<HTMLDivElement>) => {
-    onPaste?.(event);
-    if (readOnly || parsedSelectedSections !== 'all') {
-      event.preventDefault();
-      return;
-    }
-
-    const pastedValue = event.clipboardData.getData('text');
-    event.preventDefault();
-    resetCharacterQuery();
-    updateValueFromValueStr(pastedValue);
-  });
-
   const handleContainerKeyDown = useEventCallback((event: React.KeyboardEvent<HTMLSpanElement>) => {
     // eslint-disable-next-line default-case
     switch (true) {
@@ -246,10 +233,7 @@ export const useField = <
   // This causes a small flickering on Android,
   // But we can't use `useEnhancedEffect` which is always called before the second `onChange` call and then would cause false positives.
   React.useEffect(() => {
-    const sectionWithTempValueStr = state.sections.findIndex(
-      (section) => section.tempValueStr != null,
-    );
-    if (sectionWithTempValueStr > -1 && activeSectionIndex != null) {
+    if (state.tempValueStrAndroid != null && activeSectionIndex != null) {
       resetCharacterQuery();
       clearActiveSection();
     }
@@ -275,7 +259,6 @@ export const useField = <
     readOnly,
     onKeyDown: handleContainerKeyDown,
     onBlur: handleContainerBlur,
-    onPaste: handleContainerPaste,
     onClear: handleClearValue,
     error: inputError,
     clearable: Boolean(clearable && !areAllSectionsEmpty && !readOnly && !disabled),
