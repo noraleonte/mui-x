@@ -57,7 +57,6 @@ export const useField = <
     clearValue,
     clearActiveSection,
     updateSectionValue,
-    updateValueFromValueStr,
     setTempAndroidValueStr,
     sectionsValueBoundaries,
     timezone,
@@ -250,6 +249,7 @@ export const useField = <
     onClear?.(event, ...(args as []));
     clearValue();
     setSelectedSections(0);
+    // TODO: Add back the v6 focus
   });
 
   return {

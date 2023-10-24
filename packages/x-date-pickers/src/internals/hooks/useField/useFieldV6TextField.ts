@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { useTheme } from '@mui/material/styles';
 import useEventCallback from '@mui/utils/useEventCallback';
+import useForkRef from '@mui/utils/useForkRef';
 import {
   UseFieldForwardedProps,
   UseFieldInternalProps,
@@ -22,7 +23,8 @@ interface UseFieldV6TextFieldParams<
 > extends UseFieldParams<TValue, TDate, TSection, TForwardedProps, TInternalProps>,
     UseFieldStateResponse<TValue, TDate, TSection>,
     UseFieldCharacterEditingResponse {
-  inputRef: React.RefObject<HTMLInputElement>;
+  areAllSectionsEmpty: boolean;
+  inputRef: React.Ref<HTMLInputElement>;
 }
 
 type FieldSectionWithPositions<TSection> = TSection & {
@@ -104,8 +106,9 @@ export const useFieldV6TextField = <
     parsedSelectedSections,
     activeSectionIndex,
     state,
-    inputRef,
+    inputRef: inputRefProp,
     fieldValueManager,
+    valueManager,
     applyCharacterEditing,
     resetCharacterQuery,
     updateValueFromValueStr,
@@ -113,7 +116,12 @@ export const useFieldV6TextField = <
     clearValue,
     setTempAndroidValueStr,
     setSelectedSections,
+    getSectionsFromValue,
+    areAllSectionsEmpty,
   } = params;
+
+  const inputRef = React.useRef<HTMLInputElement>(null);
+  const handleRef = useForkRef(inputRefProp, inputRef);
 
   const sections = React.useMemo(
     () => addPositionPropertiesToSections(state.sections, isRTL),
@@ -373,17 +381,39 @@ export const useFieldV6TextField = <
     applyCharacterEditing({ keyPressed, sectionIndex: activeSectionIndex });
   });
 
+  const placeholder = React.useMemo(
+    () =>
+      fieldValueManager.getV6InputValueFromSections(
+        getSectionsFromValue(valueManager.emptyValue),
+        isRTL,
+      ),
+    [fieldValueManager, getSectionsFromValue, valueManager.emptyValue, isRTL],
+  );
+
+  const valueStr = React.useMemo(
+    () =>
+      state.tempValueStrAndroid ??
+      fieldValueManager.getV6InputValueFromSections(state.sections, isRTL),
+    [state.sections, fieldValueManager, state.tempValueStrAndroid, isRTL],
+  );
+
   React.useEffect(() => {
     return () => window.clearTimeout(focusTimeoutRef.current);
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
+  const inputHasFocus = inputRef.current && inputRef.current === getActiveElement(document);
+  const shouldShowPlaceholder = !inputHasFocus && areAllSectionsEmpty;
+
   return {
     interactions,
     returnedValue: {
+      placeholder,
+      value: shouldShowPlaceholder ? '' : valueStr,
       onChange: handleInputChange,
       onFocus: handleInputFocus,
       onClick: handleInputClick,
       onPaste: handleInputPaste,
+      inputRef: handleRef,
     },
   };
 };

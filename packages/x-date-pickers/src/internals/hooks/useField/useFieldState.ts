@@ -52,6 +52,7 @@ export interface UseFieldStateResponse<TValue, TDate, TSection extends FieldSect
   updateValueFromValueStr: (valueStr: string) => void;
   setTempAndroidValueStr: (tempAndroidValueStr: string | null) => void;
   sectionsValueBoundaries: FieldSectionsValueBoundaries<TDate>;
+  getSectionsFromValue: (value: TValue, fallbackSections?: TSection[] | null) => TSection[];
   timezone: PickersTimezone;
 }
 
@@ -429,6 +430,7 @@ export const useFieldState = <
     updateSectionValue,
     updateValueFromValueStr,
     setTempAndroidValueStr,
+    getSectionsFromValue,
     sectionsValueBoundaries,
     timezone,
   };

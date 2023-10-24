@@ -28,7 +28,7 @@ interface UseFieldCharacterEditingParams<TDate, TSection extends FieldSection> {
   sections: TSection[];
   updateSectionValue: (params: UpdateSectionValueParams<TSection>) => void;
   sectionsValueBoundaries: FieldSectionsValueBoundaries<TDate>;
-  setTempAndroidValueStr: (tempAndroidValueStr: string | null) => void;
+  setTempAndroidValueStr: (newValue: string | null) => void;
   timezone: PickersTimezone;
 }
 
