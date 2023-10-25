@@ -5,27 +5,12 @@ import useForkRef from '@mui/utils/useForkRef';
 import {
   UseFieldForwardedProps,
   UseFieldInternalProps,
-  UseFieldParams,
+  UseFieldTextFieldParams,
   UseFieldTextFieldInteractions,
 } from './useField.types';
-import { UseFieldStateResponse } from './useFieldState';
-import { UseFieldCharacterEditingResponse } from './useFieldCharacterEditing';
 import { FieldSection } from '../../../models';
 import { getActiveElement } from '../../utils/utils';
 import { getSectionVisibleValue, isAndroid } from './useField.utils';
-
-interface UseFieldV6TextFieldParams<
-  TValue,
-  TDate,
-  TSection extends FieldSection,
-  TForwardedProps extends UseFieldForwardedProps,
-  TInternalProps extends UseFieldInternalProps<any, any, any, any>,
-> extends UseFieldParams<TValue, TDate, TSection, TForwardedProps, TInternalProps>,
-    UseFieldStateResponse<TValue, TDate, TSection>,
-    UseFieldCharacterEditingResponse {
-  areAllSectionsEmpty: boolean;
-  inputRef: React.Ref<HTMLInputElement>;
-}
 
 type FieldSectionWithPositions<TSection> = TSection & {
   /**
@@ -94,7 +79,7 @@ export const useFieldV6TextField = <
   TForwardedProps extends UseFieldForwardedProps,
   TInternalProps extends UseFieldInternalProps<any, any, any, any>,
 >(
-  params: UseFieldV6TextFieldParams<TValue, TDate, TSection, TForwardedProps, TInternalProps>,
+  params: UseFieldTextFieldParams<TValue, TDate, TSection, TForwardedProps, TInternalProps>,
 ) => {
   const theme = useTheme();
   const isRTL = theme.direction === 'rtl';
@@ -102,11 +87,10 @@ export const useFieldV6TextField = <
 
   const {
     internalProps: { readOnly },
-    forwardedProps: { onFocus, onClick, onPaste },
+    forwardedProps: { onFocus, onClick, onPaste, inputRef: inputRefProp },
     parsedSelectedSections,
     activeSectionIndex,
     state,
-    inputRef: inputRefProp,
     fieldValueManager,
     valueManager,
     applyCharacterEditing,

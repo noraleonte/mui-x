@@ -16,6 +16,7 @@ import { useFieldState } from './useFieldState';
 import { useFieldCharacterEditing } from './useFieldCharacterEditing';
 import { FieldSection } from '../../../models';
 import { useFieldV7TextField } from './useFieldV7TextField';
+import { useFieldV6TextField } from './useFieldV6TextField';
 
 export const useField = <
   TValue,
@@ -25,7 +26,7 @@ export const useField = <
   TInternalProps extends UseFieldInternalProps<any, any, any, any> & { minutesStep?: number },
 >(
   params: UseFieldParams<TValue, TDate, TSection, TForwardedProps, TInternalProps>,
-): UseFieldResponse<TForwardedProps> => {
+): UseFieldResponse<TForwardedProps, any> => {
   const utils = useUtils<TDate>();
 
   const {
@@ -78,7 +79,11 @@ export const useField = <
     valueManager.emptyValue,
   );
 
-  const { returnedValue, interactions } = useFieldV7TextField({
+  const shouldUseV6TextField = true;
+
+  const useFieldTextField = shouldUseV6TextField ? useFieldV6TextField : useFieldV7TextField;
+
+  const { returnedValue, interactions } = useFieldTextField({
     ...params,
     ...stateResponse,
     ...characterEditingResponse,

@@ -14,6 +14,9 @@ import {
 } from '../../../models';
 import type { PickerValueManager } from '../usePicker';
 import { InferError, Validator } from '../useValidation';
+import type { UseFieldStateResponse } from './useFieldState';
+import type { UseFieldCharacterEditingResponse } from './useFieldCharacterEditing';
+import { FakeTextFieldElement } from '../../components/FakeTextField/FakeTextField';
 
 export interface UseFieldParams<
   TValue,
@@ -162,20 +165,33 @@ export interface UseFieldForwardedProps {
   onClear?: React.MouseEventHandler;
   clearable?: boolean;
   disabled?: boolean;
+  /**
+   * Only used for v7 TextField implementation.
+   */
   ref?: React.Ref<HTMLDivElement>;
+  /**
+   * Only used for v6 TextField implementation.
+   */
+  inputRef?: React.Ref<HTMLInputElement>;
 }
 
-export type UseFieldResponse<TForwardedProps extends UseFieldForwardedProps> = Omit<
-  TForwardedProps,
-  keyof UseFieldForwardedProps
-> &
-  Required<UseFieldForwardedProps> & {
-    valueStr: string;
-    onValueStrChange: React.ChangeEventHandler<HTMLInputElement>;
-    ref: React.Ref<HTMLInputElement>;
+export type UseFieldResponse<
+  TForwardedProps extends UseFieldForwardedProps,
+  TTextField extends 'v6' | 'v7',
+> = Omit<TForwardedProps, keyof UseFieldForwardedProps> &
+  Required<Omit<UseFieldForwardedProps, 'inputRef' | 'ref'>> & {
     error: boolean;
     readOnly: boolean;
-  };
+  } & (TTextField extends 'v6'
+    ? {
+        inputRef: React.Ref<HTMLInputElement>;
+      }
+    : {
+        ref?: React.Ref<HTMLDivElement>;
+        valueStr: string;
+        onValueStrChange: React.ChangeEventHandler<HTMLInputElement>;
+        elements: FakeTextFieldElement[];
+      });
 
 export type FieldSectionValueBoundaries<TDate, SectionType extends FieldSectionType> = {
   minimum: number;
@@ -410,4 +426,16 @@ export interface UseFieldTextFieldInteractions {
    */
   getActiveSectionIndexFromDOM: () => number | null;
   isFocused: () => boolean;
+}
+
+export interface UseFieldTextFieldParams<
+  TValue,
+  TDate,
+  TSection extends FieldSection,
+  TForwardedProps extends UseFieldForwardedProps,
+  TInternalProps extends UseFieldInternalProps<any, any, any, any>,
+> extends UseFieldParams<TValue, TDate, TSection, TForwardedProps, TInternalProps>,
+    UseFieldStateResponse<TValue, TDate, TSection>,
+    UseFieldCharacterEditingResponse {
+  areAllSectionsEmpty: boolean;
 }
