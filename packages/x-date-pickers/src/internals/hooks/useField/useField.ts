@@ -79,7 +79,7 @@ export const useField = <
     valueManager.emptyValue,
   );
 
-  const shouldUseV6TextField = true;
+  const shouldUseV6TextField = false;
 
   const useFieldTextField = shouldUseV6TextField ? useFieldV6TextField : useFieldV7TextField;
 
