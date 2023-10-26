@@ -12,6 +12,15 @@ export const expectFieldValue = (
   return expect(value).to.equal(expectedValue);
 };
 
+export const expectFieldValueV6 = (
+  input: HTMLInputElement,
+  expectedValue: string,
+  specialCase?: 'singleDigit' | 'RTL',
+) => {
+  const value = cleanText(input.value, specialCase);
+  return expect(value).to.equal(expectedValue);
+};
+
 export const expectInputPlaceholder = (
   input: HTMLInputElement,
   placeholder: string,

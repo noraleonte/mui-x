@@ -1,7 +1,10 @@
 import * as React from 'react';
 import { createRenderer, screen, userEvent, act, fireEvent } from '@mui-internal/test-utils';
 import { FieldRef, FieldSection, FieldSectionType } from '@mui/x-date-pickers/models';
-import { expectFieldValue } from './assertions';
+import { addPositionPropertiesToSections } from '@mui/x-date-pickers/internals/hooks/useField/useFieldV6TextField';
+import { expectFieldValue, expectFieldValueV6 } from './assertions';
+
+export const getTextbox = (): HTMLInputElement => screen.getByRole('textbox');
 
 interface BuildFieldInteractionsParams<P extends {}> {
   // TODO: Export `Clock` from monorepo
@@ -13,9 +16,9 @@ interface BuildFieldInteractionsParams<P extends {}> {
 export type FieldSectionSelector = (
   selectedSection: FieldSectionType | undefined,
   index?: 'first' | 'last',
-) => { sectionContent: HTMLSpanElement };
+) => { sectionContent: HTMLSpanElement | null };
 
-export interface BuildFieldInteractionsResponse<P extends {}> {
+export interface BuildFieldInteractionsResponse<P extends { shouldUseV6TextField?: boolean }> {
   renderWithProps: (
     props: P,
     hook?: (props: P) => Record<string, any>,
@@ -40,7 +43,7 @@ export interface BuildFieldInteractionsResponse<P extends {}> {
   ) => void;
 }
 
-export const buildFieldInteractions = <P extends {}>({
+export const buildFieldInteractions = <P extends { shouldUseV6TextField?: boolean }>({
   clock,
   render,
   Component,
@@ -130,6 +133,39 @@ export const buildFieldInteractions = <P extends {}>({
     };
 
     const selectSection: FieldSectionSelector = (selectedSection, index = 'first') => {
+      if (props.shouldUseV6TextField) {
+        const input = fieldContainerRef.current!.querySelector('input')!;
+        if (document.activeElement !== input) {
+          // focus input to trigger setting placeholder as value if no value is present
+          act(() => {
+            input.focus();
+          });
+          // make sure the value of the input is rendered before proceeding
+          clock.runToLast();
+        }
+
+        let clickPosition: number;
+        if (selectedSection) {
+          const sections = addPositionPropertiesToSections(fieldRef.current!.getSections(), false);
+          const cleanSections = index === 'first' ? sections : [...sections].reverse();
+          const sectionToSelect = cleanSections.find((section) => section.type === selectedSection);
+          clickPosition = sectionToSelect!.startInInput;
+        } else {
+          clickPosition = 1;
+        }
+
+        act(() => {
+          fireEvent.mouseDown(input);
+          fireEvent.mouseUp(input);
+          input.setSelectionRange(clickPosition, clickPosition);
+          fireEvent.click(input);
+
+          clock.runToLast();
+        });
+
+        return { sectionContent: null };
+      }
+
       const sectionIndex = getSectionIndex(selectedSection, index);
       const sectionContent = fieldContainerRef.current!.querySelector<HTMLSpanElement>(
         `span[data-sectionindex="${sectionIndex}"] .content`,
@@ -160,10 +196,20 @@ export const buildFieldInteractions = <P extends {}>({
     selectedSection,
     ...props
   }) => {
-    const { selectSection, fieldContainer } = renderWithProps(props as any as P);
-    const { sectionContent } = selectSection(selectedSection);
-    userEvent.keyPress(sectionContent, { key });
-    expectFieldValue(fieldContainer, expectedValue);
+    // Test with v7 input
+    const v7Response = renderWithProps(props as any as P);
+    const { sectionContent } = v7Response.selectSection(selectedSection);
+    userEvent.keyPress(sectionContent!, { key });
+    expectFieldValue(v7Response.fieldContainer, expectedValue);
+    v7Response.unmount();
+
+    // Test with v6 input
+    const v6Response = renderWithProps({ ...props, shouldUseV6TextField: true } as any as P);
+    v6Response.selectSection(selectedSection);
+    const input = getTextbox();
+    userEvent.keyPress(input, { key });
+    expectFieldValueV6(input, expectedValue);
+    v6Response.unmount();
   };
 
   const testFieldChange: BuildFieldInteractionsResponse<P>['testFieldChange'] = ({
@@ -171,17 +217,33 @@ export const buildFieldInteractions = <P extends {}>({
     selectedSection,
     ...props
   }) => {
-    const { selectSection, fieldContainer } = renderWithProps(props as any as P);
-    const { sectionContent } = selectSection(selectedSection);
-
+    // Test with v7 input
+    const v7Response = renderWithProps(props as any as P);
+    const { sectionContent } = v7Response.selectSection(selectedSection);
     keyStrokes.forEach((keyStroke) => {
-      fireEvent.input(sectionContent, { target: { innerText: keyStroke.value } });
+      fireEvent.input(sectionContent!, { target: { innerText: keyStroke.value } });
       expectFieldValue(
-        fieldContainer,
+        v7Response.fieldContainer,
         keyStroke.expected,
         (props as any).shouldRespectLeadingZeros ? 'singleDigit' : undefined,
       );
     });
+    v7Response.unmount();
+
+    // Test with v6 input
+    const v6Response = renderWithProps(props as any as P);
+    v6Response.selectSection(selectedSection);
+    const input = getTextbox();
+
+    keyStrokes.forEach((keyStroke) => {
+      fireEvent.change(input, { target: { value: keyStroke.value } });
+      expectFieldValue(
+        v7Response.fieldContainer,
+        keyStroke.expected,
+        (props as any).shouldRespectLeadingZeros ? 'singleDigit' : undefined,
+      );
+    });
+    v6Response.unmount();
   };
 
   return { clickOnField, testFieldKeyPress, testFieldChange, renderWithProps };
@@ -201,5 +263,3 @@ export const cleanText = (text: string, specialCase?: 'singleDigit' | 'RTL') => 
 
 export const getCleanedSelectedContent = (input: HTMLInputElement) =>
   cleanText(input.value.slice(input.selectionStart ?? 0, input.selectionEnd ?? 0));
-
-export const getTextbox = (): HTMLInputElement => screen.getByRole('textbox');
