@@ -1,16 +1,14 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
+import MuiTextField from '@mui/material/TextField';
 import { useThemeProps } from '@mui/material/styles';
 import { useSlotProps } from '@mui/base/utils';
 import { refType } from '@mui/utils';
-import {
-  TimeFieldProps,
-  TimeFieldSlotsComponent,
-  TimeFieldSlotsComponentsProps,
-} from './TimeField.types';
+import { TimeFieldProps } from './TimeField.types';
 import { useTimeField } from './useTimeField';
 import { useClearableField } from '../hooks';
 import { FakeTextField } from '../internals/components/FakeTextField';
+import { useConvertFieldResponseIntoMuiTextFieldProps } from '../internals/hooks/useConvertFieldResponseIntoMuiTextFieldProps';
 
 type TimeFieldComponent = (<TDate>(
   props: TimeFieldProps<TDate> & React.RefAttributes<HTMLDivElement>,
@@ -40,7 +38,10 @@ const TimeField = React.forwardRef(function TimeField<TDate>(
 
   const ownerState = themeProps;
 
-  const TextField = slots?.textField ?? components?.TextField ?? FakeTextField;
+  const TextField =
+    slots?.textField ??
+    components?.TextField ??
+    (inProps.shouldUseV6TextField ? MuiTextField : FakeTextField);
   const textFieldProps: TimeFieldProps<TDate> = useSlotProps({
     elementType: TextField,
     externalSlotProps: slotProps?.textField ?? componentsProps?.textField,
@@ -55,34 +56,18 @@ const TimeField = React.forwardRef(function TimeField<TDate>(
   textFieldProps.inputProps = { ...inputProps, ...textFieldProps.inputProps };
   textFieldProps.InputProps = { ...InputProps, ...textFieldProps.InputProps };
 
-  const { ref, readOnly, clearable, onClear, ...fieldProps } = useTimeField<
-    TDate,
-    typeof textFieldProps
-  >(textFieldProps);
+  const fieldResponse = useTimeField<TDate, typeof textFieldProps>(textFieldProps);
+  const convertedFieldResponse = useConvertFieldResponseIntoMuiTextFieldProps(fieldResponse);
 
-  const { InputProps: ProcessedInputProps, fieldProps: processedFieldProps } = useClearableField<
-    typeof fieldProps,
-    typeof fieldProps.InputProps,
-    TimeFieldSlotsComponent,
-    TimeFieldSlotsComponentsProps<TDate>
-  >({
-    onClear,
-    clearable,
-    fieldProps,
-    InputProps: fieldProps.InputProps,
+  const processedFieldProps = useClearableField({
+    props: convertedFieldResponse,
     slots,
     slotProps,
     components,
     componentsProps,
   });
 
-  return (
-    <TextField
-      ref={ref}
-      {...processedFieldProps}
-      InputProps={{ ...ProcessedInputProps, readOnly }}
-    />
-  );
+  return <TextField {...processedFieldProps} />;
 }) as TimeFieldComponent;
 
 TimeField.propTypes = {
@@ -335,6 +320,10 @@ TimeField.propTypes = {
    * @default `false`
    */
   shouldRespectLeadingZeros: PropTypes.bool,
+  /**
+   * @defauilt false
+   */
+  shouldUseV6TextField: PropTypes.bool,
   /**
    * The size of the component.
    */

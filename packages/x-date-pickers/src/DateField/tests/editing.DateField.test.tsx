@@ -352,7 +352,7 @@ describe('<DateField /> - Editing', () => {
   });
 
   describeAdapters('Digit editing', DateField, ({ adapter, testFieldChange }) => {
-    it.only('should set the day to the digit pressed when no digit no value is provided', () => {
+    it('should set the day to the digit pressed when no digit no value is provided', () => {
       testFieldChange({
         format: adapter.formats.dayOfMonth,
         keyStrokes: [{ value: '1', expected: '01' }],

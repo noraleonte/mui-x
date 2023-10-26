@@ -57,6 +57,14 @@ Setting `formatDensity` to `"spacious"` will add a space before and after each `
 
 ## Commonly used custom field
 
+### Using the MUI TextField
+
+:::warning
+This approach will be removed in the next major (v8)
+:::
+
+{{"demo": "PickerWithV6TextField.js"}}
+
 ### Using another input
 
 #### With the Joy UI input
@@ -67,7 +75,7 @@ You can use the [Joy UI](https://mui.com/joy-ui/getting-started/) components ins
 A higher-level solution for _Joy UI_ will be provided in the near future for even simpler usage.
 :::
 
-{{"demo": "PickerWithJoyField.js", "defaultCodeOpen": false}}
+[//]: # '{{"demo": "PickerWithJoyField.js", "defaultCodeOpen": false}}'
 
 ### Using an `Autocomplete`
 

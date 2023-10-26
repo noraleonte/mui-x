@@ -358,6 +358,10 @@ MultiInputTimeRangeField.propTypes = {
    */
   shouldRespectLeadingZeros: PropTypes.bool,
   /**
+   * @defauilt false
+   */
+  shouldUseV6TextField: PropTypes.bool,
+  /**
    * The props used for each component slot.
    * @default {}
    */

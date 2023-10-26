@@ -1,0 +1,3 @@
+<DatePicker
+    slotProps={{ field: { shouldUseV6TextField: true } }}
+/>

@@ -101,6 +101,11 @@ export interface FieldRef<TSection extends FieldSection> {
    * @param {FieldSelectedSections} selectedSections The sections to select.
    */
   setSelectedSections: (selectedSections: FieldSelectedSections) => void;
+  /**
+   * Focuses the field.
+   * On the v6 TextField, it focuses the `<input />` element.
+   * On the v7 TextField, it focuses the outer `<Box />` element.
+   */
   focusField: () => void;
 }
 

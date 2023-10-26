@@ -1,15 +1,15 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
+import MuiTextField from '@mui/material/TextField';
 import { useClearableField } from '@mui/x-date-pickers/hooks';
-import { FakeTextField } from '@mui/x-date-pickers/internals';
+import {
+  FakeTextField,
+  useConvertFieldResponseIntoMuiTextFieldProps,
+} from '@mui/x-date-pickers/internals';
 import { useThemeProps } from '@mui/material/styles';
 import { useSlotProps } from '@mui/base/utils';
 import { refType } from '@mui/utils';
-import {
-  SingleInputTimeRangeFieldProps,
-  SingleInputTimeRangeFieldSlotsComponent,
-  SingleInputTimeRangeFieldSlotsComponentsProps,
-} from './SingleInputTimeRangeField.types';
+import { SingleInputTimeRangeFieldProps } from './SingleInputTimeRangeField.types';
 import { useSingleInputTimeRangeField } from './useSingleInputTimeRangeField';
 
 type DateRangeFieldComponent = (<TDate>(
@@ -40,7 +40,10 @@ const SingleInputTimeRangeField = React.forwardRef(function SingleInputTimeRange
 
   const ownerState = themeProps;
 
-  const TextField = slots?.textField ?? components?.TextField ?? FakeTextField;
+  const TextField =
+    slots?.textField ??
+    components?.TextField ??
+    (inProps.shouldUseV6TextField ? MuiTextField : FakeTextField);
   const textFieldProps: SingleInputTimeRangeFieldProps<TDate> = useSlotProps({
     elementType: TextField,
     externalSlotProps: slotProps?.textField ?? componentsProps?.textField,
@@ -55,34 +58,18 @@ const SingleInputTimeRangeField = React.forwardRef(function SingleInputTimeRange
   textFieldProps.inputProps = { ...inputProps, ...textFieldProps.inputProps };
   textFieldProps.InputProps = { ...InputProps, ...textFieldProps.InputProps };
 
-  const { ref, readOnly, clearable, onClear, ...fieldProps } = useSingleInputTimeRangeField<
-    TDate,
-    typeof textFieldProps
-  >(textFieldProps);
+  const fieldResponse = useSingleInputTimeRangeField<TDate, typeof textFieldProps>(textFieldProps);
+  const convertedFieldResponse = useConvertFieldResponseIntoMuiTextFieldProps(fieldResponse);
 
-  const { InputProps: ProcessedInputProps, fieldProps: processedFieldProps } = useClearableField<
-    typeof fieldProps,
-    typeof fieldProps.InputProps,
-    SingleInputTimeRangeFieldSlotsComponent,
-    SingleInputTimeRangeFieldSlotsComponentsProps<TDate>
-  >({
-    onClear,
-    clearable,
-    fieldProps,
-    InputProps: fieldProps.InputProps,
+  const processedFieldProps = useClearableField({
+    props: convertedFieldResponse,
     slots,
     slotProps,
     components,
     componentsProps,
   });
 
-  return (
-    <TextField
-      ref={ref}
-      {...processedFieldProps}
-      InputProps={{ ...ProcessedInputProps, readOnly }}
-    />
-  );
+  return <TextField {...processedFieldProps} />;
 }) as DateRangeFieldComponent;
 
 SingleInputTimeRangeField.fieldType = 'single-input';
@@ -337,6 +324,10 @@ SingleInputTimeRangeField.propTypes = {
    * @default `false`
    */
   shouldRespectLeadingZeros: PropTypes.bool,
+  /**
+   * @defauilt false
+   */
+  shouldUseV6TextField: PropTypes.bool,
   /**
    * The size of the component.
    */

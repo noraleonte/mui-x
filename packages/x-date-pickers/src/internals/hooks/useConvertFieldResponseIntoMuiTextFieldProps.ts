@@ -12,7 +12,7 @@ export const useConvertFieldResponseIntoMuiTextFieldProps = <
       props;
 
     return {
-      ...props,
+      ...other,
       InputProps: { ...(InputProps ?? {}), readOnly },
       inputProps: { ...(inputProps ?? {}), inputMode, onPaste, onKeyDown, ref: inputRef },
     };

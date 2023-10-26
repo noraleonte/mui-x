@@ -384,7 +384,7 @@ export const useFieldV6TextField = <
 
   React.useEffect(() => {
     return () => window.clearTimeout(focusTimeoutRef.current);
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, []);
 
   const inputHasFocus = inputRef.current && inputRef.current === getActiveElement(document);
   const shouldShowPlaceholder = !inputHasFocus && areAllSectionsEmpty;
