@@ -15,6 +15,6 @@ export interface UseMultiInputRangeFieldParams<
 }
 
 export interface UseMultiInputRangeFieldResponse<TForwardedProps extends {}> {
-  startDate: UseFieldResponse<TForwardedProps>;
-  endDate: UseFieldResponse<TForwardedProps>;
+  startDate: UseFieldResponse<TForwardedProps, any>;
+  endDate: UseFieldResponse<TForwardedProps, any>;
 }

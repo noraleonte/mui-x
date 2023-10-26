@@ -15,6 +15,7 @@ import {
   splitFieldInternalAndForwardedProps,
   FieldsTextFieldProps,
   uncapitalizeObjectKeys,
+  FakeTextField,
 } from '@mui/x-date-pickers/internals';
 import { MultiInputTimeRangeFieldProps } from './MultiInputTimeRangeField.types';
 import { useMultiInputTimeRangeField } from '../internals/hooks/useMultiInputRangeField/useMultiInputTimeRangeField';
@@ -122,7 +123,10 @@ const MultiInputTimeRangeField = React.forwardRef(function MultiInputTimeRangeFi
     className: clsx(className, classes.root),
   });
 
-  const TextField = slots?.textField ?? MuiTextField;
+  const TextField =
+    slots?.textField ??
+    components?.TextField ??
+    (inProps.shouldUseV6TextField ? MuiTextField : FakeTextField);
   const startTextFieldProps: FieldsTextFieldProps = useSlotProps({
     elementType: TextField,
     externalSlotProps: slotProps?.textField,
@@ -144,10 +148,7 @@ const MultiInputTimeRangeField = React.forwardRef(function MultiInputTimeRangeFi
     className: classes.separator,
   });
 
-  const {
-    startDate: { readOnly: startReadOnly, ...startDateProps },
-    endDate: { readOnly: endReadOnly, ...endDateProps },
-  } = useMultiInputTimeRangeField<TDate, FieldsTextFieldProps>({
+  const fieldResponse = useMultiInputTimeRangeField<TDate, FieldsTextFieldProps>({
     sharedProps: { ...timeFieldInternalProps, disabled },
     startTextFieldProps,
     endTextFieldProps,
@@ -157,23 +158,9 @@ const MultiInputTimeRangeField = React.forwardRef(function MultiInputTimeRangeFi
 
   return (
     <Root {...rootProps}>
-      <TextField
-        fullWidth
-        {...startDateProps}
-        InputProps={{
-          ...startDateProps.InputProps,
-          readOnly: startReadOnly,
-        }}
-      />
+      <TextField fullWidth {...fieldResponse.startDate} />
       <Separator {...separatorProps} />
-      <TextField
-        fullWidth
-        {...endDateProps}
-        InputProps={{
-          ...endDateProps.InputProps,
-          readOnly: endReadOnly,
-        }}
-      />
+      <TextField fullWidth {...fieldResponse.endDate} />
     </Root>
   );
 }) as MultiInputTimeRangeFieldComponent;

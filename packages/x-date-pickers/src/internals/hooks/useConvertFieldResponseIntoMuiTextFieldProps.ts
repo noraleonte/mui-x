@@ -1,10 +1,11 @@
+import { TextFieldProps } from '@mui/material/TextField';
 import { UseFieldResponse } from './useField';
 
 export const useConvertFieldResponseIntoMuiTextFieldProps = <
   TFieldResponse extends UseFieldResponse<any, any>,
 >(
   fieldResponse: TFieldResponse,
-) => {
+): TFieldResponse['textField'] extends 'v6' ? TextFieldProps : TFieldResponse => {
   const { textField, ...props } = fieldResponse;
 
   if (textField === 'v6') {
@@ -15,8 +16,8 @@ export const useConvertFieldResponseIntoMuiTextFieldProps = <
       ...other,
       InputProps: { ...(InputProps ?? {}), readOnly },
       inputProps: { ...(inputProps ?? {}), inputMode, onPaste, onKeyDown, ref: inputRef },
-    };
+    } as any;
   }
 
-  return props;
+  return props as any;
 };

@@ -55,6 +55,8 @@ export const useFieldV7TextField = <
   const containerRef = React.useRef<HTMLDivElement>(null);
   const handleRef = useForkRef(inContainerRef, containerRef);
 
+  const isFocused = !isFocusInsideContainer(containerRef);
+
   const handleContainerPaste = useEventCallback((event: React.ClipboardEvent<HTMLDivElement>) => {
     onPaste?.(event);
     if (readOnly || parsedSelectedSections !== 'all') {
@@ -165,8 +167,9 @@ export const useFieldV7TextField = <
           onClick: getInputContainerClickHandler(sectionIndex),
         } as React.HTMLAttributes<HTMLSpanElement>,
         content: {
+          tabIndex: 0,
           className: 'content',
-          contentEditable: !disabled && !readOnly,
+          contentEditable: parsedSelectedSections != null && !disabled && !readOnly,
           role: 'textbox',
           children: section.value || section.placeholder,
           onInput: handleInputContentInput,
@@ -201,6 +204,7 @@ export const useFieldV7TextField = <
       handleInputContentMouseUp,
       disabled,
       readOnly,
+      parsedSelectedSections,
     ],
   );
 
@@ -235,7 +239,8 @@ export const useFieldV7TextField = <
         const range = new Range();
 
         if (parsedSelectedSections === 'all') {
-          range.selectNodeContents(containerRef.current);
+          range.setStart(containerRef.current, 0);
+          range.setEnd(containerRef.current, 3);
         } else {
           range.selectNodeContents(
             containerRef.current.querySelector(
@@ -261,8 +266,7 @@ export const useFieldV7TextField = <
           getActiveElement(document) as HTMLSpanElement | undefined,
         );
       },
-      isFocused: () =>
-        !!containerRef.current && containerRef.current.contains(getActiveElement(document)),
+      isFocused: () => isFocusInsideContainer(containerRef),
       focusField: () => containerRef.current?.focus(),
     }),
     [containerRef, parsedSelectedSections],
@@ -278,8 +282,7 @@ export const useFieldV7TextField = <
       ref: handleRef,
       valueStr,
       onValueStrChange: handleValueStrChange,
-      valueType:
-        !isFocusInsideContainer(containerRef) && areAllSectionsEmpty ? 'placeholder' : 'value',
+      valueType: isFocused && areAllSectionsEmpty ? 'placeholder' : 'value',
       onPaste: handleContainerPaste,
     },
   };

@@ -161,11 +161,15 @@ export const useMultiInputDateTimeRangeField = <TDate, TTextFieldSlotProps exten
     onChange: handleEndDateChange,
   };
 
-  const startDateResponse = useDateTimeField(
-    startFieldProps,
-  ) as UseFieldResponse<TTextFieldSlotProps>;
+  const startDateResponse = useDateTimeField(startFieldProps) as UseFieldResponse<
+    TTextFieldSlotProps,
+    any
+  >;
 
-  const endDateResponse = useDateTimeField(endFieldProps) as UseFieldResponse<TTextFieldSlotProps>;
+  const endDateResponse = useDateTimeField(endFieldProps) as UseFieldResponse<
+    TTextFieldSlotProps,
+    any
+  >;
 
   /* TODO: Undo this change when a clearable behavior for multiple input range fields is implemented */
   return {
