@@ -11,6 +11,7 @@ import {
   FieldSectionContentType,
   FieldValueType,
   PickersTimezone,
+  FieldRef,
 } from '../../../models';
 import type { PickerValueManager } from '../usePicker';
 import { InferError, Validator } from '../useValidation';
@@ -139,25 +140,6 @@ export interface UseFieldInternalProps<TValue, TDate, TSection extends FieldSect
    * @defauilt false
    */
   shouldUseV6TextField?: boolean;
-}
-
-export interface FieldRef<TSection extends FieldSection> {
-  /**
-   * Returns the sections of the current value.
-   * @returns {TSection[]} The sections of the current value.
-   */
-  getSections: () => TSection[];
-  /**
-   * Returns the index of the active section (the first focused section).
-   * If no section is active, returns `null`.
-   * @returns {number | null} The index of the active section.
-   */
-  getActiveSectionIndex: () => number | null;
-  /**
-   * Updates the selected sections.
-   * @param {FieldSelectedSections} selectedSections The sections to select.
-   */
-  setSelectedSections: (selectedSections: FieldSelectedSections) => void;
 }
 
 export interface UseFieldForwardedProps {
@@ -432,6 +414,7 @@ export interface UseFieldTextFieldInteractions {
    */
   getActiveSectionIndexFromDOM: () => number | null;
   isFocused: () => boolean;
+  focusField: () => void;
 }
 
 export interface UseFieldTextFieldParams<

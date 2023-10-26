@@ -25,7 +25,6 @@ export const usePicker = <
   valueManager,
   valueType,
   wrapperVariant,
-  inputRef,
   additionalViewProps,
   validator,
   autoFocusView,
@@ -58,7 +57,6 @@ export const usePicker = <
     TAdditionalProps
   >({
     props,
-    inputRef,
     additionalViewProps,
     autoFocusView,
     propsFromPickerValue: pickerValueResponse.viewProps,
@@ -75,7 +73,7 @@ export const usePicker = <
     // Picker value
     open: pickerValueResponse.open,
     actions: pickerValueResponse.actions,
-    fieldProps: pickerValueResponse.fieldProps,
+    fieldProps: { ...pickerValueResponse.fieldProps, ...pickerViewsResponse.fieldProps },
 
     // Picker views
     renderCurrentView: pickerViewsResponse.renderCurrentView,

@@ -177,6 +177,7 @@ export const useFieldV6TextField = <
         return nextSectionIndex === -1 ? sections.length - 1 : nextSectionIndex - 1;
       },
       isFocused: () => !!inputRef.current && inputRef.current === getActiveElement(document),
+      focusField: () => inputRef.current?.focus(),
     }),
     [inputRef, parsedSelectedSections, sections],
   );

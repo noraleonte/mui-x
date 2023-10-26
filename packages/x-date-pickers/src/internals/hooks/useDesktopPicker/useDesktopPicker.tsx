@@ -2,7 +2,6 @@ import * as React from 'react';
 import { useSlotProps } from '@mui/base/utils';
 import MuiInputAdornment from '@mui/material/InputAdornment';
 import IconButton from '@mui/material/IconButton';
-import useForkRef from '@mui/utils/useForkRef';
 import useId from '@mui/utils/useId';
 import { PickersPopper } from '../../components/PickersPopper';
 import { UseDesktopPickerParams, UseDesktopPickerProps } from './useDesktopPicker.types';
@@ -47,8 +46,8 @@ export const useDesktopPicker = <
   } = props;
 
   const utils = useUtils<TDate>();
-  const internalInputRef = React.useRef<HTMLInputElement>(null);
   const containerRef = React.useRef<HTMLDivElement>(null);
+
   const labelId = useId();
   const isToolbarHidden = innerSlotProps?.toolbar?.hidden ?? false;
 
@@ -63,7 +62,6 @@ export const useDesktopPicker = <
   } = usePicker<TDate | null, TDate, TView, FieldSection, TExternalProps, {}>({
     ...pickerParams,
     props,
-    inputRef: internalInputRef,
     autoFocusView: true,
     additionalViewProps: {},
     wrapperVariant: 'desktop',
@@ -116,6 +114,7 @@ export const useDesktopPicker = <
       label,
       autoFocus: autoFocus && !props.open,
       focused: open ? true : undefined,
+      inputRef,
     },
     ownerState: props,
   });
@@ -149,8 +148,6 @@ export const useDesktopPicker = <
 
   const Layout = slots.layout ?? PickersLayout;
 
-  const handleInputRef = useForkRef(internalInputRef, fieldProps.inputRef, inputRef);
-
   let labelledById = labelId;
   if (isToolbarHidden) {
     if (label) {
@@ -173,12 +170,7 @@ export const useDesktopPicker = <
 
   const renderPicker = () => (
     <LocalizationProvider localeText={localeText}>
-      <Field
-        {...fieldProps}
-        slots={slotsForField}
-        slotProps={slotProps}
-        inputRef={handleInputRef}
-      />
+      <Field {...fieldProps} slots={slotsForField} slotProps={slotProps} />
       <PickersPopper
         role="dialog"
         placement="bottom-start"

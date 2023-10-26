@@ -1,16 +1,14 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
+import MuiTextField from '@mui/material/TextField';
 import { useThemeProps } from '@mui/material/styles';
 import { useSlotProps } from '@mui/base/utils';
 import { refType } from '@mui/utils';
-import {
-  DateTimeFieldProps,
-  DateTimeFieldSlotsComponent,
-  DateTimeFieldSlotsComponentsProps,
-} from './DateTimeField.types';
+import { DateTimeFieldProps } from './DateTimeField.types';
 import { useDateTimeField } from './useDateTimeField';
 import { useClearableField } from '../hooks';
 import { FakeTextField } from '../internals/components/FakeTextField';
+import { useConvertFieldResponseIntoMuiTextFieldProps } from '../internals/hooks/useConvertFieldResponseIntoMuiTextFieldProps';
 
 type DateTimeFieldComponent = (<TDate>(
   props: DateTimeFieldProps<TDate> & React.RefAttributes<HTMLDivElement>,
@@ -40,7 +38,10 @@ const DateTimeField = React.forwardRef(function DateTimeField<TDate>(
 
   const ownerState = themeProps;
 
-  const TextField = slots?.textField ?? components?.TextField ?? FakeTextField;
+  const TextField =
+    slots?.textField ??
+    components?.TextField ??
+    (inProps.shouldUseV6TextField ? MuiTextField : FakeTextField);
   const textFieldProps: DateTimeFieldProps<TDate> = useSlotProps({
     elementType: TextField,
     externalSlotProps: slotProps?.textField ?? componentsProps?.textField,
@@ -55,33 +56,18 @@ const DateTimeField = React.forwardRef(function DateTimeField<TDate>(
   textFieldProps.inputProps = { ...inputProps, ...textFieldProps.inputProps };
   textFieldProps.InputProps = { ...InputProps, ...textFieldProps.InputProps };
 
-  const { ref, readOnly, clearable, onClear, ...fieldProps } = useDateTimeField<
-    TDate,
-    typeof textFieldProps
-  >(textFieldProps);
+  const fieldResponse = useDateTimeField<TDate, typeof textFieldProps>(textFieldProps);
 
-  const { InputProps: ProcessedInputProps, fieldProps: processedFieldProps } = useClearableField<
-    typeof fieldProps,
-    typeof fieldProps.InputProps,
-    DateTimeFieldSlotsComponent,
-    DateTimeFieldSlotsComponentsProps<TDate>
-  >({
-    onClear,
-    clearable,
-    fieldProps,
-    InputProps: fieldProps.InputProps,
+  const convertedFieldResponse = useConvertFieldResponseIntoMuiTextFieldProps(fieldResponse);
+
+  const processedFieldProps = useClearableField({
+    props: convertedFieldResponse,
     slots,
     slotProps,
     components,
     componentsProps,
   });
-  return (
-    <TextField
-      ref={ref}
-      {...processedFieldProps}
-      InputProps={{ ...ProcessedInputProps, readOnly }}
-    />
-  );
+  return <TextField {...processedFieldProps} />;
 }) as DateTimeFieldComponent;
 
 DateTimeField.propTypes = {

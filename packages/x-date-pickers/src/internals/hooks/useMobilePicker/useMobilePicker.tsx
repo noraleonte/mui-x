@@ -1,6 +1,5 @@
 import * as React from 'react';
 import { useSlotProps } from '@mui/base/utils';
-import useForkRef from '@mui/utils/useForkRef';
 import useId from '@mui/utils/useId';
 import { PickersModalDialog } from '../../components/PickersModalDialog';
 import { UseMobilePickerParams, UseMobilePickerProps } from './useMobilePicker.types';
@@ -44,7 +43,6 @@ export const useMobilePicker = <
   } = props;
 
   const utils = useUtils<TDate>();
-  const internalInputRef = React.useRef<HTMLInputElement>(null);
   const labelId = useId();
   const isToolbarHidden = innerSlotProps?.toolbar?.hidden ?? false;
 
@@ -57,7 +55,6 @@ export const useMobilePicker = <
   } = usePicker<TDate | null, TDate, TView, FieldSection, TExternalProps, {}>({
     ...pickerParams,
     props,
-    inputRef: internalInputRef,
     autoFocusView: true,
     additionalViewProps: {},
     wrapperVariant: 'mobile',
@@ -109,8 +106,6 @@ export const useMobilePicker = <
 
   const Layout = slots.layout ?? PickersLayout;
 
-  const handleInputRef = useForkRef(internalInputRef, fieldProps.inputRef, inputRef);
-
   let labelledById = labelId;
   if (isToolbarHidden) {
     if (label) {
@@ -133,12 +128,7 @@ export const useMobilePicker = <
 
   const renderPicker = () => (
     <LocalizationProvider localeText={localeText}>
-      <Field
-        {...fieldProps}
-        slots={slotsForField}
-        slotProps={slotProps}
-        inputRef={handleInputRef}
-      />
+      <Field {...fieldProps} slots={slotsForField} slotProps={slotProps} />
       <PickersModalDialog {...actions} open={open} slots={slots} slotProps={slotProps}>
         <Layout {...layoutProps} {...slotProps?.layout} slots={slots} slotProps={slotProps}>
           {renderCurrentView()}

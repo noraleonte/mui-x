@@ -7,7 +7,6 @@ export type {
   UseFieldResponse,
   FieldChangeHandler,
   FieldChangeHandlerContext,
-  FieldRef,
   FieldSlotsComponents,
   FieldSlotsComponentsProps,
 } from './useField.types';

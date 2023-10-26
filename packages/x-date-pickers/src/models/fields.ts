@@ -101,6 +101,7 @@ export interface FieldRef<TSection extends FieldSection> {
    * @param {FieldSelectedSections} selectedSections The sections to select.
    */
   setSelectedSections: (selectedSections: FieldSelectedSections) => void;
+  focusField: () => void;
 }
 
 export type FieldSelectedSections = number | FieldSectionType | null | 'all';

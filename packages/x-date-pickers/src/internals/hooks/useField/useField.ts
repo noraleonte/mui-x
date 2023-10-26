@@ -250,6 +250,7 @@ export const useField = <
     getSections: () => state.sections,
     getActiveSectionIndex: interactions.getActiveSectionIndexFromDOM,
     setSelectedSections: (newActiveSectionIndex) => setSelectedSections(newActiveSectionIndex),
+    focusField: interactions.focusField,
   }));
 
   const handleClearValue = useEventCallback((event: React.MouseEvent, ...args) => {

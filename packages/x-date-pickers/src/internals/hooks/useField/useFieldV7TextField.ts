@@ -263,6 +263,7 @@ export const useFieldV7TextField = <
       },
       isFocused: () =>
         !!containerRef.current && containerRef.current.contains(getActiveElement(document)),
+      focusField: () => containerRef.current?.focus(),
     }),
     [containerRef, parsedSelectedSections],
   );
