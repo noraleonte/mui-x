@@ -391,7 +391,9 @@ export const useFieldV6TextField = <
   return {
     interactions,
     returnedValue: {
+      textField: 'v6' as const,
       placeholder,
+      autoComplete: 'off',
       value: shouldShowPlaceholder ? '' : valueStr,
       onChange: handleInputChange,
       onFocus: handleInputFocus,

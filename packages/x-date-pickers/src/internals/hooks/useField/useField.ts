@@ -31,7 +31,12 @@ export const useField = <
 
   const {
     internalProps,
-    internalProps: { readOnly = false, unstableFieldRef, minutesStep },
+    internalProps: {
+      readOnly = false,
+      unstableFieldRef,
+      minutesStep,
+      shouldUseV6TextField = false,
+    },
     forwardedProps: {
       onBlur,
       onPaste,
@@ -78,8 +83,6 @@ export const useField = <
     state.value,
     valueManager.emptyValue,
   );
-
-  const shouldUseV6TextField = false;
 
   const useFieldTextField = shouldUseV6TextField ? useFieldV6TextField : useFieldV7TextField;
 

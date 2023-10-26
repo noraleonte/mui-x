@@ -270,6 +270,7 @@ export const useFieldV7TextField = <
   return {
     interactions,
     returnedValue: {
+      textField: 'v7' as const,
       onFocus,
       onClick,
       elements,

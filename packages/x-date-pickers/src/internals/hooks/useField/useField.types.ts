@@ -135,6 +135,10 @@ export interface UseFieldInternalProps<TValue, TDate, TSection extends FieldSect
    * @default false
    */
   disabled?: boolean;
+  /**
+   * @defauilt false
+   */
+  shouldUseV6TextField?: boolean;
 }
 
 export interface FieldRef<TSection extends FieldSection> {
@@ -184,10 +188,12 @@ export type UseFieldResponse<
     readOnly: boolean;
   } & (TTextField extends 'v6'
     ? {
+        textField: 'v6';
         inputRef: React.Ref<HTMLInputElement>;
       }
     : {
-        ref?: React.Ref<HTMLDivElement>;
+        textField: 'v7';
+        ref: React.Ref<HTMLDivElement>;
         valueStr: string;
         onValueStrChange: React.ChangeEventHandler<HTMLInputElement>;
         elements: FakeTextFieldElement[];
