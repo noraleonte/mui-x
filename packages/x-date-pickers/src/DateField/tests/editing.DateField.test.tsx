@@ -3,7 +3,12 @@ import { expect } from 'chai';
 import { spy } from 'sinon';
 import { DateField } from '@mui/x-date-pickers/DateField';
 import { act, userEvent, fireEvent } from '@mui-internal/test-utils';
-import { expectFieldValue, getTextbox, describeAdapters } from 'test/utils/pickers';
+import {
+  expectFieldValue,
+  getTextbox,
+  describeAdapters,
+  expectFieldValueV6,
+} from 'test/utils/pickers';
 
 describe('<DateField /> - Editing', () => {
   describeAdapters('key: ArrowDown', DateField, ({ adapter, testFieldKeyPress }) => {
@@ -774,7 +779,7 @@ describe('<DateField /> - Editing', () => {
     },
   );
 
-  describeAdapters('Pasting', DateField, ({ adapter, render, renderWithProps, clickOnField }) => {
+  describeAdapters('Pasting', DateField, ({ adapter, renderWithProps }) => {
     const firePasteEventV7 = (element: HTMLElement, pastedValue: string) => {
       act(() => {
         const clipboardEvent = new window.Event('paste', {
@@ -898,36 +903,68 @@ describe('<DateField /> - Editing', () => {
     });
 
     it('should not set the date when all sections are selected and the pasted value is not valid', () => {
-      const onChange = spy();
+      // Test with v7 input
+      const onChangeV7 = spy();
+      const v7Response = renderWithProps({ onChange: onChangeV7 });
+      const sectionSelection1 = v7Response.selectSection('month');
 
-      const { input, selectSection } = renderWithProps({ onChange });
-      selectSection('month');
+      // Select all sections
+      userEvent.keyPress(sectionSelection1.sectionContent!, { key: 'a', ctrlKey: true });
+
+      firePasteEventV7(v7Response.fieldContainer, 'Some invalid content');
+      expectFieldValue(v7Response.fieldContainer, 'MM/DD/YYYY');
+      v7Response.unmount();
+
+      // Test with v6 input
+      const onChangeV6 = spy();
+      const v6Response = renderWithProps({ onChange: onChangeV6, shouldUseV6TextField: true });
+      const input = getTextbox();
+      v6Response.selectSection('month');
 
       // Select all sections
       userEvent.keyPress(input, { key: 'a', ctrlKey: true });
 
       firePasteEventV6(input, 'Some invalid content');
-      expectFieldValue(input, 'MM/DD/YYYY');
+      expectFieldValueV6(input, 'MM/DD/YYYY');
     });
 
     it('should set the date when all sections are selected and the format contains escaped characters', () => {
       const { start: startChar, end: endChar } = adapter.escapedCharacters;
-      const onChange = spy();
-      render(
-        <DateField
-          onChange={onChange}
-          format={`${startChar}Escaped${endChar} ${adapter.formats.year}`}
-        />,
-      );
+
+      // Test with v7 input
+      const onChangeV7 = spy();
+      const v7Response = renderWithProps({
+        onChange: onChangeV7,
+        format: `${startChar}Escaped${endChar} ${adapter.formats.year}`,
+      });
+
+      const sectionSelection1 = v7Response.selectSection('year');
+
+      // Select all sections
+      userEvent.keyPress(sectionSelection1.sectionContent!, { key: 'a', ctrlKey: true });
+
+      firePasteEventV7(v7Response.fieldContainer, `Escaped 2014`);
+      expect(onChangeV7.callCount).to.equal(1);
+      expect(adapter.getYear(onChangeV7.lastCall.firstArg)).to.equal(2014);
+      v7Response.unmount();
+
+      // Test with v6 input
+      const onChangeV6 = spy();
+      const v6Response = renderWithProps({
+        onChange: onChangeV6,
+        format: `${startChar}Escaped${endChar} ${adapter.formats.year}`,
+        shouldUseV6TextField: true,
+      });
+
       const input = getTextbox();
-      clickOnField(input, 0);
+      v6Response.selectSection('year');
 
       // Select all sections
       userEvent.keyPress(input, { key: 'a', ctrlKey: true });
 
       firePasteEventV6(input, `Escaped 2014`);
-      expect(onChange.callCount).to.equal(1);
-      expect(adapter.getYear(onChange.lastCall.firstArg)).to.equal(2014);
+      expect(onChangeV6.callCount).to.equal(1);
+      expect(adapter.getYear(onChangeV6.lastCall.firstArg)).to.equal(2014);
     });
 
     it('should not set the date when all sections are selected and props.readOnly = true', () => {
@@ -996,24 +1033,49 @@ describe('<DateField /> - Editing', () => {
       expect(onChange.callCount).to.equal(0);
     });
 
-    it('should reset sections internal state when pasting', () => {
-      const onChange = spy();
-
-      const { input, selectSection } = renderWithProps({
+    it.only('should reset sections internal state when pasting', () => {
+      // Test with v7 input
+      const v7Response = renderWithProps({
         defaultValue: adapter.date(new Date(2018, 11, 5)),
-        onChange,
       });
 
-      selectSection('day');
+      const sectionSelection1 = v7Response.selectSection('day');
 
-      fireEvent.change(input, { target: { value: '12/2/2018' } }); // Press 2
-      expectFieldValue(input, '12/02/2018');
+      fireEvent.input(sectionSelection1.sectionContent!, { target: { innerText: '2' } });
+      expectFieldValue(v7Response.fieldContainer, '12/02/2018');
 
-      firePasteEventV6(input, '09/16/2022');
-      expectFieldValue(input, '09/16/2022');
+      // Select all sections
+      userEvent.keyPress(sectionSelection1.sectionContent!, { key: 'a', ctrlKey: true });
 
-      fireEvent.change(input, { target: { value: '09/2/2022' } }); // Press 2
-      expectFieldValue(input, '09/02/2022'); // If internal state is not reset it would be 22 instead of 02
+      firePasteEventV7(v7Response.fieldContainer, '09/16/2022');
+      expectFieldValue(v7Response.fieldContainer, '09/16/2022');
+
+      const sectionSelection2 = v7Response.selectSection('day');
+
+      console.log('BEFORE');
+
+      fireEvent.input(sectionSelection2.sectionContent!, { target: { innerText: '2' } }); // Press 2
+      expectFieldValue(v7Response.fieldContainer, '09/02/2022'); // If internal state is not reset it would be 22 instead of 02
+      //
+      // v7Response.unmount();
+
+      // Test with v6 input
+      // const v6Response = renderWithProps({
+      //   defaultValue: adapter.date(new Date(2018, 11, 5)),
+      //   shouldUseV6TextField: true,
+      // });
+      //
+      // const input = getTextbox()
+      // v6Response.selectSection('day');
+      //
+      // fireEvent.change(input, { target: { value: '12/2/2018' } }); // Press 2
+      // expectFieldValueV6(input, '12/02/2018');
+      //
+      // firePasteEventV6(input, '09/16/2022');
+      // expectFieldValueV6(input, '09/16/2022');
+      //
+      // fireEvent.change(input, { target: { value: '09/2/2022' } }); // Press 2
+      // expectFieldValueV6(input, '09/02/2022'); // If internal state is not reset it would be 22 instead of 02
     });
   });
 

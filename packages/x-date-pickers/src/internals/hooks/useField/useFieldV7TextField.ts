@@ -79,8 +79,7 @@ export const useFieldV7TextField = <
         const range = new Range();
 
         if (parsedSelectedSections === 'all') {
-          range.setStart(containerRef.current, 0);
-          range.setEnd(containerRef.current, 3);
+          range.selectNodeContents(containerRef.current);
         } else {
           range.selectNodeContents(
             containerRef.current.querySelector(
@@ -245,7 +244,7 @@ export const useFieldV7TextField = <
         content: {
           tabIndex: 0,
           className: 'content',
-          contentEditable: parsedSelectedSections != null && !disabled && !readOnly,
+          contentEditable: typeof parsedSelectedSections === 'number' && !disabled && !readOnly,
           role: 'textbox',
           children: section.value || section.placeholder,
           onInput: handleInputContentInput,
