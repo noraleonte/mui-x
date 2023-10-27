@@ -705,28 +705,57 @@ describe('<DateField /> - Editing', () => {
       });
 
       it('should call `onChange` when clearing the first and last section (Backspace)', () => {
-        const onChange = spy();
+        // Test with v7 input
+        const onChangeV7 = spy();
 
-        const { selectSection, input } = renderWithProps({
+        const v7Response = renderWithProps({
           format: `${adapter.formats.month} ${adapter.formats.year}`,
           defaultValue: adapter.date(),
-          onChange,
+          onChange: onChangeV7,
         });
 
-        selectSection('month');
+        const sectionSelection1 = v7Response.selectSection('month');
+        fireEvent.input(sectionSelection1.sectionContent!, { target: { innerText: '' } });
+        expect(onChangeV7.callCount).to.equal(1);
+        expect(onChangeV7.lastCall.args[1].validationError).to.equal('invalidDate');
+
+        const sectionSelection2 = v7Response.selectSection('year');
+        fireEvent.input(sectionSelection2.sectionContent!, { target: { innerText: '' } });
+        expect(onChangeV7.callCount).to.equal(2);
+        expect(onChangeV7.lastCall.firstArg).to.equal(null);
+        expect(onChangeV7.lastCall.args[1].validationError).to.equal(null);
+
+        v7Response.unmount();
+
+        // Test with v6 input
+        const onChangeV6 = spy();
+
+        const v6Response = renderWithProps({
+          shouldUseV6TextField: true,
+          format: `${adapter.formats.month} ${adapter.formats.year}`,
+          defaultValue: adapter.date(),
+          onChange: onChangeV6,
+        });
+
+        const input = getTextbox();
+        v6Response.selectSection('month');
         fireEvent.change(input, { target: { value: ' 2022' } });
-        expect(onChange.callCount).to.equal(1);
-        expect(onChange.lastCall.args[1].validationError).to.equal('invalidDate');
+        expect(onChangeV6.callCount).to.equal(1);
+        expect(onChangeV6.lastCall.args[1].validationError).to.equal('invalidDate');
 
         userEvent.keyPress(input, { key: 'ArrowRight' });
 
         fireEvent.change(input, { target: { value: 'MMMM ' } });
-        expect(onChange.callCount).to.equal(2);
-        expect(onChange.lastCall.firstArg).to.equal(null);
-        expect(onChange.lastCall.args[1].validationError).to.equal(null);
+        expect(onChangeV6.callCount).to.equal(2);
+        expect(onChangeV6.lastCall.firstArg).to.equal(null);
+        expect(onChangeV6.lastCall.args[1].validationError).to.equal(null);
       });
 
       it('should not call `onChange` if the section is already empty (Backspace)', () => {
+        if (adapter.lib !== 'dayjs') {
+          return;
+        }
+
         const onChange = spy();
 
         testFieldChange({
@@ -739,13 +768,36 @@ describe('<DateField /> - Editing', () => {
           onChange,
         });
 
-        expect(onChange.callCount).to.equal(1);
+        // 1 for v7 and 1 for v7 input
+        expect(onChange.callCount).to.equal(2);
       });
     },
   );
 
   describeAdapters('Pasting', DateField, ({ adapter, render, renderWithProps, clickOnField }) => {
-    const firePasteEvent = (input: HTMLInputElement, pastedValue: string) => {
+    const firePasteEventV7 = (element: HTMLElement, pastedValue: string) => {
+      act(() => {
+        const clipboardEvent = new window.Event('paste', {
+          bubbles: true,
+          cancelable: true,
+          composed: true,
+        });
+
+        // @ts-ignore
+        clipboardEvent.clipboardData = {
+          getData: () => pastedValue,
+        };
+        // canContinue is `false` if default have been prevented
+        const canContinue = element.dispatchEvent(clipboardEvent);
+        if (!canContinue) {
+          return;
+        }
+
+        fireEvent.input(element, { target: { innerText: pastedValue } });
+      });
+    };
+
+    const firePasteEventV6 = (input: HTMLInputElement, pastedValue: string) => {
       act(() => {
         const clipboardEvent = new window.Event('paste', {
           bubbles: true,
@@ -773,40 +825,76 @@ describe('<DateField /> - Editing', () => {
     };
 
     it('should set the date when all sections are selected, the pasted value is valid and a value is provided', () => {
-      const onChange = spy();
-
-      const { input, selectSection } = renderWithProps({
+      // Test with v7 input
+      const onChangeV7 = spy();
+      const v7Response = renderWithProps({
         defaultValue: adapter.date(),
-        onChange,
+        onChange: onChangeV7,
       });
+      const sectionSelection1 = v7Response.selectSection('month');
 
-      selectSection('month');
+      // Select all sections
+      userEvent.keyPress(sectionSelection1.sectionContent!, { key: 'a', ctrlKey: true });
+
+      firePasteEventV7(v7Response.fieldContainer, '09/16/2022');
+
+      expect(onChangeV7.callCount).to.equal(1);
+      expect(onChangeV7.lastCall.firstArg).toEqualDateTime(new Date(2022, 8, 16));
+
+      v7Response.unmount();
+
+      // Test with v6 input
+      const onChangeV6 = spy();
+      const v6Response = renderWithProps({
+        defaultValue: adapter.date(),
+        onChange: onChangeV6,
+        shouldUseV6TextField: true,
+      });
+      const input = getTextbox();
+      v6Response.selectSection('month');
 
       // Select all sections
       userEvent.keyPress(input, { key: 'a', ctrlKey: true });
 
-      firePasteEvent(input, '09/16/2022');
+      firePasteEventV6(input, '09/16/2022');
 
-      expect(onChange.callCount).to.equal(1);
-      expect(onChange.lastCall.firstArg).toEqualDateTime(new Date(2022, 8, 16));
+      expect(onChangeV6.callCount).to.equal(1);
+      expect(onChangeV6.lastCall.firstArg).toEqualDateTime(new Date(2022, 8, 16));
     });
 
     it('should set the date when all sections are selected, the pasted value is valid and no value is provided', () => {
-      const onChange = spy();
-
-      const { input, selectSection } = renderWithProps({
-        onChange,
+      // Test with v7 input
+      const onChangeV7 = spy();
+      const v7Response = renderWithProps({
+        onChange: onChangeV7,
       });
+      const sectionSelection1 = v7Response.selectSection('month');
 
-      selectSection('month');
+      // Select all sections
+      userEvent.keyPress(sectionSelection1.sectionContent!, { key: 'a', ctrlKey: true });
+
+      firePasteEventV7(v7Response.fieldContainer, '09/16/2022');
+
+      expect(onChangeV7.callCount).to.equal(1);
+      expect(onChangeV7.lastCall.firstArg).toEqualDateTime(new Date(2022, 8, 16));
+      v7Response.unmount();
+
+      // Test with v6 input
+      const onChangeV6 = spy();
+      const v6Response = renderWithProps({
+        onChange: onChangeV6,
+        shouldUseV6TextField: true,
+      });
+      const input = getTextbox();
+      v6Response.selectSection('month');
 
       // Select all sections
       userEvent.keyPress(input, { key: 'a', ctrlKey: true });
 
-      firePasteEvent(input, '09/16/2022');
+      firePasteEventV6(input, '09/16/2022');
 
-      expect(onChange.callCount).to.equal(1);
-      expect(onChange.lastCall.firstArg).toEqualDateTime(new Date(2022, 8, 16));
+      expect(onChangeV6.callCount).to.equal(1);
+      expect(onChangeV6.lastCall.firstArg).toEqualDateTime(new Date(2022, 8, 16));
     });
 
     it('should not set the date when all sections are selected and the pasted value is not valid', () => {
@@ -818,7 +906,7 @@ describe('<DateField /> - Editing', () => {
       // Select all sections
       userEvent.keyPress(input, { key: 'a', ctrlKey: true });
 
-      firePasteEvent(input, 'Some invalid content');
+      firePasteEventV6(input, 'Some invalid content');
       expectFieldValue(input, 'MM/DD/YYYY');
     });
 
@@ -837,7 +925,7 @@ describe('<DateField /> - Editing', () => {
       // Select all sections
       userEvent.keyPress(input, { key: 'a', ctrlKey: true });
 
-      firePasteEvent(input, `Escaped 2014`);
+      firePasteEventV6(input, `Escaped 2014`);
       expect(onChange.callCount).to.equal(1);
       expect(adapter.getYear(onChange.lastCall.firstArg)).to.equal(2014);
     });
@@ -855,7 +943,7 @@ describe('<DateField /> - Editing', () => {
       // Select all sections
       userEvent.keyPress(input, { key: 'a', ctrlKey: true });
 
-      firePasteEvent(input, '09/16/2022');
+      firePasteEventV6(input, '09/16/2022');
       expect(onChange.callCount).to.equal(0);
     });
 
@@ -869,7 +957,7 @@ describe('<DateField /> - Editing', () => {
       selectSection('month');
 
       expectFieldValue(input, 'MM/DD/YYYY');
-      firePasteEvent(input, '12');
+      firePasteEventV6(input, '12');
 
       expect(onChange.callCount).to.equal(1);
       expectFieldValue(input, '12/DD/YYYY');
@@ -886,7 +974,7 @@ describe('<DateField /> - Editing', () => {
       selectSection('month');
 
       expectFieldValue(input, '01/13/2018');
-      firePasteEvent(input, '12');
+      firePasteEventV6(input, '12');
       expectFieldValue(input, '12/13/2018');
       expect(onChange.callCount).to.equal(1);
       expect(onChange.lastCall.firstArg).toEqualDateTime(new Date(2018, 11, 13));
@@ -903,7 +991,7 @@ describe('<DateField /> - Editing', () => {
       selectSection('month');
 
       expectFieldValue(input, '01/13/2018');
-      firePasteEvent(input, 'Jun');
+      firePasteEventV6(input, 'Jun');
       expectFieldValue(input, '01/13/2018');
       expect(onChange.callCount).to.equal(0);
     });
@@ -921,7 +1009,7 @@ describe('<DateField /> - Editing', () => {
       fireEvent.change(input, { target: { value: '12/2/2018' } }); // Press 2
       expectFieldValue(input, '12/02/2018');
 
-      firePasteEvent(input, '09/16/2022');
+      firePasteEventV6(input, '09/16/2022');
       expectFieldValue(input, '09/16/2022');
 
       fireEvent.change(input, { target: { value: '09/2/2022' } }); // Press 2

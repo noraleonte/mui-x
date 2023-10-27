@@ -57,6 +57,78 @@ export const useFieldV7TextField = <
 
   const isFocused = !isFocusInsideContainer(containerRef);
 
+  const interactions = React.useMemo<UseFieldTextFieldInteractions>(
+    () => ({
+      syncSelectionToDOM: () => {
+        if (!containerRef.current) {
+          return;
+        }
+
+        if (parsedSelectedSections == null) {
+          if (isFocusInsideContainer(containerRef)) {
+            containerRef.current.blur();
+          }
+          return;
+        }
+
+        const selection = document.getSelection();
+        if (!selection) {
+          return;
+        }
+
+        const range = new Range();
+
+        if (parsedSelectedSections === 'all') {
+          range.setStart(containerRef.current, 0);
+          range.setEnd(containerRef.current, 3);
+        } else {
+          range.selectNodeContents(
+            containerRef.current.querySelector(
+              `span[data-sectionindex="${parsedSelectedSections}"] .content`,
+            )!,
+          );
+        }
+
+        selection.removeAllRanges();
+        selection.addRange(range);
+      },
+      getActiveSectionIndexFromDOM: () => {
+        const activeElement = getActiveElement(document) as HTMLElement | undefined;
+        if (
+          !activeElement ||
+          !containerRef.current ||
+          !containerRef.current.contains(activeElement)
+        ) {
+          return null;
+        }
+
+        return getSectionIndexFromDOMElement(
+          getActiveElement(document) as HTMLSpanElement | undefined,
+        );
+      },
+      isFocused: () => isFocusInsideContainer(containerRef),
+      focusField: () => containerRef.current?.focus(),
+    }),
+    [containerRef, parsedSelectedSections],
+  );
+
+  /**
+   * If a section content has been updated with a value we don't want to keep,
+   * Then we need to imperatively revert it (we can't let React do it because the value did not change in his internal representation).
+   */
+  const revertDOMSectionChange = useEventCallback((sectionIndex: number) => {
+    if (!containerRef.current) {
+      return;
+    }
+
+    const section = state.sections[sectionIndex];
+
+    containerRef.current.querySelector(
+      `span[data-sectionindex="${sectionIndex}"] .content`,
+    )!.innerHTML = section.value || section.placeholder;
+    interactions.syncSelectionToDOM();
+  });
+
   const handleContainerPaste = useEventCallback((event: React.ClipboardEvent<HTMLDivElement>) => {
     onPaste?.(event);
     if (readOnly || parsedSelectedSections !== 'all') {
@@ -139,10 +211,17 @@ export const useFieldV7TextField = <
     const target = event.target as HTMLSpanElement;
     const keyPressed = target.innerText;
     const sectionIndex = getSectionIndexFromDOMElement(target)!;
+    const section = state.sections[sectionIndex];
 
     if (keyPressed.length === 0) {
+      if (section.value === '') {
+        revertDOMSectionChange(sectionIndex);
+        return;
+      }
+
       resetCharacterQuery();
       clearActiveSection();
+      return;
     }
 
     const isValid = applyCharacterEditing({
@@ -152,10 +231,7 @@ export const useFieldV7TextField = <
 
     // Without this, the span will contain the newly typed character.
     if (!isValid) {
-      const section = state.sections[sectionIndex];
-      containerRef.current.querySelector(
-        `span[data-sectionindex="${sectionIndex}"] .content`,
-      )!.innerHTML = section.value || section.placeholder;
+      revertDOMSectionChange(sectionIndex);
     }
   });
 
@@ -215,61 +291,6 @@ export const useFieldV7TextField = <
   const valueStr = React.useMemo(
     () => fieldValueManager.getV7HiddenInputValueFromSections(state.sections),
     [state.sections, fieldValueManager],
-  );
-
-  const interactions = React.useMemo<UseFieldTextFieldInteractions>(
-    () => ({
-      syncSelectionToDOM: () => {
-        if (!containerRef.current) {
-          return;
-        }
-
-        if (parsedSelectedSections == null) {
-          if (isFocusInsideContainer(containerRef)) {
-            containerRef.current.blur();
-          }
-          return;
-        }
-
-        const selection = document.getSelection();
-        if (!selection) {
-          return;
-        }
-
-        const range = new Range();
-
-        if (parsedSelectedSections === 'all') {
-          range.setStart(containerRef.current, 0);
-          range.setEnd(containerRef.current, 3);
-        } else {
-          range.selectNodeContents(
-            containerRef.current.querySelector(
-              `span[data-sectionindex="${parsedSelectedSections}"] .content`,
-            )!,
-          );
-        }
-
-        selection.removeAllRanges();
-        selection.addRange(range);
-      },
-      getActiveSectionIndexFromDOM: () => {
-        const activeElement = getActiveElement(document) as HTMLElement | undefined;
-        if (
-          !activeElement ||
-          !containerRef.current ||
-          !containerRef.current.contains(activeElement)
-        ) {
-          return null;
-        }
-
-        return getSectionIndexFromDOMElement(
-          getActiveElement(document) as HTMLSpanElement | undefined,
-        );
-      },
-      isFocused: () => isFocusInsideContainer(containerRef),
-      focusField: () => containerRef.current?.focus(),
-    }),
-    [containerRef, parsedSelectedSections],
   );
 
   return {

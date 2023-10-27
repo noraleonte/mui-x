@@ -231,14 +231,14 @@ export const buildFieldInteractions = <P extends { shouldUseV6TextField?: boolea
     v7Response.unmount();
 
     // Test with v6 input
-    const v6Response = renderWithProps(props as any as P);
+    const v6Response = renderWithProps({ ...props, shouldUseV6TextField: true } as any as P);
     v6Response.selectSection(selectedSection);
     const input = getTextbox();
 
     keyStrokes.forEach((keyStroke) => {
       fireEvent.change(input, { target: { value: keyStroke.value } });
-      expectFieldValue(
-        v7Response.fieldContainer,
+      expectFieldValueV6(
+        input,
         keyStroke.expected,
         (props as any).shouldRespectLeadingZeros ? 'singleDigit' : undefined,
       );

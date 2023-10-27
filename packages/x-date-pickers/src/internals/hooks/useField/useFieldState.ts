@@ -272,19 +272,7 @@ export const useFieldState = <
     const newActiveDate = hasNoOtherNonEmptySections ? null : utils.date(new Date(''));
     const newValues = activeDateManager.getNewValuesFromNewActiveDate(newActiveDate);
 
-    if (
-      (newActiveDate != null && !utils.isValid(newActiveDate)) !==
-      (activeDateManager.date != null && !utils.isValid(activeDateManager.date))
-    ) {
-      publishValue({ ...newValues, sections: newSections });
-    } else {
-      setState((prevState) => ({
-        ...prevState,
-        ...newValues,
-        sections: newSections,
-        tempValueStrAndroid: null,
-      }));
-    }
+    publishValue({ ...newValues, sections: newSections });
   };
 
   const updateValueFromValueStr = (valueStr: string) => {
