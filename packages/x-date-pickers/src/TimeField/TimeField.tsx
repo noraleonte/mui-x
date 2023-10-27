@@ -59,8 +59,6 @@ const TimeField = React.forwardRef(function TimeField<TDate>(
   const fieldResponse = useTimeField<TDate, typeof textFieldProps>(textFieldProps);
   const convertedFieldResponse = useConvertFieldResponseIntoMuiTextFieldProps(fieldResponse);
 
-  const a = fieldResponse.InputProps?.endAdornment;
-
   const processedFieldProps = useClearableField({
     props: convertedFieldResponse,
     slots,
