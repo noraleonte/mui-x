@@ -130,14 +130,14 @@ export const useFieldV7TextField = <
   });
 
   const handleContainerInput = useEventCallback((event: React.FormEvent<HTMLDivElement>) => {
-    if (parsedSelectedSections !== 'all') {
+    if (!containerRef.current || parsedSelectedSections !== 'all') {
       return;
     }
 
     const target = event.target as HTMLSpanElement;
     const keyPressed = target.innerText;
 
-    target.innerHTML = state.sections
+    containerRef.current.innerHTML = state.sections
       .map(
         (section) =>
           `${section.startSeparator}${section.value ?? section.placeholder}${section.endSeparator}`,

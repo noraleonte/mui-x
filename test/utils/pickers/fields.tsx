@@ -175,6 +175,7 @@ export const buildFieldInteractions = <P extends { shouldUseV6TextField?: boolea
         fireEvent.mouseDown(sectionContent);
         fireEvent.mouseUp(sectionContent);
         fireEvent.click(sectionContent);
+        sectionContent.focus();
       });
 
       return { sectionContent };

@@ -1106,11 +1106,7 @@ describe('<DateField /> - Editing', () => {
         expect(onChangeV6.lastCall.firstArg).toEqualDateTime(new Date(2009, 3, 3, 3, 3, 3));
       });
 
-      it.only('should not loose time information when cleaning the date then filling it again', () => {
-        if (adapter.lib !== 'dayjs') {
-          return;
-        }
-
+      it('should not loose time information when cleaning the date then filling it again', () => {
         // Test with v7 input
         const onChangeV7 = spy();
 
@@ -1120,30 +1116,30 @@ describe('<DateField /> - Editing', () => {
         });
 
         const sectionSelection1 = v7Response.selectSection('month');
-        userEvent.keyPress(document.activeElement!, { key: 'a', ctrlKey: true });
+
+        fireEvent.keyDown(sectionSelection1.sectionContent!, { key: 'a', ctrlKey: true });
         fireEvent.input(v7Response.fieldContainer, { target: { innerText: '' } });
+        expectFieldValue(v7Response.fieldContainer, 'MM/DD/YYYY');
         v7Response.selectSection('month');
-        //
-        // fireEvent.input(document.activeElement!, { target: { innerText: '1' } });
-        // expectFieldValue(v7Response.fieldContainer, '01/DD/YYYY');
-        //
-        // fireEvent.input(document.activeElement!, { target: { innerText: '1' } });
-        // expectFieldValue(v7Response.fieldContainer, '11/DD/YYYY');
-        //
-        // fireEvent.input(document.activeElement!, { target: { innerText: '2' } });
-        // fireEvent.input(document.activeElement!, { target: { innerText: '5' } });
-        // expectFieldValue(v7Response.fieldContainer, '11/25/YYYY');
-        //
-        // fireEvent.input(document.activeElement!, { target: { innerText: '2' } });
-        // fireEvent.input(document.activeElement!, { target: { innerText: '0' } });
-        // fireEvent.input(document.activeElement!, { target: { innerText: '0' } });
-        // fireEvent.input(document.activeElement!, { target: { innerText: '9' } });
-        // expectFieldValue(v7Response.fieldContainer, '11/25/2009');
-        // expect(onChangeV7.lastCall.firstArg).toEqualDateTime(new Date(2009, 10, 25, 3, 3, 3));
+
+        fireEvent.input(document.activeElement!, { target: { innerText: '1' } });
+        expectFieldValue(v7Response.fieldContainer, '01/DD/YYYY');
+
+        fireEvent.input(document.activeElement!, { target: { innerText: '1' } });
+        expectFieldValue(v7Response.fieldContainer, '11/DD/YYYY');
+
+        fireEvent.input(document.activeElement!, { target: { innerText: '2' } });
+        fireEvent.input(document.activeElement!, { target: { innerText: '5' } });
+        expectFieldValue(v7Response.fieldContainer, '11/25/YYYY');
+
+        fireEvent.input(document.activeElement!, { target: { innerText: '2' } });
+        fireEvent.input(document.activeElement!, { target: { innerText: '0' } });
+        fireEvent.input(document.activeElement!, { target: { innerText: '0' } });
+        fireEvent.input(document.activeElement!, { target: { innerText: '9' } });
+        expectFieldValue(v7Response.fieldContainer, '11/25/2009');
+        expect(onChangeV7.lastCall.firstArg).toEqualDateTime(new Date(2009, 10, 25, 3, 3, 3));
 
         v7Response.unmount();
-
-        return;
 
         // Test with v6 input
         const onChangeV6 = spy();
@@ -1179,34 +1175,69 @@ describe('<DateField /> - Editing', () => {
       });
 
       it('should not loose date information when using the year format and value is provided', () => {
-        const onChange = spy();
+        // Test with v7 input
+        const onChangeV7 = spy();
 
-        const { input, selectSection } = renderWithProps({
+        const v7Response = renderWithProps({
           format: adapter.formats.year,
           defaultValue: adapter.date(new Date(2010, 3, 3, 3, 3, 3)),
-          onChange,
+          onChange: onChangeV7,
         });
 
-        selectSection('year');
+        const sectionSelection1 = v7Response.selectSection('year');
+        userEvent.keyPress(sectionSelection1.sectionContent!, { key: 'ArrowDown' });
 
+        expect(onChangeV7.lastCall.firstArg).toEqualDateTime(new Date(2009, 3, 3, 3, 3, 3));
+
+        v7Response.unmount();
+
+        // Test with v6 input
+        const onChangeV6 = spy();
+
+        const v6Response = renderWithProps({
+          format: adapter.formats.year,
+          defaultValue: adapter.date(new Date(2010, 3, 3, 3, 3, 3)),
+          onChange: onChangeV6,
+          shouldUseV6TextField: true,
+        });
+
+        const input = getTextbox();
+        v6Response.selectSection('year');
         userEvent.keyPress(input, { key: 'ArrowDown' });
 
-        expect(onChange.lastCall.firstArg).toEqualDateTime(new Date(2009, 3, 3, 3, 3, 3));
+        expect(onChangeV6.lastCall.firstArg).toEqualDateTime(new Date(2009, 3, 3, 3, 3, 3));
       });
 
       it('should not loose date information when using the month format and value is provided', () => {
-        const onChange = spy();
+        // Test with v7 input
+        const onChangeV7 = spy();
 
-        const { input, selectSection } = renderWithProps({
+        const v7Response = renderWithProps({
           format: adapter.formats.month,
           defaultValue: adapter.date(new Date(2010, 3, 3, 3, 3, 3)),
-          onChange,
+          onChange: onChangeV7,
         });
 
-        selectSection('month');
-        userEvent.keyPress(input, { key: 'ArrowDown' });
+        const sectionSelection1 = v7Response.selectSection('month');
+        userEvent.keyPress(sectionSelection1.sectionContent!, { key: 'ArrowDown' });
+        expect(onChangeV7.lastCall.firstArg).toEqualDateTime(new Date(2010, 2, 3, 3, 3, 3));
 
-        expect(onChange.lastCall.firstArg).toEqualDateTime(new Date(2010, 2, 3, 3, 3, 3));
+        v7Response.unmount();
+
+        // Test with v6 input
+        const onChangeV6 = spy();
+
+        const v6Response = renderWithProps({
+          format: adapter.formats.month,
+          defaultValue: adapter.date(new Date(2010, 3, 3, 3, 3, 3)),
+          onChange: onChangeV6,
+          shouldUseV6TextField: true,
+        });
+
+        v6Response.selectSection('month');
+        const input = getTextbox();
+        userEvent.keyPress(input, { key: 'ArrowDown' });
+        expect(onChangeV6.lastCall.firstArg).toEqualDateTime(new Date(2010, 2, 3, 3, 3, 3));
       });
     },
   );
@@ -1377,8 +1408,24 @@ describe('<DateField /> - Editing', () => {
 
   describeAdapters('Select all', DateField, ({ renderWithProps }) => {
     it('should edit the 1st section when all sections are selected', () => {
-      const { input, selectSection } = renderWithProps({});
-      selectSection('month');
+      // Test with v7 input
+      const v7Response = renderWithProps({});
+      const sectionSelection1 = v7Response.selectSection('month');
+
+      // Select all sections
+      fireEvent.keyDown(sectionSelection1.sectionContent!, { key: 'a', ctrlKey: true });
+
+      // When all sections are selected, the value only contains the key pressed
+      fireEvent.input(v7Response.fieldContainer, { target: { innerText: '9' } });
+
+      expectFieldValue(v7Response.fieldContainer, '09/DD/YYYY');
+
+      v7Response.unmount();
+
+      // Test with v6 input
+      const v6Response = renderWithProps({ shouldUseV6TextField: true });
+      v6Response.selectSection('month');
+      const input = getTextbox();
 
       // Select all sections
       userEvent.keyPress(input, { key: 'a', ctrlKey: true });
@@ -1386,7 +1433,7 @@ describe('<DateField /> - Editing', () => {
       // When all sections are selected, the value only contains the key pressed
       fireEvent.change(input, { target: { value: '9' } });
 
-      expectFieldValue(input, '09/DD/YYYY');
+      expectFieldValueV6(input, '09/DD/YYYY');
     });
   });
 });
