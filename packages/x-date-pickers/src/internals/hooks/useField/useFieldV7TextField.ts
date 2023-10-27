@@ -47,6 +47,7 @@ export const useFieldV7TextField = <
     parsedSelectedSections,
     state,
     clearActiveSection,
+    clearValue,
     updateSectionValue,
     updateValueFromValueStr,
     areAllSectionsEmpty,
@@ -126,6 +127,34 @@ export const useFieldV7TextField = <
       `span[data-sectionindex="${sectionIndex}"] .content`,
     )!.innerHTML = section.value || section.placeholder;
     interactions.syncSelectionToDOM();
+  });
+
+  const handleContainerInput = useEventCallback((event: React.FormEvent<HTMLDivElement>) => {
+    if (parsedSelectedSections !== 'all') {
+      return;
+    }
+
+    const target = event.target as HTMLSpanElement;
+    const keyPressed = target.innerText;
+
+    target.innerHTML = state.sections
+      .map(
+        (section) =>
+          `${section.startSeparator}${section.value ?? section.placeholder}${section.endSeparator}`,
+      )
+      .join('');
+    interactions.syncSelectionToDOM();
+
+    if (keyPressed.length === 0 || keyPressed.charCodeAt(0) === 10) {
+      resetCharacterQuery();
+      clearValue();
+      setSelectedSections(0);
+    } else {
+      applyCharacterEditing({
+        keyPressed,
+        sectionIndex: 0,
+      });
+    }
   });
 
   const handleContainerPaste = useEventCallback((event: React.ClipboardEvent<HTMLDivElement>) => {
@@ -300,6 +329,8 @@ export const useFieldV7TextField = <
       textField: 'v7' as const,
       onFocus,
       onClick,
+      onInput: handleContainerInput,
+      onPaste: handleContainerPaste,
       contentEditable: parsedSelectedSections === 'all',
       suppressContentEditableWarning: true,
       elements,
@@ -307,7 +338,6 @@ export const useFieldV7TextField = <
       valueStr,
       onValueStrChange: handleValueStrChange,
       valueType: isFocused && areAllSectionsEmpty ? 'placeholder' : 'value',
-      onPaste: handleContainerPaste,
     },
   };
 };

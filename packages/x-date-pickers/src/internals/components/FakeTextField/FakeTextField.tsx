@@ -20,6 +20,7 @@ interface FakeTextFieldProps {
   autoFocus?: boolean;
   ownerState?: any;
   valueType: 'value' | 'placeholder';
+  contentEditable?: boolean;
 }
 
 export const FakeTextField = React.forwardRef(function FakeTextField(
@@ -41,6 +42,26 @@ export const FakeTextField = React.forwardRef(function FakeTextField(
     ...other
   } = props;
 
+  let children: React.ReactNode;
+  if (other.contentEditable) {
+    children = elements
+      .map(({ content, before, after }) => `${before.children}${content.children}${after.children}`)
+      .join('');
+  } else {
+    children = (
+      <React.Fragment>
+        {elements.map(({ container, content, before, after }, elementIndex) => (
+          <span {...container} key={elementIndex}>
+            <span {...before} />
+            <span {...content} />
+            <span {...after} />
+          </span>
+        ))}
+        <input type="hidden" value={valueStr} onChange={onValueStrChange} id={id} />
+      </React.Fragment>
+    );
+  }
+
   return (
     <Box
       ref={ref}
@@ -53,14 +74,7 @@ export const FakeTextField = React.forwardRef(function FakeTextField(
         color: valueType === 'placeholder' ? 'grey' : 'black',
       }}
     >
-      {elements.map(({ container, content, before, after }, elementIndex) => (
-        <span {...container} key={elementIndex}>
-          <span {...before} />
-          <span {...content} />
-          <span {...after} />
-        </span>
-      ))}
-      <input type="hidden" value={valueStr} onChange={onValueStrChange} id={id} />
+      {children}
     </Box>
   );
 });
