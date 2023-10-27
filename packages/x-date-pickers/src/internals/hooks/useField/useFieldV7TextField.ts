@@ -236,39 +236,41 @@ export const useFieldV7TextField = <
 
   const elements = React.useMemo<FakeTextFieldElement[]>(
     () =>
-      state.sections.map((section, sectionIndex) => ({
-        container: {
-          'data-sectionindex': sectionIndex,
-          onClick: getInputContainerClickHandler(sectionIndex),
-        } as React.HTMLAttributes<HTMLSpanElement>,
-        content: {
-          tabIndex: 0,
-          className: 'content',
-          contentEditable: typeof parsedSelectedSections === 'number' && !disabled && !readOnly,
-          role: 'textbox',
-          children: section.value || section.placeholder,
-          onInput: handleInputContentInput,
-          onPaste: handleInputContentPaste,
-          onFocus: getInputContentFocusHandler(sectionIndex),
-          onDragOver: handleInputContentDragOver,
-          onMouseUp: handleInputContentMouseUp,
-          inputMode: section.contentType === 'letter' ? 'text' : 'numeric',
-          suppressContentEditableWarning: true,
-          style: {
-            outline: 'none',
+      state.sections.map((section, sectionIndex) => {
+        return {
+          container: {
+            'data-sectionindex': sectionIndex,
+            onClick: getInputContainerClickHandler(sectionIndex),
+          } as React.HTMLAttributes<HTMLSpanElement>,
+          content: {
+            tabIndex: parsedSelectedSections === 'all' ? undefined : 0,
+            className: 'content',
+            contentEditable: parsedSelectedSections === sectionIndex && !disabled && !readOnly,
+            suppressContentEditableWarning: true,
+            role: 'textbox',
+            children: section.value || section.placeholder,
+            onInput: handleInputContentInput,
+            onPaste: handleInputContentPaste,
+            onFocus: getInputContentFocusHandler(sectionIndex),
+            onDragOver: handleInputContentDragOver,
+            onMouseUp: handleInputContentMouseUp,
+            inputMode: section.contentType === 'letter' ? 'text' : 'numeric',
+            style: {
+              outline: 'none',
+            },
           },
-        },
-        before: {
-          className: 'before',
-          children: section.startSeparator,
-          style: { height: 16, fontSize: 12, whiteSpace: 'pre' },
-        },
-        after: {
-          className: 'after',
-          children: section.endSeparator,
-          style: { height: 16, fontSize: 12, whiteSpace: 'pre' },
-        },
-      })),
+          before: {
+            className: 'before',
+            children: section.startSeparator,
+            style: { height: 16, fontSize: 12, whiteSpace: 'pre' },
+          },
+          after: {
+            className: 'after',
+            children: section.endSeparator,
+            style: { height: 16, fontSize: 12, whiteSpace: 'pre' },
+          },
+        };
+      }),
     [
       state.sections,
       getInputContentFocusHandler,
@@ -298,6 +300,8 @@ export const useFieldV7TextField = <
       textField: 'v7' as const,
       onFocus,
       onClick,
+      contentEditable: parsedSelectedSections === 'all',
+      suppressContentEditableWarning: true,
       elements,
       ref: handleRef,
       valueStr,

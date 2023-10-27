@@ -104,6 +104,7 @@ export const useField = <
   });
 
   const handleContainerKeyDown = useEventCallback((event: React.KeyboardEvent<HTMLSpanElement>) => {
+    console.log('CALL');
     // eslint-disable-next-line default-case
     switch (true) {
       // Select all

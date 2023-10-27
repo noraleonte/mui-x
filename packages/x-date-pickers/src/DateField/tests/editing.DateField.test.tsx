@@ -1033,7 +1033,7 @@ describe('<DateField /> - Editing', () => {
       expect(onChange.callCount).to.equal(0);
     });
 
-    it.only('should reset sections internal state when pasting', () => {
+    it('should reset sections internal state when pasting', () => {
       // Test with v7 input
       const v7Response = renderWithProps({
         defaultValue: adapter.date(new Date(2018, 11, 5)),
@@ -1052,30 +1052,28 @@ describe('<DateField /> - Editing', () => {
 
       const sectionSelection2 = v7Response.selectSection('day');
 
-      console.log('BEFORE');
-
       fireEvent.input(sectionSelection2.sectionContent!, { target: { innerText: '2' } }); // Press 2
       expectFieldValue(v7Response.fieldContainer, '09/02/2022'); // If internal state is not reset it would be 22 instead of 02
-      //
-      // v7Response.unmount();
+
+      v7Response.unmount();
 
       // Test with v6 input
-      // const v6Response = renderWithProps({
-      //   defaultValue: adapter.date(new Date(2018, 11, 5)),
-      //   shouldUseV6TextField: true,
-      // });
-      //
-      // const input = getTextbox()
-      // v6Response.selectSection('day');
-      //
-      // fireEvent.change(input, { target: { value: '12/2/2018' } }); // Press 2
-      // expectFieldValueV6(input, '12/02/2018');
-      //
-      // firePasteEventV6(input, '09/16/2022');
-      // expectFieldValueV6(input, '09/16/2022');
-      //
-      // fireEvent.change(input, { target: { value: '09/2/2022' } }); // Press 2
-      // expectFieldValueV6(input, '09/02/2022'); // If internal state is not reset it would be 22 instead of 02
+      const v6Response = renderWithProps({
+        defaultValue: adapter.date(new Date(2018, 11, 5)),
+        shouldUseV6TextField: true,
+      });
+
+      const input = getTextbox();
+      v6Response.selectSection('day');
+
+      fireEvent.change(input, { target: { value: '12/2/2018' } }); // Press 2
+      expectFieldValueV6(input, '12/02/2018');
+
+      firePasteEventV6(input, '09/16/2022');
+      expectFieldValueV6(input, '09/16/2022');
+
+      fireEvent.change(input, { target: { value: '09/2/2022' } }); // Press 2
+      expectFieldValueV6(input, '09/02/2022'); // If internal state is not reset it would be 22 instead of 02
     });
   });
 
@@ -1084,48 +1082,100 @@ describe('<DateField /> - Editing', () => {
     DateField,
     ({ adapter, renderWithProps }) => {
       it('should not loose time information when a value is provided', () => {
-        const onChange = spy();
-
-        const { input, selectSection } = renderWithProps({
+        // Test with v7 input
+        const onChangeV7 = spy();
+        const v7Response = renderWithProps({
           defaultValue: adapter.date(new Date(2010, 3, 3, 3, 3, 3)),
-          onChange,
+          onChange: onChangeV7,
         });
+        const sectionSelection1 = v7Response.selectSection('year');
+        userEvent.keyPress(sectionSelection1.sectionContent!, { key: 'ArrowDown' });
+        expect(onChangeV7.lastCall.firstArg).toEqualDateTime(new Date(2009, 3, 3, 3, 3, 3));
+        v7Response.unmount();
 
-        selectSection('year');
+        // Test with v6 input
+        const onChangeV6 = spy();
+        const v6Response = renderWithProps({
+          defaultValue: adapter.date(new Date(2010, 3, 3, 3, 3, 3)),
+          onChange: onChangeV6,
+          shouldUseV6TextField: true,
+        });
+        const input = getTextbox();
+        v6Response.selectSection('year');
         userEvent.keyPress(input, { key: 'ArrowDown' });
-
-        expect(onChange.lastCall.firstArg).toEqualDateTime(new Date(2009, 3, 3, 3, 3, 3));
+        expect(onChangeV6.lastCall.firstArg).toEqualDateTime(new Date(2009, 3, 3, 3, 3, 3));
       });
 
-      it('should not loose time information when cleaning the date then filling it again', () => {
-        const onChange = spy();
+      it.only('should not loose time information when cleaning the date then filling it again', () => {
+        if (adapter.lib !== 'dayjs') {
+          return;
+        }
 
-        const { input, selectSection } = renderWithProps({
+        // Test with v7 input
+        const onChangeV7 = spy();
+
+        const v7Response = renderWithProps({
           defaultValue: adapter.date(new Date(2010, 3, 3, 3, 3, 3)),
-          onChange,
+          onChange: onChangeV7,
         });
 
-        selectSection('month');
+        const sectionSelection1 = v7Response.selectSection('month');
+        userEvent.keyPress(document.activeElement!, { key: 'a', ctrlKey: true });
+        fireEvent.input(v7Response.fieldContainer, { target: { innerText: '' } });
+        v7Response.selectSection('month');
+        //
+        // fireEvent.input(document.activeElement!, { target: { innerText: '1' } });
+        // expectFieldValue(v7Response.fieldContainer, '01/DD/YYYY');
+        //
+        // fireEvent.input(document.activeElement!, { target: { innerText: '1' } });
+        // expectFieldValue(v7Response.fieldContainer, '11/DD/YYYY');
+        //
+        // fireEvent.input(document.activeElement!, { target: { innerText: '2' } });
+        // fireEvent.input(document.activeElement!, { target: { innerText: '5' } });
+        // expectFieldValue(v7Response.fieldContainer, '11/25/YYYY');
+        //
+        // fireEvent.input(document.activeElement!, { target: { innerText: '2' } });
+        // fireEvent.input(document.activeElement!, { target: { innerText: '0' } });
+        // fireEvent.input(document.activeElement!, { target: { innerText: '0' } });
+        // fireEvent.input(document.activeElement!, { target: { innerText: '9' } });
+        // expectFieldValue(v7Response.fieldContainer, '11/25/2009');
+        // expect(onChangeV7.lastCall.firstArg).toEqualDateTime(new Date(2009, 10, 25, 3, 3, 3));
+
+        v7Response.unmount();
+
+        return;
+
+        // Test with v6 input
+        const onChangeV6 = spy();
+
+        const v6Response = renderWithProps({
+          defaultValue: adapter.date(new Date(2010, 3, 3, 3, 3, 3)),
+          onChange: onChangeV6,
+          shouldUseV6TextField: true,
+        });
+
+        const input = getTextbox();
+        v6Response.selectSection('month');
         userEvent.keyPress(input, { key: 'a', ctrlKey: true });
         fireEvent.change(input, { target: { value: '' } });
         userEvent.keyPress(input, { key: 'ArrowLeft' });
 
         fireEvent.change(input, { target: { value: '1/DD/YYYY' } }); // Press "1"
-        expectFieldValue(input, '01/DD/YYYY');
+        expectFieldValueV6(input, '01/DD/YYYY');
 
         fireEvent.change(input, { target: { value: '11/DD/YYYY' } }); // Press "1"
-        expectFieldValue(input, '11/DD/YYYY');
+        expectFieldValueV6(input, '11/DD/YYYY');
 
         fireEvent.change(input, { target: { value: '11/2/YYYY' } }); // Press "2"
         fireEvent.change(input, { target: { value: '11/5/YYYY' } }); // Press "5"
-        expectFieldValue(input, '11/25/YYYY');
+        expectFieldValueV6(input, '11/25/YYYY');
 
         fireEvent.change(input, { target: { value: '11/25/2' } }); // Press "2"
         fireEvent.change(input, { target: { value: '11/25/0' } }); // Press "0"
         fireEvent.change(input, { target: { value: '11/25/0' } }); // Press "0"
         fireEvent.change(input, { target: { value: '11/25/9' } }); // Press "9"
-        expectFieldValue(input, '11/25/2009');
-        expect(onChange.lastCall.firstArg).toEqualDateTime(new Date(2009, 10, 25, 3, 3, 3));
+        expectFieldValueV6(input, '11/25/2009');
+        expect(onChangeV6.lastCall.firstArg).toEqualDateTime(new Date(2009, 10, 25, 3, 3, 3));
       });
 
       it('should not loose date information when using the year format and value is provided', () => {

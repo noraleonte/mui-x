@@ -171,14 +171,11 @@ export const buildFieldInteractions = <P extends { shouldUseV6TextField?: boolea
         `span[data-sectionindex="${sectionIndex}"] .content`,
       )!;
 
-      if (document.activeElement !== fieldContainerRef.current) {
-        // focus input to trigger setting placeholder as value if no value is present
-        act(() => {
-          sectionContent.focus();
-        });
-        // make sure the value of the input is rendered before proceeding
-        clock.runToLast();
-      }
+      act(() => {
+        fireEvent.mouseDown(sectionContent);
+        fireEvent.mouseUp(sectionContent);
+        fireEvent.click(sectionContent);
+      });
 
       return { sectionContent };
     };
