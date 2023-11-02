@@ -1,7 +1,7 @@
 import * as React from 'react';
+import { expect } from 'chai';
 import { createRenderer, screen, userEvent, act, fireEvent } from '@mui-internal/test-utils';
 import { FieldRef, FieldSection, FieldSectionType } from '@mui/x-date-pickers/models';
-import { addPositionPropertiesToSections } from '@mui/x-date-pickers/internals/hooks/useField/useFieldV6TextField';
 import { expectFieldValue, expectFieldValueV6 } from './assertions';
 
 export const getTextbox = (): HTMLInputElement => screen.getByRole('textbox');
@@ -16,7 +16,7 @@ interface BuildFieldInteractionsParams<P extends {}> {
 export type FieldSectionSelector = (
   selectedSection: FieldSectionType | undefined,
   index?: 'first' | 'last',
-) => { sectionContent: HTMLSpanElement | null };
+) => void;
 
 export interface BuildFieldInteractionsResponse<P extends { shouldUseV6TextField?: boolean }> {
   renderWithProps: (
@@ -26,6 +26,12 @@ export interface BuildFieldInteractionsResponse<P extends { shouldUseV6TextField
   ) => ReturnType<ReturnType<typeof createRenderer>['render']> & {
     selectSection: FieldSectionSelector;
     fieldContainer: HTMLDivElement;
+    /**
+     * Returns the contentEditable DOM node of the active section.
+     * @param {number | undefined} sectionIndex If defined, asserts that the active section is the expected one.
+     * @returns {HTMLSpanElement} The contentEditable DOM node of the active section.
+     */
+    getActiveSection: (sectionIndex: number | undefined) => HTMLSpanElement;
   };
   clickOnField: (container: HTMLDivElement, sectionIndex: number) => void;
   testFieldKeyPress: (
@@ -73,13 +79,13 @@ export const buildFieldInteractions = <P extends { shouldUseV6TextField?: boolea
     let fieldRef: React.RefObject<FieldRef<FieldSection>> = { current: null };
     let fieldContainerRef: React.RefObject<HTMLDivElement> = { current: null };
 
-    function WrappedComponent() {
+    function WrappedComponent(propsFromRender: any) {
       fieldRef = React.useRef<FieldRef<FieldSection>>(null);
       fieldContainerRef = React.useRef<HTMLDivElement>(null);
-      const hookResult = hook?.(props);
+      const hookResult = hook?.(propsFromRender);
 
       const allProps = {
-        ...props,
+        ...propsFromRender,
         ...hookResult,
       } as any;
 
@@ -111,78 +117,48 @@ export const buildFieldInteractions = <P extends { shouldUseV6TextField?: boolea
       return <Component {...(allProps as P)} />;
     }
 
-    const result = render(<WrappedComponent />);
-
-    const getSectionIndex = (
-      selectedSection: FieldSectionType | undefined,
-      index: 'first' | 'last',
-    ) => {
-      let sectionIndex: number;
-      if (selectedSection) {
-        const sections = fieldRef.current!.getSections();
-        const cleanSections = index === 'first' ? sections : [...sections].reverse();
-        sectionIndex = cleanSections.findIndex((section) => section.type === selectedSection);
-        if (sectionIndex === -1) {
-          throw new Error(`No section of type ${selectedSection}`);
-        }
-
-        return sectionIndex;
-      }
-
-      return 0;
-    };
+    const result = render(<WrappedComponent {...(props as any)} />);
 
     const selectSection: FieldSectionSelector = (selectedSection, index = 'first') => {
-      if (props.shouldUseV6TextField) {
-        const input = fieldContainerRef.current!.querySelector('input')!;
-        if (document.activeElement !== input) {
-          // focus input to trigger setting placeholder as value if no value is present
-          act(() => {
-            input.focus();
-          });
-          // make sure the value of the input is rendered before proceeding
-          clock.runToLast();
-        }
-
-        let clickPosition: number;
-        if (selectedSection) {
-          const sections = addPositionPropertiesToSections(fieldRef.current!.getSections(), false);
-          const cleanSections = index === 'first' ? sections : [...sections].reverse();
-          const sectionToSelect = cleanSections.find((section) => section.type === selectedSection);
-          clickPosition = sectionToSelect!.startInInput;
-        } else {
-          clickPosition = 1;
-        }
-
-        act(() => {
-          fireEvent.mouseDown(input);
-          fireEvent.mouseUp(input);
-          input.setSelectionRange(clickPosition, clickPosition);
-          fireEvent.click(input);
-
-          clock.runToLast();
-        });
-
-        return { sectionContent: null };
+      let sectionIndexToSelect: number;
+      if (selectedSection === undefined) {
+        sectionIndexToSelect = 0;
+      } else {
+        const sections = fieldRef.current!.getSections();
+        const cleanSections = index === 'first' ? sections : [...sections].reverse();
+        sectionIndexToSelect = cleanSections.findIndex(
+          (section) => section.type === selectedSection,
+        );
       }
 
-      const sectionIndex = getSectionIndex(selectedSection, index);
-      const sectionContent = fieldContainerRef.current!.querySelector<HTMLSpanElement>(
-        `span[data-sectionindex="${sectionIndex}"] .content`,
-      )!;
-
       act(() => {
-        fireEvent.mouseDown(sectionContent);
-        fireEvent.mouseUp(sectionContent);
-        fireEvent.click(sectionContent);
-        sectionContent.focus();
-      });
+        fieldRef.current!.setSelectedSections(sectionIndexToSelect);
 
-      return { sectionContent };
+        if (props.shouldUseV6TextField) {
+          getTextbox().focus();
+        } else {
+          fieldContainerRef
+            .current!.querySelector<HTMLSpanElement>(
+              `span[data-sectionindex="${sectionIndexToSelect}"] .content`,
+            )!
+            .focus();
+        }
+      });
+    };
+
+    const getActiveSection = (sectionIndex: number | undefined) => {
+      const activeElement = document.activeElement! as HTMLSpanElement;
+
+      if (sectionIndex !== undefined) {
+        expect(activeElement.parentElement!.dataset.sectionindex).to.equal(sectionIndex.toString());
+      }
+
+      return activeElement;
     };
 
     return {
       selectSection,
+      getActiveSection,
       fieldContainer: fieldContainerRef.current!,
       ...result,
     };
@@ -196,8 +172,8 @@ export const buildFieldInteractions = <P extends { shouldUseV6TextField?: boolea
   }) => {
     // Test with v7 input
     const v7Response = renderWithProps(props as any as P);
-    const { sectionContent } = v7Response.selectSection(selectedSection);
-    userEvent.keyPress(sectionContent!, { key });
+    v7Response.selectSection(selectedSection);
+    userEvent.keyPress(v7Response.getActiveSection(undefined), { key });
     expectFieldValue(v7Response.fieldContainer, expectedValue);
     v7Response.unmount();
 
@@ -217,9 +193,11 @@ export const buildFieldInteractions = <P extends { shouldUseV6TextField?: boolea
   }) => {
     // Test with v7 input
     const v7Response = renderWithProps(props as any as P);
-    const { sectionContent } = v7Response.selectSection(selectedSection);
+    v7Response.selectSection(selectedSection);
     keyStrokes.forEach((keyStroke) => {
-      fireEvent.input(sectionContent!, { target: { innerText: keyStroke.value } });
+      fireEvent.input(v7Response.getActiveSection(undefined), {
+        target: { innerText: keyStroke.value },
+      });
       expectFieldValue(
         v7Response.fieldContainer,
         keyStroke.expected,

@@ -17,6 +17,7 @@ import { useFieldCharacterEditing } from './useFieldCharacterEditing';
 import { FieldSection } from '../../../models';
 import { useFieldV7TextField } from './useFieldV7TextField';
 import { useFieldV6TextField } from './useFieldV6TextField';
+import { getActiveElement } from '../../utils/utils';
 
 export const useField = <
   TValue,

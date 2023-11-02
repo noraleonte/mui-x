@@ -129,6 +129,40 @@ export const useFieldV7TextField = <
     interactions.syncSelectionToDOM();
   });
 
+  const handleContainerClick = useEventCallback((event: React.MouseEvent, ...args) => {
+    // The click event on the clear button would propagate to the input, trigger this handler and result in a wrong section selection.
+    // We avoid this by checking if the call of `handleContainerClick` is actually intended, or a side effect.
+    if (event.isDefaultPrevented()) {
+      return;
+    }
+
+    onClick?.(event, ...(args as []));
+
+    if (parsedSelectedSections === 'all') {
+      window.setTimeout(() => {
+        const cursorPosition = document.getSelection()!.getRangeAt(0).startOffset;
+
+        if (cursorPosition === 0) {
+          setSelectedSections(0);
+          return;
+        }
+
+        let sectionIndex = 0;
+        let cursorOnStartOfSection = 0;
+
+        while (cursorOnStartOfSection < cursorPosition && sectionIndex < state.sections.length) {
+          const section = state.sections[sectionIndex];
+          sectionIndex += 1;
+          cursorOnStartOfSection += `${section.startSeparator}${
+            section.value || section.placeholder
+          }${section.endSeparator}`.length;
+        }
+
+        setSelectedSections(sectionIndex - 1);
+      });
+    }
+  });
+
   const handleContainerInput = useEventCallback((event: React.FormEvent<HTMLDivElement>) => {
     if (!containerRef.current || parsedSelectedSections !== 'all') {
       return;
@@ -328,7 +362,7 @@ export const useFieldV7TextField = <
     returnedValue: {
       textField: 'v7' as const,
       onFocus,
-      onClick,
+      onClick: handleContainerClick,
       onInput: handleContainerInput,
       onPaste: handleContainerPaste,
       contentEditable: parsedSelectedSections === 'all',

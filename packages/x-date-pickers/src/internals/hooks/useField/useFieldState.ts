@@ -165,17 +165,12 @@ export const useFieldState = <
     controlled: selectedSectionsProp,
     default: null,
     name: 'useField',
-    state: 'selectedSectionIndexes',
+    state: 'selectedSections',
   });
 
   const setSelectedSections = (newSelectedSections: FieldSelectedSections) => {
     innerSetSelectedSections(newSelectedSections);
     onSelectedSectionsChange?.(newSelectedSections);
-
-    setState((prevState) => ({
-      ...prevState,
-      selectedSectionQuery: null,
-    }));
   };
 
   const parsedSelectedSections = React.useMemo<FieldParsedSelectedSections>(() => {
