@@ -1,39 +1,69 @@
-import * as React from 'react';
 import {
   expectInputPlaceholderV6,
+  expectFieldValueV6,
   expectFieldValue,
   getTextbox,
   describeAdapters,
 } from 'test/utils/pickers';
 import { DateField } from '@mui/x-date-pickers/DateField';
 
-describeAdapters('<DateField /> - Format', DateField, ({ render, adapter }) => {
+describeAdapters('<DateField /> - Format', DateField, ({ adapter, renderWithProps }) => {
   it('should support escaped characters in start separator', () => {
     const { start: startChar, end: endChar } = adapter.escapedCharacters;
-    // For Day.js: "[Escaped] YYYY"
-    const { setProps } = render(
-      <DateField format={`${startChar}Escaped${endChar} ${adapter.formats.year}`} />,
-    );
+
+    // Test with v7 input
+    const v7Response = renderWithProps({
+      // For Day.js: "[Escaped] YYYY"
+      format: `${startChar}Escaped${endChar} ${adapter.formats.year}`,
+    });
+    expectFieldValue(v7Response.fieldContainer, 'Escaped YYYY');
+
+    v7Response.setProps({ value: adapter.date(new Date(2019, 0, 1)) });
+    expectFieldValue(v7Response.fieldContainer, 'Escaped 2019');
+
+    v7Response.unmount();
+
+    // Test with v6 input
+    const v6Response = renderWithProps({
+      // For Day.js: "[Escaped] YYYY"
+      format: `${startChar}Escaped${endChar} ${adapter.formats.year}`,
+      shouldUseV6TextField: true,
+    });
     const input = getTextbox();
     expectInputPlaceholderV6(input, 'Escaped YYYY');
 
-    setProps({ value: adapter.date(new Date(2019, 0, 1)) });
-    expectFieldValue(input, 'Escaped 2019');
+    v6Response.setProps({ value: adapter.date(new Date(2019, 0, 1)) });
+    expectFieldValueV6(input, 'Escaped 2019');
   });
 
   it('should support escaped characters between sections separator', () => {
     const { start: startChar, end: endChar } = adapter.escapedCharacters;
-    // For Day.js: "MMMM [Escaped] YYYY"
-    const { setProps } = render(
-      <DateField
-        format={`${adapter.formats.month} ${startChar}Escaped${endChar} ${adapter.formats.year}`}
-      />,
-    );
+
+    // Test with v7 input
+    const v7Response = renderWithProps({
+      // For Day.js: "MMMM [Escaped] YYYY"
+      format: `${adapter.formats.month} ${startChar}Escaped${endChar} ${adapter.formats.year}`,
+    });
+
+    expectFieldValue(v7Response.fieldContainer, 'MMMM Escaped YYYY');
+
+    v7Response.setProps({ value: adapter.date(new Date(2019, 0, 1)) });
+    expectFieldValue(v7Response.fieldContainer, 'January Escaped 2019');
+
+    v7Response.unmount();
+
+    // Test with v6 input
+    const v6Response = renderWithProps({
+      // For Day.js: "MMMM [Escaped] YYYY"
+      format: `${adapter.formats.month} ${startChar}Escaped${endChar} ${adapter.formats.year}`,
+      shouldUseV6TextField: true,
+    });
+
     const input = getTextbox();
     expectInputPlaceholderV6(input, 'MMMM Escaped YYYY');
 
-    setProps({ value: adapter.date(new Date(2019, 0, 1)) });
-    expectFieldValue(input, 'January Escaped 2019');
+    v6Response.setProps({ value: adapter.date(new Date(2019, 0, 1)) });
+    expectFieldValueV6(input, 'January Escaped 2019');
   });
 
   it('should support nested escaped characters', function test() {
@@ -44,69 +74,142 @@ describeAdapters('<DateField /> - Format', DateField, ({ render, adapter }) => {
       this.skip();
     }
 
-    // For Day.js: "MMMM [Escaped[] YYYY"
-    const { setProps } = render(
-      <DateField
-        format={`${adapter.formats.month} ${startChar}Escaped ${startChar}${endChar} ${adapter.formats.year}`}
-      />,
-    );
+    // Test with v7 input
+    const v7Response = renderWithProps({
+      // For Day.js: "MMMM [Escaped[] YYYY"
+      format: `${adapter.formats.month} ${startChar}Escaped ${startChar}${endChar} ${adapter.formats.year}`,
+    });
+
+    expectFieldValue(v7Response.fieldContainer, 'MMMM Escaped [ YYYY');
+
+    v7Response.setProps({ value: adapter.date(new Date(2019, 0, 1)) });
+    expectFieldValue(v7Response.fieldContainer, 'January Escaped [ 2019');
+
+    v7Response.unmount();
+
+    // Test with v6 input
+    const v6Response = renderWithProps({
+      // For Day.js: "MMMM [Escaped[] YYYY"
+      format: `${adapter.formats.month} ${startChar}Escaped ${startChar}${endChar} ${adapter.formats.year}`,
+      shouldUseV6TextField: true,
+    });
+
     const input = getTextbox();
     expectInputPlaceholderV6(input, 'MMMM Escaped [ YYYY');
 
-    setProps({ value: adapter.date(new Date(2019, 0, 1)) });
-    expectFieldValue(input, 'January Escaped [ 2019');
+    v6Response.setProps({ value: adapter.date(new Date(2019, 0, 1)) });
+    expectFieldValueV6(input, 'January Escaped [ 2019');
   });
 
-  it('should support several escaped parts', function test() {
+  it('should support several escaped parts', () => {
     const { start: startChar, end: endChar } = adapter.escapedCharacters;
 
-    // For Day.js: "[Escaped] MMMM [Escaped] YYYY"
-    const { setProps } = render(
-      <DateField
-        format={`${startChar}Escaped${endChar} ${adapter.formats.month} ${startChar}Escaped${endChar} ${adapter.formats.year}`}
-      />,
-    );
+    // Test with v7 input
+    const v7Response = renderWithProps({
+      // For Day.js: "[Escaped] MMMM [Escaped] YYYY"
+      format: `${startChar}Escaped${endChar} ${adapter.formats.month} ${startChar}Escaped${endChar} ${adapter.formats.year}`,
+    });
+
+    expectFieldValue(v7Response.fieldContainer, 'Escaped MMMM Escaped YYYY');
+
+    v7Response.setProps({ value: adapter.date(new Date(2019, 0, 1)) });
+    expectFieldValue(v7Response.fieldContainer, 'Escaped January Escaped 2019');
+
+    v7Response.unmount();
+
+    // Test with v6 input
+    const v6Response = renderWithProps({
+      // For Day.js: "[Escaped] MMMM [Escaped] YYYY"
+      format: `${startChar}Escaped${endChar} ${adapter.formats.month} ${startChar}Escaped${endChar} ${adapter.formats.year}`,
+      shouldUseV6TextField: true,
+    });
+
     const input = getTextbox();
     expectInputPlaceholderV6(input, 'Escaped MMMM Escaped YYYY');
 
-    setProps({ value: adapter.date(new Date(2019, 0, 1)) });
-    expectFieldValue(input, 'Escaped January Escaped 2019');
+    v6Response.setProps({ value: adapter.date(new Date(2019, 0, 1)) });
+    expectFieldValueV6(input, 'Escaped January Escaped 2019');
   });
 
   it('should add spaces around `/` when `formatDensity = "spacious"`', () => {
-    const { setProps } = render(<DateField formatDensity="spacious" />);
+    // Test with v7 input
+    const v7Response = renderWithProps({
+      formatDensity: `spacious`,
+    });
+
+    expectFieldValue(v7Response.fieldContainer, 'MM / DD / YYYY');
+
+    v7Response.setProps({ value: adapter.date(new Date(2019, 0, 1)) });
+    expectFieldValue(v7Response.fieldContainer, '01 / 01 / 2019');
+
+    v7Response.unmount();
+
+    // Test with v6 input
+    const v6Response = renderWithProps({
+      formatDensity: `spacious`,
+      shouldUseV6TextField: true,
+    });
+
     const input = getTextbox();
     expectInputPlaceholderV6(input, 'MM / DD / YYYY');
 
-    setProps({ value: adapter.date(new Date(2019, 0, 1)) });
-    expectFieldValue(input, '01 / 01 / 2019');
+    v6Response.setProps({ value: adapter.date(new Date(2019, 0, 1)) });
+    expectFieldValueV6(input, '01 / 01 / 2019');
   });
 
   it('should add spaces around `.` when `formatDensity = "spacious"`', () => {
-    const { setProps } = render(
-      <DateField
-        formatDensity="spacious"
-        format={adapter.expandFormat(adapter.formats.keyboardDate).replace(/\//g, '.')}
-      />,
-    );
+    // Test with v7 input
+    const v7Response = renderWithProps({
+      formatDensity: `spacious`,
+      format: adapter.expandFormat(adapter.formats.keyboardDate).replace(/\//g, '.'),
+    });
+
+    expectFieldValue(v7Response.fieldContainer, 'MM . DD . YYYY');
+
+    v7Response.setProps({ value: adapter.date(new Date(2019, 0, 1)) });
+    expectFieldValue(v7Response.fieldContainer, '01 . 01 . 2019');
+
+    v7Response.unmount();
+
+    // Test with v6 input
+    const v6Response = renderWithProps({
+      formatDensity: `spacious`,
+      format: adapter.expandFormat(adapter.formats.keyboardDate).replace(/\//g, '.'),
+      shouldUseV6TextField: true,
+    });
+
     const input = getTextbox();
     expectInputPlaceholderV6(input, 'MM . DD . YYYY');
 
-    setProps({ value: adapter.date(new Date(2019, 0, 1)) });
-    expectFieldValue(input, '01 . 01 . 2019');
+    v6Response.setProps({ value: adapter.date(new Date(2019, 0, 1)) });
+    expectFieldValueV6(input, '01 . 01 . 2019');
   });
 
   it('should add spaces around `-` when `formatDensity = "spacious"`', () => {
-    const { setProps } = render(
-      <DateField
-        formatDensity="spacious"
-        format={adapter.expandFormat(adapter.formats.keyboardDate).replace(/\//g, '-')}
-      />,
-    );
+    // Test with v7 input
+    const v7Response = renderWithProps({
+      formatDensity: `spacious`,
+      format: adapter.expandFormat(adapter.formats.keyboardDate).replace(/\//g, '-'),
+    });
+
+    expectFieldValue(v7Response.fieldContainer, 'MM - DD - YYYY');
+
+    v7Response.setProps({ value: adapter.date(new Date(2019, 0, 1)) });
+    expectFieldValue(v7Response.fieldContainer, '01 - 01 - 2019');
+
+    v7Response.unmount();
+
+    // Test with v6 input
+    const v6Response = renderWithProps({
+      formatDensity: `spacious`,
+      format: adapter.expandFormat(adapter.formats.keyboardDate).replace(/\//g, '-'),
+      shouldUseV6TextField: true,
+    });
+
     const input = getTextbox();
     expectInputPlaceholderV6(input, 'MM - DD - YYYY');
 
-    setProps({ value: adapter.date(new Date(2019, 0, 1)) });
-    expectFieldValue(input, '01 - 01 - 2019');
+    v6Response.setProps({ value: adapter.date(new Date(2019, 0, 1)) });
+    expectFieldValueV6(input, '01 - 01 - 2019');
   });
 });

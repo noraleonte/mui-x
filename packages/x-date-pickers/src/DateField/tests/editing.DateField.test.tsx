@@ -9,7 +9,7 @@ import {
   expectFieldValueV6,
 } from 'test/utils/pickers';
 
-describe.only('<DateField /> - Editing', () => {
+describe('<DateField /> - Editing', () => {
   describeAdapters('key: ArrowDown', DateField, ({ adapter, testFieldKeyPress }) => {
     it("should set the year to today's value when no value is provided (ArrowDown)", () => {
       testFieldKeyPress({
