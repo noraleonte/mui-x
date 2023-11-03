@@ -7,7 +7,7 @@ import { AdapterMomentJalaali } from '@mui/x-date-pickers/AdapterMomentJalaali';
 import { screen } from '@mui-internal/test-utils/createRenderer';
 import {
   createPickerRenderer,
-  expectInputPlaceholder,
+  expectInputPlaceholderV6,
   expectFieldValue,
   describeJalaliAdapter,
 } from 'test/utils/pickers';
@@ -84,7 +84,7 @@ describe('<AdapterMomentJalaali />', () => {
         it('should have correct placeholder', () => {
           render(<DateTimePicker />);
 
-          expectInputPlaceholder(
+          expectInputPlaceholderV6(
             screen.getByRole('textbox'),
             localizedTexts[localeKey].placeholder,
           );

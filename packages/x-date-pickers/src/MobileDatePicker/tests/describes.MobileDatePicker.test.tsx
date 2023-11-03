@@ -3,7 +3,7 @@ import {
   createPickerRenderer,
   adapterToUse,
   expectFieldValue,
-  expectInputPlaceholder,
+  expectInputPlaceholderV6,
   openPicker,
   getTextbox,
   describeValidation,
@@ -35,7 +35,7 @@ describe('<MobileDatePicker /> - Describes', () => {
     assertRenderedValue: (expectedValue: any) => {
       const input = getTextbox();
       if (!expectedValue) {
-        expectInputPlaceholder(input, 'MM/DD/YYYY');
+        expectInputPlaceholderV6(input, 'MM/DD/YYYY');
       }
       expectFieldValue(
         input,

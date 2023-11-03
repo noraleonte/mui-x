@@ -6,7 +6,7 @@ import {
   buildFieldInteractions,
   getTextbox,
   expectFieldValue,
-  expectInputPlaceholder,
+  expectInputPlaceholderV6,
   adapterToUse,
   describeAdapters,
 } from 'test/utils/pickers';
@@ -31,7 +31,7 @@ describe('<DesktopDatePicker /> - Field', () => {
       );
 
       const input = getTextbox();
-      expectInputPlaceholder(input, 'MMMM DD');
+      expectInputPlaceholderV6(input, 'MMMM DD');
       clickOnField(input, 0);
 
       fireEvent.change(input, { target: { value: 'N DD' } }); // Press "1"
@@ -48,7 +48,7 @@ describe('<DesktopDatePicker /> - Field', () => {
       const testFormat = (props: DesktopDatePickerProps<any>, expectedFormat: string) => {
         const { unmount } = render(<DesktopDatePicker {...props} />);
         const input = getTextbox();
-        expectInputPlaceholder(input, expectedFormat);
+        expectInputPlaceholderV6(input, expectedFormat);
         unmount();
       };
 

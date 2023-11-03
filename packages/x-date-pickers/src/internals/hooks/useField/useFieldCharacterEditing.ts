@@ -33,7 +33,7 @@ interface UseFieldCharacterEditingParams<TDate, TSection extends FieldSection> {
 }
 
 export interface UseFieldCharacterEditingResponse {
-  applyCharacterEditing: (params: ApplyCharacterEditingParams) => boolean;
+  applyCharacterEditing: (params: ApplyCharacterEditingParams) => void;
   resetCharacterQuery: () => void;
 }
 
@@ -354,6 +354,7 @@ export const useFieldCharacterEditing = <TDate, TSection extends FieldSection>({
           'MM',
           activeSection.format,
         );
+
         return {
           ...response,
           sectionValue: formattedValue,
@@ -393,7 +394,7 @@ export const useFieldCharacterEditing = <TDate, TSection extends FieldSection>({
     const response = isNumericEditing ? applyNumericEditing(params) : applyLetterEditing(params);
     if (response == null) {
       setTempAndroidValueStr(null);
-      return false;
+      return;
     }
 
     updateSectionValue({
@@ -401,7 +402,6 @@ export const useFieldCharacterEditing = <TDate, TSection extends FieldSection>({
       newSectionValue: response.sectionValue,
       shouldGoToNextSection: response.shouldGoToNextSection,
     });
-    return true;
   });
 
   return {

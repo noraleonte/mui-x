@@ -7,7 +7,7 @@ import { AdapterFormats } from '@mui/x-date-pickers/models';
 import { screen } from '@mui-internal/test-utils/createRenderer';
 import {
   createPickerRenderer,
-  expectInputPlaceholder,
+  expectInputPlaceholderV6,
   expectFieldValue,
   describeHijriAdapter,
 } from 'test/utils/pickers';
@@ -77,7 +77,7 @@ describe('<AdapterMomentHijri />', () => {
         it('should have correct placeholder', () => {
           render(<DateTimePicker />);
 
-          expectInputPlaceholder(
+          expectInputPlaceholderV6(
             screen.getByRole('textbox'),
             localizedTexts[localeKey].placeholder,
           );

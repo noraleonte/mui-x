@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { MobileDateTimePicker } from '@mui/x-date-pickers/MobileDateTimePicker';
-import { createPickerRenderer, getTextbox, expectInputPlaceholder } from 'test/utils/pickers';
+import { createPickerRenderer, getTextbox, expectInputPlaceholderV6 } from 'test/utils/pickers';
 
 describe('<MobileDateTimePicker /> - Field', () => {
   const { render } = createPickerRenderer();
@@ -9,9 +9,9 @@ describe('<MobileDateTimePicker /> - Field', () => {
     const { setProps } = render(<MobileDateTimePicker ampm />);
 
     const input = getTextbox();
-    expectInputPlaceholder(input, 'MM/DD/YYYY hh:mm aa');
+    expectInputPlaceholderV6(input, 'MM/DD/YYYY hh:mm aa');
 
     setProps({ ampm: false });
-    expectInputPlaceholder(input, 'MM/DD/YYYY hh:mm');
+    expectInputPlaceholderV6(input, 'MM/DD/YYYY hh:mm');
   });
 });

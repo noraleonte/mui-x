@@ -21,7 +21,7 @@ export const expectFieldValueV6 = (
   return expect(value).to.equal(expectedValue);
 };
 
-export const expectInputPlaceholder = (
+export const expectInputPlaceholderV6 = (
   input: HTMLInputElement,
   placeholder: string,
   specialCase?: 'singleDigit' | 'RTL',

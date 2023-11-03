@@ -10,7 +10,7 @@ import { expect } from 'chai';
 import {
   buildPickerDragInteractions,
   MockedDataTransfer,
-  expectInputPlaceholder,
+  expectInputPlaceholderV6,
   expectFieldValue,
   createPickerRenderer,
   describeGregorianAdapter,
@@ -156,7 +156,7 @@ describe('<AdapterDayjs />', () => {
         it('should have correct placeholder', () => {
           render(<DateTimePicker />);
 
-          expectInputPlaceholder(
+          expectInputPlaceholderV6(
             screen.getByRole('textbox'),
             localizedTexts[localeKey].placeholder,
           );

@@ -8,7 +8,7 @@ import { screen } from '@mui-internal/test-utils/createRenderer';
 import {
   cleanText,
   createPickerRenderer,
-  expectInputPlaceholder,
+  expectInputPlaceholderV6,
   expectFieldValue,
   describeGregorianAdapter,
   TEST_DATE_ISO_STRING,
@@ -115,7 +115,7 @@ describe('<AdapterLuxon />', () => {
         it('should have correct placeholder', () => {
           render(<DateTimePicker />);
 
-          expectInputPlaceholder(
+          expectInputPlaceholderV6(
             screen.getByRole('textbox'),
             localizedTexts[localeKey].placeholder,
           );

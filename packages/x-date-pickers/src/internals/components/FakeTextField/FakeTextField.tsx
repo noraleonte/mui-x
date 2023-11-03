@@ -1,5 +1,7 @@
 import * as React from 'react';
 import Box from '@mui/material/Box';
+import { styled } from '@mui/material/styles';
+import { visuallyHidden } from '@mui/utils';
 
 export interface FakeTextFieldElement {
   container: React.HTMLAttributes<HTMLSpanElement>;
@@ -22,6 +24,14 @@ interface FakeTextFieldProps {
   valueType: 'value' | 'placeholder';
   contentEditable?: boolean;
 }
+
+const FakeTextFieldHiddenInput = styled('input', {
+  name: 'MuiFakeTextField',
+  slot: 'HiddenInput',
+  overridesResolver: (props, styles) => styles.hiddenInput,
+})({
+  ...visuallyHidden,
+});
 
 export const FakeTextField = React.forwardRef(function FakeTextField(
   props: FakeTextFieldProps,
@@ -57,7 +67,12 @@ export const FakeTextField = React.forwardRef(function FakeTextField(
             <span {...after} />
           </span>
         ))}
-        <input type="hidden" value={valueStr} onChange={onValueStrChange} id={id} />
+        <FakeTextFieldHiddenInput
+          value={valueStr}
+          onChange={onValueStrChange}
+          id={id}
+          aria-hidden="true"
+        />
       </React.Fragment>
     );
   }

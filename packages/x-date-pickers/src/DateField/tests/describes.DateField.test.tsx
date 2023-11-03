@@ -6,7 +6,7 @@ import {
   createPickerRenderer,
   wrapPickerMount,
   expectFieldValue,
-  expectInputPlaceholder,
+  expectInputPlaceholderV6,
   adapterToUse,
   getTextbox,
   describeValidation,
@@ -50,7 +50,7 @@ describe('<DateField /> - Describes', () => {
     assertRenderedValue: (expectedValue: any) => {
       const input = getTextbox();
       if (!expectedValue) {
-        expectInputPlaceholder(input, 'MM/DD/YYYY');
+        expectInputPlaceholderV6(input, 'MM/DD/YYYY');
       }
       expectFieldValue(
         input,

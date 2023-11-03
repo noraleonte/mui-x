@@ -9,7 +9,7 @@ import { expect } from 'chai';
 import { spy } from 'sinon';
 import {
   createPickerRenderer,
-  expectInputPlaceholder,
+  expectInputPlaceholderV6,
   expectFieldValue,
   describeGregorianAdapter,
   TEST_DATE_ISO_STRING,
@@ -188,7 +188,7 @@ describe('<AdapterMoment />', () => {
         it('should have correct placeholder', () => {
           render(<DateTimePicker />);
 
-          expectInputPlaceholder(
+          expectInputPlaceholderV6(
             screen.getByRole('textbox'),
             localizedTexts[localeKey].placeholder,
           );

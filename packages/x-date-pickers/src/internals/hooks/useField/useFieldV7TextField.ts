@@ -39,7 +39,7 @@ export const useFieldV7TextField = <
 ) => {
   const {
     internalProps: { readOnly, disabled },
-    forwardedProps: { ref: inContainerRef, onPaste, onFocus = noop, onClick = noop },
+    forwardedProps: { ref: inContainerRef, onPaste, onBlur, onFocus = noop, onClick = noop },
     fieldValueManager,
     applyCharacterEditing,
     resetCharacterQuery,
@@ -204,6 +204,16 @@ export const useFieldV7TextField = <
     updateValueFromValueStr(pastedValue);
   });
 
+  const handleContainerBlur = useEventCallback((...args) => {
+    onBlur?.(...(args as []));
+
+    window.setTimeout(() => {
+      if (containerRef.current && !containerRef.current.contains(getActiveElement(document))) {
+        setSelectedSections(null);
+      }
+    });
+  });
+
   const getInputContainerClickHandler = useEventCallback(
     (sectionIndex: number) => (event: React.MouseEvent<HTMLDivElement>) => {
       // The click event on the clear button would propagate to the input, trigger this handler and result in a wrong section selection.
@@ -266,14 +276,15 @@ export const useFieldV7TextField = <
   });
 
   const handleInputContentInput = useEventCallback((event: React.FormEvent<HTMLSpanElement>) => {
-    if (readOnly || !containerRef.current) {
-      return;
-    }
-
     const target = event.target as HTMLSpanElement;
     const keyPressed = target.innerText;
     const sectionIndex = getSectionIndexFromDOMElement(target)!;
     const section = state.sections[sectionIndex];
+
+    if (readOnly || !containerRef.current) {
+      revertDOMSectionChange(sectionIndex);
+      return;
+    }
 
     if (keyPressed.length === 0) {
       if (section.value === '') {
@@ -286,15 +297,13 @@ export const useFieldV7TextField = <
       return;
     }
 
-    const isValid = applyCharacterEditing({
+    applyCharacterEditing({
       keyPressed,
       sectionIndex,
     });
 
-    // Without this, the span will contain the newly typed character.
-    if (!isValid) {
-      revertDOMSectionChange(sectionIndex);
-    }
+    // The DOM value needs to remain the one React is expecting.
+    revertDOMSectionChange(sectionIndex);
   });
 
   const elements = React.useMemo<FakeTextFieldElement[]>(
@@ -365,6 +374,7 @@ export const useFieldV7TextField = <
       onClick: handleContainerClick,
       onInput: handleContainerInput,
       onPaste: handleContainerPaste,
+      onBlur: handleContainerBlur,
       contentEditable: parsedSelectedSections === 'all',
       suppressContentEditableWarning: true,
       elements,

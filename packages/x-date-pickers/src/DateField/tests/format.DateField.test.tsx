@@ -1,6 +1,6 @@
 import * as React from 'react';
 import {
-  expectInputPlaceholder,
+  expectInputPlaceholderV6,
   expectFieldValue,
   getTextbox,
   describeAdapters,
@@ -15,7 +15,7 @@ describeAdapters('<DateField /> - Format', DateField, ({ render, adapter }) => {
       <DateField format={`${startChar}Escaped${endChar} ${adapter.formats.year}`} />,
     );
     const input = getTextbox();
-    expectInputPlaceholder(input, 'Escaped YYYY');
+    expectInputPlaceholderV6(input, 'Escaped YYYY');
 
     setProps({ value: adapter.date(new Date(2019, 0, 1)) });
     expectFieldValue(input, 'Escaped 2019');
@@ -30,7 +30,7 @@ describeAdapters('<DateField /> - Format', DateField, ({ render, adapter }) => {
       />,
     );
     const input = getTextbox();
-    expectInputPlaceholder(input, 'MMMM Escaped YYYY');
+    expectInputPlaceholderV6(input, 'MMMM Escaped YYYY');
 
     setProps({ value: adapter.date(new Date(2019, 0, 1)) });
     expectFieldValue(input, 'January Escaped 2019');
@@ -51,7 +51,7 @@ describeAdapters('<DateField /> - Format', DateField, ({ render, adapter }) => {
       />,
     );
     const input = getTextbox();
-    expectInputPlaceholder(input, 'MMMM Escaped [ YYYY');
+    expectInputPlaceholderV6(input, 'MMMM Escaped [ YYYY');
 
     setProps({ value: adapter.date(new Date(2019, 0, 1)) });
     expectFieldValue(input, 'January Escaped [ 2019');
@@ -67,7 +67,7 @@ describeAdapters('<DateField /> - Format', DateField, ({ render, adapter }) => {
       />,
     );
     const input = getTextbox();
-    expectInputPlaceholder(input, 'Escaped MMMM Escaped YYYY');
+    expectInputPlaceholderV6(input, 'Escaped MMMM Escaped YYYY');
 
     setProps({ value: adapter.date(new Date(2019, 0, 1)) });
     expectFieldValue(input, 'Escaped January Escaped 2019');
@@ -76,7 +76,7 @@ describeAdapters('<DateField /> - Format', DateField, ({ render, adapter }) => {
   it('should add spaces around `/` when `formatDensity = "spacious"`', () => {
     const { setProps } = render(<DateField formatDensity="spacious" />);
     const input = getTextbox();
-    expectInputPlaceholder(input, 'MM / DD / YYYY');
+    expectInputPlaceholderV6(input, 'MM / DD / YYYY');
 
     setProps({ value: adapter.date(new Date(2019, 0, 1)) });
     expectFieldValue(input, '01 / 01 / 2019');
@@ -90,7 +90,7 @@ describeAdapters('<DateField /> - Format', DateField, ({ render, adapter }) => {
       />,
     );
     const input = getTextbox();
-    expectInputPlaceholder(input, 'MM . DD . YYYY');
+    expectInputPlaceholderV6(input, 'MM . DD . YYYY');
 
     setProps({ value: adapter.date(new Date(2019, 0, 1)) });
     expectFieldValue(input, '01 . 01 . 2019');
@@ -104,7 +104,7 @@ describeAdapters('<DateField /> - Format', DateField, ({ render, adapter }) => {
       />,
     );
     const input = getTextbox();
-    expectInputPlaceholder(input, 'MM - DD - YYYY');
+    expectInputPlaceholderV6(input, 'MM - DD - YYYY');
 
     setProps({ value: adapter.date(new Date(2019, 0, 1)) });
     expectFieldValue(input, '01 - 01 - 2019');

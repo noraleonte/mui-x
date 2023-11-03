@@ -1,4 +1,3 @@
-import * as React from 'react';
 import { expect } from 'chai';
 import { spy } from 'sinon';
 import { DateField } from '@mui/x-date-pickers/DateField';
@@ -10,7 +9,7 @@ import {
   expectFieldValueV6,
 } from 'test/utils/pickers';
 
-describe('<DateField /> - Editing', () => {
+describe.only('<DateField /> - Editing', () => {
   describeAdapters('key: ArrowDown', DateField, ({ adapter, testFieldKeyPress }) => {
     it("should set the year to today's value when no value is provided (ArrowDown)", () => {
       testFieldKeyPress({
@@ -514,7 +513,7 @@ describe('<DateField /> - Editing', () => {
     });
   });
 
-  describeAdapters('Digit editing', DateField, ({ adapter, testFieldChange }) => {
+  describeAdapters('Digit editing', DateField, ({ adapter, testFieldChange, renderWithProps }) => {
     it('should set the day to the digit pressed when no digit no value is provided', () => {
       testFieldChange({
         format: adapter.formats.dayOfMonth,
@@ -676,18 +675,65 @@ describe('<DateField /> - Editing', () => {
     });
 
     it('should allow to type the date 29th of February for leap years', () => {
-      testFieldChange({
+      // Test with v7 input
+      const v7Response = renderWithProps({
         format: adapter.formats.keyboardDate,
-        keyStrokes: [
-          { value: '2/DD/YYYY', expected: '02/DD/YYYY' },
-          { value: '02/2/YYYY', expected: '02/02/YYYY' },
-          { value: '02/9/YYYY', expected: '02/29/YYYY' },
-          { value: '02/29/1', expected: '02/29/0001' },
-          { value: '02/29/9', expected: '02/29/0019' },
-          { value: '02/29/8', expected: '02/29/0198' },
-          { value: '02/29/8', expected: '02/29/1988' },
-        ],
       });
+
+      v7Response.selectSection('month');
+
+      fireEvent.input(v7Response.getActiveSection(0), { target: { innerText: '2' } });
+      expectFieldValue(v7Response.fieldContainer, '02/DD/YYYY');
+
+      fireEvent.input(v7Response.getActiveSection(1), { target: { innerText: '2' } });
+      expectFieldValue(v7Response.fieldContainer, '02/02/YYYY');
+
+      fireEvent.input(v7Response.getActiveSection(1), { target: { innerText: '9' } });
+      expectFieldValue(v7Response.fieldContainer, '02/29/YYYY');
+
+      fireEvent.input(v7Response.getActiveSection(2), { target: { innerText: '1' } });
+      expectFieldValue(v7Response.fieldContainer, '02/29/0001');
+
+      fireEvent.input(v7Response.getActiveSection(2), { target: { innerText: '9' } });
+      expectFieldValue(v7Response.fieldContainer, '02/29/0019');
+
+      fireEvent.input(v7Response.getActiveSection(2), { target: { innerText: '8' } });
+      expectFieldValue(v7Response.fieldContainer, '02/29/0198');
+
+      fireEvent.input(v7Response.getActiveSection(2), { target: { innerText: '8' } });
+      expectFieldValue(v7Response.fieldContainer, '02/29/1988');
+
+      v7Response.unmount();
+
+      // Test with v6 input
+      const v6Response = renderWithProps({
+        shouldUseV6TextField: true,
+        format: adapter.formats.keyboardDate,
+      });
+
+      const input = getTextbox();
+      v6Response.selectSection('month');
+
+      fireEvent.change(input, { target: { value: '2/DD/YYYY' } });
+      expectFieldValueV6(input, '02/DD/YYYY');
+
+      fireEvent.change(input, { target: { value: '02/2/YYYY' } });
+      expectFieldValueV6(input, '02/02/YYYY');
+
+      fireEvent.change(input, { target: { value: '02/9/YYYY' } });
+      expectFieldValueV6(input, '02/29/YYYY');
+
+      fireEvent.change(input, { target: { value: '02/29/1' } });
+      expectFieldValueV6(input, '02/29/0001');
+
+      fireEvent.change(input, { target: { value: '02/29/9' } });
+      expectFieldValueV6(input, '02/29/0019');
+
+      fireEvent.change(input, { target: { value: '02/29/8' } });
+      expectFieldValueV6(input, '02/29/0198');
+
+      fireEvent.change(input, { target: { value: '02/29/8' } });
+      expectFieldValueV6(input, '02/29/1988');
     });
 
     it('should not edit when props.readOnly = true and no value is provided', () => {
@@ -800,39 +846,131 @@ describe('<DateField /> - Editing', () => {
     DateField,
     ({ adapter, renderWithProps, testFieldChange }) => {
       it('should clear the selected section when only this section is completed (Backspace)', () => {
-        testFieldChange({
+        // Test with v7 input
+        const v7Response = renderWithProps({
           format: `${adapter.formats.month} ${adapter.formats.year}`,
-          keyStrokes: [
-            { value: 'j YYYY', expected: 'January YYYY' },
-            { value: ' YYYY', expected: 'MMMM YYYY' },
-          ],
         });
+
+        v7Response.selectSection('month');
+        fireEvent.input(v7Response.getActiveSection(0), { target: { innerText: 'j' } });
+        expectFieldValue(v7Response.fieldContainer, 'January YYYY');
+
+        fireEvent.input(v7Response.getActiveSection(0), { target: { innerText: '' } });
+        expectFieldValue(v7Response.fieldContainer, 'MMMM YYYY');
+
+        v7Response.unmount();
+
+        // Test with v6 input
+        const v6Response = renderWithProps({
+          format: `${adapter.formats.month} ${adapter.formats.year}`,
+          shouldUseV6TextField: true,
+        });
+
+        const input = getTextbox();
+        v6Response.selectSection('month');
+        fireEvent.change(input, { target: { value: 'j YYYY' } });
+        expectFieldValueV6(input, 'January YYYY');
+
+        fireEvent.change(input, { target: { value: ' YYYY' } });
+        expectFieldValueV6(input, 'MMMM YYYY');
       });
 
       it('should clear the selected section when all sections are completed (Backspace)', () => {
-        testFieldChange({
+        // Test with v7 input
+        const v7Response = renderWithProps({
           format: `${adapter.formats.month} ${adapter.formats.year}`,
           defaultValue: adapter.date(),
-          keyStrokes: [{ value: ' 2022', expected: 'MMMM 2022' }],
         });
+
+        v7Response.selectSection('month');
+
+        fireEvent.input(v7Response.getActiveSection(0), { target: { innerText: '' } });
+        expectFieldValue(v7Response.fieldContainer, 'MMMM 2022');
+
+        v7Response.unmount();
+
+        // Test with v6 input
+        const v6Response = renderWithProps({
+          format: `${adapter.formats.month} ${adapter.formats.year}`,
+          defaultValue: adapter.date(),
+          shouldUseV6TextField: true,
+        });
+
+        const input = getTextbox();
+        v6Response.selectSection('month');
+
+        fireEvent.change(input, { target: { value: ' 2022' } });
+        expectFieldValueV6(input, 'MMMM 2022');
       });
 
       it('should clear all the sections when all sections are selected and all sections are completed (Backspace)', () => {
-        testFieldChange({
+        // Test with v7 input
+        const v7Response = renderWithProps({
           format: `${adapter.formats.month} ${adapter.formats.year}`,
           defaultValue: adapter.date(),
-          keyStrokes: [{ value: '', expected: 'MMMM YYYY' }],
         });
+
+        v7Response.selectSection('month');
+
+        // Select all sections
+        fireEvent.keyDown(v7Response.getActiveSection(0), { key: 'a', ctrlKey: true });
+
+        fireEvent.input(v7Response.fieldContainer, { target: { innerText: '' } });
+        expectFieldValue(v7Response.fieldContainer, 'MMMM YYYY');
+
+        v7Response.unmount();
+
+        // Test with v6 input
+        const v6Response = renderWithProps({
+          format: `${adapter.formats.month} ${adapter.formats.year}`,
+          defaultValue: adapter.date(),
+          shouldUseV6TextField: true,
+        });
+
+        const input = getTextbox();
+        v6Response.selectSection('month');
+
+        // Select all sections
+        fireEvent.keyDown(input, { key: 'a', ctrlKey: true });
+
+        fireEvent.change(input, { target: { value: '' } });
+        expectFieldValueV6(input, 'MMMM YYYY');
       });
 
       it('should clear all the sections when all sections are selected and not all sections are completed (Backspace)', () => {
-        testFieldChange({
+        // Test with v7 input
+        const v7Response = renderWithProps({
           format: `${adapter.formats.month} ${adapter.formats.year}`,
-          keyStrokes: [
-            { value: 'j YYYY', expected: 'January YYYY' },
-            { value: '', expected: 'MMMM YYYY' },
-          ],
         });
+
+        v7Response.selectSection('month');
+        fireEvent.input(v7Response.getActiveSection(0), { target: { innerText: 'j' } });
+        expectFieldValue(v7Response.fieldContainer, 'January YYYY');
+
+        // Select all sections
+        fireEvent.keyDown(v7Response.getActiveSection(0), { key: 'a', ctrlKey: true });
+
+        fireEvent.input(v7Response.fieldContainer, { target: { innerText: '' } });
+        expectFieldValue(v7Response.fieldContainer, 'MMMM YYYY');
+
+        v7Response.unmount();
+
+        // Test with v6 input
+        const v6Response = renderWithProps({
+          format: `${adapter.formats.month} ${adapter.formats.year}`,
+          shouldUseV6TextField: true,
+        });
+
+        const input = getTextbox();
+        v6Response.selectSection('month');
+        fireEvent.change(input, { target: { value: 'j YYYY' } });
+        expectFieldValueV6(input, 'January YYYY');
+
+        // Select all sections
+        fireEvent.keyDown(input, { key: 'a', ctrlKey: true });
+
+        fireEvent.change(input, { target: { value: '' } });
+        expectFieldValueV6(input, 'MMMM YYYY');
       });
 
       it('should not keep query after typing again on a cleared section (Backspace)', () => {
@@ -851,7 +989,7 @@ describe('<DateField /> - Editing', () => {
           format: adapter.formats.year,
           defaultValue: adapter.date(),
           readOnly: true,
-          keyStrokes: [{ value: '2', expected: '2022' }],
+          keyStrokes: [{ value: '', expected: '2022' }],
         });
       });
 
@@ -1481,128 +1619,63 @@ describe('<DateField /> - Editing', () => {
   describeAdapters(
     'Imperative change (without any section selected)',
     DateField,
-    ({ adapter, render }) => {
+    ({ adapter, renderWithProps }) => {
       it('should set the date when the change value is valid and no value is provided', () => {
-        const onChange = spy();
-        render(<DateField onChange={onChange} />);
-        const input = getTextbox();
-        fireEvent.change(input, { target: { value: '09/16/2022' } });
-
-        expect(onChange.callCount).to.equal(1);
-        expect(onChange.lastCall.firstArg).toEqualDateTime(new Date(2022, 8, 16));
-      });
-
-      it('should set the date when the change value is valid and a value is provided', () => {
-        const onChange = spy();
-        render(
-          <DateField
-            defaultValue={adapter.date(new Date(2010, 3, 3, 3, 3, 3))}
-            onChange={onChange}
-          />,
-        );
-        const input = getTextbox();
-        fireEvent.change(input, { target: { value: '09/16/2022' } });
-
-        expect(onChange.callCount).to.equal(1);
-        expect(onChange.lastCall.firstArg).toEqualDateTime(new Date(2022, 8, 16, 3, 3, 3));
-      });
-    },
-  );
-
-  describeAdapters(
-    'Editing from the outside',
-    DateField,
-    ({ adapter, render, clickOnField, renderWithProps }) => {
-      it('should be able to reset the value from the outside', () => {
-        const { setProps } = render(<DateField value={adapter.date(new Date(2022, 10, 23))} />);
-        const input = getTextbox();
-        expectFieldValue(input, '11/23/2022');
-
-        setProps({ value: null });
-
-        clickOnField(input, 0);
-        expectFieldValue(input, 'MM/DD/YYYY');
-      });
-
-      it.only('should reset the input query state on an unfocused field', () => {
-        if (adapter.lib !== 'dayjs') return;
-
         // Test with v7 input
-        const v7Response = renderWithProps({ value: null });
-
-        v7Response.selectSection('month');
-
-        fireEvent.input(v7Response.getActiveSection(0), { target: { innerText: '1' } });
-        expectFieldValue(v7Response.fieldContainer, '01/DD/YYYY');
-
-        fireEvent.input(v7Response.getActiveSection(0), { target: { innerText: '1' } });
-        expectFieldValue(v7Response.fieldContainer, '11/DD/YYYY');
-
-        fireEvent.input(v7Response.getActiveSection(1), { target: { innerText: '2' } });
-        fireEvent.input(v7Response.getActiveSection(1), { target: { innerText: '5' } });
-        expectFieldValue(v7Response.fieldContainer, '11/25/YYYY');
-
-        fireEvent.input(v7Response.getActiveSection(2), { target: { innerText: '2' } });
-        fireEvent.input(v7Response.getActiveSection(2), { target: { innerText: '0' } });
-        expectFieldValue(v7Response.fieldContainer, '11/25/0020');
-
-        act(() => {
-          v7Response.fieldContainer.blur();
+        const onChangeV7 = spy();
+        const v7Response = renderWithProps({
+          onChange: onChangeV7,
         });
+        fireEvent.change(v7Response.getHiddenInput(), { target: { value: '09/16/2022' } });
 
-        //  v7Response.setProps({ value: adapter.date(new Date(2022, 10, 23)) });
-        // expectFieldValue(v7Response.fieldContainer, '11/23/2022');
-        //
-        // v7Response.selectSection('year')
-        //
-        // fireEvent.input(v7Response.getActiveSection(2), { target: { innerText: '2' } });
-        // expectFieldValue(v7Response.fieldContainer, '11/23/0002');
-        // fireEvent.input(v7Response.getActiveSection(2), { target: { innerText: '1' } });
-        // expectFieldValue(v7Response.fieldContainer, '11/23/0021');
+        expect(onChangeV7.callCount).to.equal(1);
+        expect(onChangeV7.lastCall.firstArg).toEqualDateTime(new Date(2022, 8, 16));
 
         v7Response.unmount();
 
-        return;
+        // Test with v6 input
+        const onChangeV6 = spy();
+        renderWithProps({
+          onChange: onChangeV6,
+          shouldUseV6TextField: true,
+        });
+        const input = getTextbox();
+        fireEvent.change(input, { target: { value: '09/16/2022' } });
+
+        expect(onChangeV6.callCount).to.equal(1);
+        expect(onChangeV6.lastCall.firstArg).toEqualDateTime(new Date(2022, 8, 16));
+      });
+
+      it('should set the date when the change value is valid and a value is provided', () => {
+        // Test with v7 input
+        const onChangeV7 = spy();
+
+        const v7Response = renderWithProps({
+          defaultValue: adapter.date(new Date(2010, 3, 3, 3, 3, 3)),
+          onChange: onChangeV7,
+        });
+
+        fireEvent.change(v7Response.getHiddenInput(), { target: { value: '09/16/2022' } });
+
+        expect(onChangeV7.callCount).to.equal(1);
+        expect(onChangeV7.lastCall.firstArg).toEqualDateTime(new Date(2022, 8, 16, 3, 3, 3));
+
+        v7Response.unmount();
 
         // Test with v6 input
-        const v6Response = renderWithProps({ shouldUseV6TextField: true, value: null });
+        const onChangeV6 = spy();
+
+        renderWithProps({
+          defaultValue: adapter.date(new Date(2010, 3, 3, 3, 3, 3)),
+          onChange: onChangeV6,
+          shouldUseV6TextField: true,
+        });
 
         const input = getTextbox();
-        v6Response.selectSection('month');
+        fireEvent.change(input, { target: { value: '09/16/2022' } });
 
-        fireEvent.change(input, { target: { value: '1/DD/YYYY' } }); // Press "1"
-        expectFieldValueV6(input, '01/DD/YYYY');
-
-        fireEvent.change(input, { target: { value: '11/DD/YYYY' } }); // Press "1"
-        expectFieldValueV6(input, '11/DD/YYYY');
-
-        fireEvent.change(input, { target: { value: '11/2/YYYY' } }); // Press "2"
-        fireEvent.change(input, { target: { value: '11/5/YYYY' } }); // Press "5"
-        expectFieldValueV6(input, '11/25/YYYY');
-
-        fireEvent.change(input, { target: { value: '11/25/2' } }); // Press "2"
-        fireEvent.change(input, { target: { value: '11/25/0' } }); // Press "0"
-        expectFieldValueV6(input, '11/25/0020');
-
-        act(() => {
-          input.blur();
-        });
-
-        v6Response.setProps({ value: adapter.date(new Date(2022, 10, 23)) });
-        expectFieldValueV6(input, '11/23/2022');
-
-        // not using clickOnField here because it will call `runLast` on the fake timer
-        act(() => {
-          fireEvent.mouseDown(input);
-          fireEvent.mouseUp(input);
-          input.setSelectionRange(6, 9);
-          fireEvent.click(input);
-        });
-
-        fireEvent.change(input, { target: { value: '11/23/2' } }); // Press "2"
-        expectFieldValueV6(input, '11/23/0002');
-        fireEvent.change(input, { target: { value: '11/23/1' } }); // Press "0"
-        expectFieldValueV6(input, '11/23/0021');
+        expect(onChangeV6.callCount).to.equal(1);
+        expect(onChangeV6.lastCall.firstArg).toEqualDateTime(new Date(2022, 8, 16, 3, 3, 3));
       });
     },
   );
@@ -1691,6 +1764,115 @@ describe('<DateField /> - Editing', () => {
       });
     },
   );
+
+  describeAdapters('Editing from the outside', DateField, ({ adapter, renderWithProps, clock }) => {
+    it('should be able to reset the value from the outside', () => {
+      // Test with v7 input
+      const v7Response = renderWithProps({
+        value: adapter.date(new Date(2022, 10, 23)),
+      });
+      expectFieldValue(v7Response.fieldContainer, '11/23/2022');
+
+      v7Response.setProps({ value: null });
+
+      v7Response.selectSection('month');
+      expectFieldValue(v7Response.fieldContainer, 'MM/DD/YYYY');
+
+      v7Response.unmount();
+
+      // Test with v6 input
+      const v6Response = renderWithProps({
+        value: adapter.date(new Date(2022, 10, 23)),
+        shouldUseV6TextField: true,
+      });
+      const input = getTextbox();
+      expectFieldValueV6(input, '11/23/2022');
+
+      v6Response.setProps({ value: null });
+
+      v6Response.selectSection('month');
+      expectFieldValueV6(input, 'MM/DD/YYYY');
+    });
+
+    it('should reset the input query state on an unfocused field', () => {
+      // Test with v7 input
+      const v7Response = renderWithProps({ value: null });
+
+      v7Response.selectSection('month');
+
+      fireEvent.input(v7Response.getActiveSection(0), { target: { innerText: '1' } });
+      expectFieldValue(v7Response.fieldContainer, '01/DD/YYYY');
+
+      fireEvent.input(v7Response.getActiveSection(0), { target: { innerText: '1' } });
+      expectFieldValue(v7Response.fieldContainer, '11/DD/YYYY');
+
+      fireEvent.input(v7Response.getActiveSection(1), { target: { innerText: '2' } });
+      fireEvent.input(v7Response.getActiveSection(1), { target: { innerText: '5' } });
+      expectFieldValue(v7Response.fieldContainer, '11/25/YYYY');
+
+      fireEvent.input(v7Response.getActiveSection(2), { target: { innerText: '2' } });
+      fireEvent.input(v7Response.getActiveSection(2), { target: { innerText: '0' } });
+      expectFieldValue(v7Response.fieldContainer, '11/25/0020');
+
+      act(() => {
+        v7Response.fieldContainer.blur();
+      });
+
+      clock.runToLast();
+
+      v7Response.setProps({ value: adapter.date(new Date(2022, 10, 23)) });
+      expectFieldValue(v7Response.fieldContainer, '11/23/2022');
+
+      v7Response.selectSection('year');
+
+      fireEvent.input(v7Response.getActiveSection(2), { target: { innerText: '2' } });
+      expectFieldValue(v7Response.fieldContainer, '11/23/0002');
+      fireEvent.input(v7Response.getActiveSection(2), { target: { innerText: '1' } });
+      expectFieldValue(v7Response.fieldContainer, '11/23/0021');
+
+      v7Response.unmount();
+
+      // Test with v6 input
+      const v6Response = renderWithProps({ shouldUseV6TextField: true, value: null });
+
+      const input = getTextbox();
+      v6Response.selectSection('month');
+
+      fireEvent.change(input, { target: { value: '1/DD/YYYY' } }); // Press "1"
+      expectFieldValueV6(input, '01/DD/YYYY');
+
+      fireEvent.change(input, { target: { value: '11/DD/YYYY' } }); // Press "1"
+      expectFieldValueV6(input, '11/DD/YYYY');
+
+      fireEvent.change(input, { target: { value: '11/2/YYYY' } }); // Press "2"
+      fireEvent.change(input, { target: { value: '11/5/YYYY' } }); // Press "5"
+      expectFieldValueV6(input, '11/25/YYYY');
+
+      fireEvent.change(input, { target: { value: '11/25/2' } }); // Press "2"
+      fireEvent.change(input, { target: { value: '11/25/0' } }); // Press "0"
+      expectFieldValueV6(input, '11/25/0020');
+
+      act(() => {
+        input.blur();
+      });
+
+      v6Response.setProps({ value: adapter.date(new Date(2022, 10, 23)) });
+      expectFieldValueV6(input, '11/23/2022');
+
+      // not using clickOnField here because it will call `runLast` on the fake timer
+      act(() => {
+        fireEvent.mouseDown(input);
+        fireEvent.mouseUp(input);
+        input.setSelectionRange(6, 9);
+        fireEvent.click(input);
+      });
+
+      fireEvent.change(input, { target: { value: '11/23/2' } }); // Press "2"
+      expectFieldValueV6(input, '11/23/0002');
+      fireEvent.change(input, { target: { value: '11/23/1' } }); // Press "0"
+      expectFieldValueV6(input, '11/23/0021');
+    });
+  });
 
   describeAdapters('Select all', DateField, ({ renderWithProps }) => {
     it('should edit the 1st section when all sections are selected', () => {

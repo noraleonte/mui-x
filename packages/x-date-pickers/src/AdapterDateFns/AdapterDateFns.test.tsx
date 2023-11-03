@@ -6,7 +6,7 @@ import { screen } from '@mui-internal/test-utils/createRenderer';
 import { expect } from 'chai';
 import {
   createPickerRenderer,
-  expectInputPlaceholder,
+  expectInputPlaceholderV6,
   expectFieldValue,
   describeGregorianAdapter,
   TEST_DATE_ISO_STRING,
@@ -129,7 +129,7 @@ describe('<AdapterDateFns />', () => {
         it('should have correct placeholder', () => {
           render(<DateTimePicker />);
 
-          expectInputPlaceholder(
+          expectInputPlaceholderV6(
             screen.getByRole('textbox'),
             localizedTexts[localeKey].placeholder,
           );

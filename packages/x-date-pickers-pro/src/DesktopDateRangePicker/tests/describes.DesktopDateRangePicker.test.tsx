@@ -5,7 +5,7 @@ import {
   createPickerRenderer,
   wrapPickerMount,
   getTextbox,
-  expectInputPlaceholder,
+  expectInputPlaceholderV6,
   expectFieldValue,
   describePicker,
   describeValue,
@@ -67,7 +67,7 @@ describe('<DesktopDateRangePicker /> - Describes', () => {
       expectedValues.forEach((value, index) => {
         const input = textBoxes[index];
         if (!value) {
-          expectInputPlaceholder(input, 'MM/DD/YYYY');
+          expectInputPlaceholderV6(input, 'MM/DD/YYYY');
         }
         expectFieldValue(input, value ? adapterToUse.format(value, 'keyboardDate') : '');
       });
@@ -126,7 +126,7 @@ describe('<DesktopDateRangePicker /> - Describes', () => {
       const isEmpty = expectedValues[0] == null && expectedValues[1] == null;
 
       if (isEmpty) {
-        expectInputPlaceholder(input, expectedValueStr);
+        expectInputPlaceholderV6(input, expectedValueStr);
       }
 
       expectFieldValue(input, isEmpty ? '' : expectedValueStr);

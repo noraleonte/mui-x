@@ -87,7 +87,7 @@ export const useFieldV6TextField = <
 
   const {
     internalProps: { readOnly },
-    forwardedProps: { onFocus, onClick, onPaste, inputRef: inputRefProp },
+    forwardedProps: { onFocus, onClick, onPaste, onBlur, inputRef: inputRefProp },
     parsedSelectedSections,
     activeSectionIndex,
     state,
@@ -279,6 +279,11 @@ export const useFieldV6TextField = <
     updateValueFromValueStr(pastedValue);
   });
 
+  const handleContainerBlur = useEventCallback((...args) => {
+    onBlur?.(...(args as []));
+    setSelectedSections(null);
+  });
+
   const handleInputChange = useEventCallback((event: React.ChangeEvent<HTMLInputElement>) => {
     if (readOnly) {
       return;
@@ -400,6 +405,7 @@ export const useFieldV6TextField = <
       onFocus: handleInputFocus,
       onClick: handleInputClick,
       onPaste: handleInputPaste,
+      onBlur: handleContainerBlur,
       inputRef: handleRef,
     },
   };

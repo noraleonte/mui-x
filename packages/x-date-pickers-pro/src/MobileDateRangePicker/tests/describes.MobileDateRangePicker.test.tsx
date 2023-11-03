@@ -11,7 +11,7 @@ import {
   createPickerRenderer,
   wrapPickerMount,
   openPicker,
-  expectInputPlaceholder,
+  expectInputPlaceholderV6,
   expectFieldValue,
   describeRangeValidation,
   describeValue,
@@ -77,7 +77,7 @@ describe('<MobileDateRangePicker /> - Describes', () => {
         const input = textBoxes[index];
         // TODO: Support single range input
         if (!value) {
-          expectInputPlaceholder(input, 'MM/DD/YYYY');
+          expectInputPlaceholderV6(input, 'MM/DD/YYYY');
         }
         expectFieldValue(input, value ? adapterToUse.format(value, 'keyboardDate') : '');
       });

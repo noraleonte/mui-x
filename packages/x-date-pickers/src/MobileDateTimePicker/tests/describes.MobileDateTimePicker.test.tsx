@@ -3,7 +3,7 @@ import {
   createPickerRenderer,
   adapterToUse,
   expectFieldValue,
-  expectInputPlaceholder,
+  expectInputPlaceholderV6,
   openPicker,
   getClockTouchEvent,
   getTextbox,
@@ -44,7 +44,7 @@ describe('<MobileDateTimePicker /> - Describes', () => {
       const hasMeridiem = adapterToUse.is12HourCycleInCurrentLocale();
       const input = getTextbox();
       if (!expectedValue) {
-        expectInputPlaceholder(input, hasMeridiem ? 'MM/DD/YYYY hh:mm aa' : 'MM/DD/YYYY hh:mm');
+        expectInputPlaceholderV6(input, hasMeridiem ? 'MM/DD/YYYY hh:mm aa' : 'MM/DD/YYYY hh:mm');
       }
       const expectedValueStr = expectedValue
         ? adapterToUse.format(

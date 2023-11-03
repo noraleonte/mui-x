@@ -17,7 +17,6 @@ import { useFieldCharacterEditing } from './useFieldCharacterEditing';
 import { FieldSection } from '../../../models';
 import { useFieldV7TextField } from './useFieldV7TextField';
 import { useFieldV6TextField } from './useFieldV6TextField';
-import { getActiveElement } from '../../utils/utils';
 
 export const useField = <
   TValue,
@@ -39,7 +38,6 @@ export const useField = <
       shouldUseV6TextField = false,
     },
     forwardedProps: {
-      onBlur,
       onPaste,
       error,
       clearable,
@@ -98,11 +96,6 @@ export const useField = <
     () => getSectionOrder(state.sections, isRTL),
     [state.sections, isRTL],
   );
-
-  const handleContainerBlur = useEventCallback((...args) => {
-    onBlur?.(...(args as []));
-    setSelectedSections(null);
-  });
 
   const handleContainerKeyDown = useEventCallback((event: React.KeyboardEvent<HTMLSpanElement>) => {
     // eslint-disable-next-line default-case
@@ -268,7 +261,6 @@ export const useField = <
     disabled,
     readOnly,
     onKeyDown: handleContainerKeyDown,
-    onBlur: handleContainerBlur,
     onClear: handleClearValue,
     error: inputError,
     clearable: Boolean(clearable && !areAllSectionsEmpty && !readOnly && !disabled),

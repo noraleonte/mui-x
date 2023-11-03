@@ -32,6 +32,7 @@ export interface BuildFieldInteractionsResponse<P extends { shouldUseV6TextField
      * @returns {HTMLSpanElement} The contentEditable DOM node of the active section.
      */
     getActiveSection: (sectionIndex: number | undefined) => HTMLSpanElement;
+    getHiddenInput: () => HTMLInputElement;
   };
   clickOnField: (container: HTMLDivElement, sectionIndex: number) => void;
   testFieldKeyPress: (
@@ -45,6 +46,7 @@ export interface BuildFieldInteractionsResponse<P extends { shouldUseV6TextField
     params: P & {
       keyStrokes: { value: string; expected: string }[];
       selectedSection?: FieldSectionType;
+      skipV7?: boolean;
     },
   ) => void;
 }
@@ -136,7 +138,11 @@ export const buildFieldInteractions = <P extends { shouldUseV6TextField?: boolea
 
         if (props.shouldUseV6TextField) {
           getTextbox().focus();
-        } else {
+        }
+      });
+
+      act(() => {
+        if (!props.shouldUseV6TextField) {
           fieldContainerRef
             .current!.querySelector<HTMLSpanElement>(
               `span[data-sectionindex="${sectionIndexToSelect}"] .content`,
@@ -159,6 +165,7 @@ export const buildFieldInteractions = <P extends { shouldUseV6TextField?: boolea
     return {
       selectSection,
       getActiveSection,
+      getHiddenInput: () => fieldContainerRef.current!.querySelector<HTMLInputElement>('input')!,
       fieldContainer: fieldContainerRef.current!,
       ...result,
     };
@@ -189,22 +196,25 @@ export const buildFieldInteractions = <P extends { shouldUseV6TextField?: boolea
   const testFieldChange: BuildFieldInteractionsResponse<P>['testFieldChange'] = ({
     keyStrokes,
     selectedSection,
+    skipV7,
     ...props
   }) => {
-    // Test with v7 input
-    const v7Response = renderWithProps(props as any as P);
-    v7Response.selectSection(selectedSection);
-    keyStrokes.forEach((keyStroke) => {
-      fireEvent.input(v7Response.getActiveSection(undefined), {
-        target: { innerText: keyStroke.value },
+    if (!skipV7) {
+      // Test with v7 input
+      const v7Response = renderWithProps(props as any as P);
+      v7Response.selectSection(selectedSection);
+      keyStrokes.forEach((keyStroke) => {
+        fireEvent.input(v7Response.getActiveSection(undefined), {
+          target: { innerText: keyStroke.value },
+        });
+        expectFieldValue(
+          v7Response.fieldContainer,
+          keyStroke.expected,
+          (props as any).shouldRespectLeadingZeros ? 'singleDigit' : undefined,
+        );
       });
-      expectFieldValue(
-        v7Response.fieldContainer,
-        keyStroke.expected,
-        (props as any).shouldRespectLeadingZeros ? 'singleDigit' : undefined,
-      );
-    });
-    v7Response.unmount();
+      v7Response.unmount();
+    }
 
     // Test with v6 input
     const v6Response = renderWithProps({ ...props, shouldUseV6TextField: true } as any as P);

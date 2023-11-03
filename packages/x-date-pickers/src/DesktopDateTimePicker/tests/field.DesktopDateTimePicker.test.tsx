@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { createPickerRenderer, getTextbox, expectInputPlaceholder } from 'test/utils/pickers';
+import { createPickerRenderer, getTextbox, expectInputPlaceholderV6 } from 'test/utils/pickers';
 import {
   DesktopDateTimePicker,
   DesktopDateTimePickerProps,
@@ -12,17 +12,17 @@ describe('<DesktopDateTimePicker /> - Field', () => {
     const { setProps } = render(<DesktopDateTimePicker ampm />);
 
     const input = getTextbox();
-    expectInputPlaceholder(input, 'MM/DD/YYYY hh:mm aa');
+    expectInputPlaceholderV6(input, 'MM/DD/YYYY hh:mm aa');
 
     setProps({ ampm: false });
-    expectInputPlaceholder(input, 'MM/DD/YYYY hh:mm');
+    expectInputPlaceholderV6(input, 'MM/DD/YYYY hh:mm');
   });
 
   it('should adapt the default field format based on the props of the picker', () => {
     const testFormat = (props: DesktopDateTimePickerProps<any>, expectedFormat: string) => {
       const { unmount } = render(<DesktopDateTimePicker {...props} />);
       const input = getTextbox();
-      expectInputPlaceholder(input, expectedFormat);
+      expectInputPlaceholderV6(input, expectedFormat);
       unmount();
     };
 
