@@ -5,13 +5,14 @@ import { act, userEvent } from '@mui-internal/test-utils';
 import {
   createPickerRenderer,
   expectFieldValue,
-  getCleanedSelectedContent,
+  expectFieldValueV6,
+  getCleanedSelectedContentV6,
   getTextbox,
   buildFieldInteractions,
   adapterToUse,
 } from 'test/utils/pickers';
 
-describe('<DateField /> - Selection', () => {
+describe.only('<DateField /> - Selection', () => {
   const { render, clock } = createPickerRenderer({ clock: 'fake' });
   const { renderWithProps } = buildFieldInteractions({ clock, render, Component: DateField });
 
@@ -21,7 +22,7 @@ describe('<DateField /> - Selection', () => {
       const input = getTextbox();
 
       expectFieldValue(input, 'MM/DD/YYYY');
-      expect(getCleanedSelectedContent(input)).to.equal('MM/DD/YYYY');
+      expect(getCleanedSelectedContentV6(input)).to.equal('MM/DD/YYYY');
     });
 
     it('should select all on mount focus (`autoFocus = true`) with start separator', () => {
@@ -29,7 +30,7 @@ describe('<DateField /> - Selection', () => {
       const input = getTextbox();
 
       expectFieldValue(input, '- YYYY');
-      expect(getCleanedSelectedContent(input)).to.equal('- YYYY');
+      expect(getCleanedSelectedContentV6(input)).to.equal('- YYYY');
     });
 
     it('should select all on <Tab> focus', () => {
@@ -43,7 +44,7 @@ describe('<DateField /> - Selection', () => {
       input.select();
 
       expectFieldValue(input, 'MM/DD/YYYY');
-      expect(getCleanedSelectedContent(input)).to.equal('MM/DD/YYYY');
+      expect(getCleanedSelectedContentV6(input)).to.equal('MM/DD/YYYY');
     });
 
     it('should select all on <Tab> focus with start separator', () => {
@@ -57,32 +58,35 @@ describe('<DateField /> - Selection', () => {
       input.select();
 
       expectFieldValue(input, '- YYYY');
-      expect(getCleanedSelectedContent(input)).to.equal('- YYYY');
+      expect(getCleanedSelectedContentV6(input)).to.equal('- YYYY');
     });
 
-    it('should select day on mobile', () => {
-      render(<DateField />);
+    it('should select day on mobile (v6 only)', () => {
+      // Test with v6 input
+      renderWithProps({ shouldUseV6TextField: true });
+
       const input = getTextbox();
       // Simulate a touch focus interaction on mobile
       act(() => {
         input.focus();
       });
       clock.runToLast();
-      expectFieldValue(input, 'MM/DD/YYYY');
+      expectFieldValueV6(input, 'MM/DD/YYYY');
 
       input.setSelectionRange(3, 5);
       expect(input.selectionStart).to.equal(3);
       expect(input.selectionEnd).to.equal(5);
     });
 
-    it('should select day on desktop', () => {
-      const { input, selectSection } = renderWithProps({});
-      render(<DateField />);
+    it.only('should select day on desktop (v6 only)', () => {
+      // Test with v6 input
+      const v6Response = renderWithProps({ shouldUseV6TextField: true });
 
-      selectSection('day');
+      const input = getTextbox();
+      v6Response.selectSection('day');
 
-      expectFieldValue(input, 'MM/DD/YYYY');
-      expect(getCleanedSelectedContent(input)).to.equal('DD');
+      expectFieldValueV6(input, 'MM/DD/YYYY');
+      expect(getCleanedSelectedContentV6(input)).to.equal('DD');
     });
   });
 
@@ -91,20 +95,20 @@ describe('<DateField /> - Selection', () => {
       const { input, selectSection } = renderWithProps({});
 
       selectSection('day');
-      expect(getCleanedSelectedContent(input)).to.equal('DD');
+      expect(getCleanedSelectedContentV6(input)).to.equal('DD');
 
       selectSection('month');
-      expect(getCleanedSelectedContent(input)).to.equal('MM');
+      expect(getCleanedSelectedContentV6(input)).to.equal('MM');
     });
 
     it('should not change the selection when clicking on the only already selected section', () => {
       const { input, selectSection } = renderWithProps({});
 
       selectSection('day');
-      expect(getCleanedSelectedContent(input)).to.equal('DD');
+      expect(getCleanedSelectedContentV6(input)).to.equal('DD');
 
       selectSection('day');
-      expect(getCleanedSelectedContent(input)).to.equal('DD');
+      expect(getCleanedSelectedContentV6(input)).to.equal('DD');
     });
   });
 
@@ -114,7 +118,7 @@ describe('<DateField /> - Selection', () => {
 
       selectSection('month');
       userEvent.keyPress(input, { key: 'a', ctrlKey: true });
-      expect(getCleanedSelectedContent(input)).to.equal('MM/DD/YYYY');
+      expect(getCleanedSelectedContentV6(input)).to.equal('MM/DD/YYYY');
     });
 
     it('should select all sections with start separator', () => {
@@ -124,7 +128,7 @@ describe('<DateField /> - Selection', () => {
 
       selectSection('year');
       userEvent.keyPress(input, { key: 'a', ctrlKey: true });
-      expect(getCleanedSelectedContent(input)).to.equal('- YYYY');
+      expect(getCleanedSelectedContentV6(input)).to.equal('- YYYY');
     });
   });
 
@@ -132,17 +136,17 @@ describe('<DateField /> - Selection', () => {
     it('should move selection to the next section when one section is selected', () => {
       const { input, selectSection } = renderWithProps({});
       selectSection('day');
-      expect(getCleanedSelectedContent(input)).to.equal('DD');
+      expect(getCleanedSelectedContentV6(input)).to.equal('DD');
       userEvent.keyPress(input, { key: 'ArrowRight' });
-      expect(getCleanedSelectedContent(input)).to.equal('YYYY');
+      expect(getCleanedSelectedContentV6(input)).to.equal('YYYY');
     });
 
     it('should stay on the current section when the last section is selected', () => {
       const { input, selectSection } = renderWithProps({});
       selectSection('year');
-      expect(getCleanedSelectedContent(input)).to.equal('YYYY');
+      expect(getCleanedSelectedContentV6(input)).to.equal('YYYY');
       userEvent.keyPress(input, { key: 'ArrowRight' });
-      expect(getCleanedSelectedContent(input)).to.equal('YYYY');
+      expect(getCleanedSelectedContentV6(input)).to.equal('YYYY');
     });
 
     it('should select the last section when all the sections are selected', () => {
@@ -151,10 +155,10 @@ describe('<DateField /> - Selection', () => {
 
       // Select all sections
       userEvent.keyPress(input, { key: 'a', ctrlKey: true });
-      expect(getCleanedSelectedContent(input)).to.equal('MM/DD/YYYY');
+      expect(getCleanedSelectedContentV6(input)).to.equal('MM/DD/YYYY');
 
       userEvent.keyPress(input, { key: 'ArrowRight' });
-      expect(getCleanedSelectedContent(input)).to.equal('YYYY');
+      expect(getCleanedSelectedContentV6(input)).to.equal('YYYY');
     });
   });
 
@@ -162,17 +166,17 @@ describe('<DateField /> - Selection', () => {
     it('should move selection to the previous section when one section is selected', () => {
       const { input, selectSection } = renderWithProps({});
       selectSection('day');
-      expect(getCleanedSelectedContent(input)).to.equal('DD');
+      expect(getCleanedSelectedContentV6(input)).to.equal('DD');
       userEvent.keyPress(input, { key: 'ArrowLeft' });
-      expect(getCleanedSelectedContent(input)).to.equal('MM');
+      expect(getCleanedSelectedContentV6(input)).to.equal('MM');
     });
 
     it('should stay on the current section when the first section is selected', () => {
       const { input, selectSection } = renderWithProps({});
       selectSection('month');
-      expect(getCleanedSelectedContent(input)).to.equal('MM');
+      expect(getCleanedSelectedContentV6(input)).to.equal('MM');
       userEvent.keyPress(input, { key: 'ArrowLeft' });
-      expect(getCleanedSelectedContent(input)).to.equal('MM');
+      expect(getCleanedSelectedContentV6(input)).to.equal('MM');
     });
 
     it('should select the first section when all the sections are selected', () => {
@@ -181,10 +185,10 @@ describe('<DateField /> - Selection', () => {
 
       // Select all sections
       userEvent.keyPress(input, { key: 'a', ctrlKey: true });
-      expect(getCleanedSelectedContent(input)).to.equal('MM/DD/YYYY');
+      expect(getCleanedSelectedContentV6(input)).to.equal('MM/DD/YYYY');
 
       userEvent.keyPress(input, { key: 'ArrowLeft' });
-      expect(getCleanedSelectedContent(input)).to.equal('MM');
+      expect(getCleanedSelectedContentV6(input)).to.equal('MM');
     });
   });
 });

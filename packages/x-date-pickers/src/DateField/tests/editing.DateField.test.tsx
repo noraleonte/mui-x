@@ -1859,7 +1859,6 @@ describe('<DateField /> - Editing', () => {
       v6Response.setProps({ value: adapter.date(new Date(2022, 10, 23)) });
       expectFieldValueV6(input, '11/23/2022');
 
-      // not using clickOnField here because it will call `runLast` on the fake timer
       act(() => {
         fireEvent.mouseDown(input);
         fireEvent.mouseUp(input);

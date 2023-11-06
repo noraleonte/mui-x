@@ -27,6 +27,12 @@ export interface BuildFieldInteractionsResponse<P extends { shouldUseV6TextField
     selectSection: FieldSectionSelector;
     fieldContainer: HTMLDivElement;
     /**
+     * Returns the contentEditable DOM node of the requested section.
+     * @param {number} sectionIndex The index of the requested section.
+     * @returns {HTMLSpanElement} The contentEditable DOM node of the requested section.
+     */
+    getSection: (sectionIndex: number) => HTMLSpanElement;
+    /**
      * Returns the contentEditable DOM node of the active section.
      * @param {number | undefined} sectionIndex If defined, asserts that the active section is the expected one.
      * @returns {HTMLSpanElement} The contentEditable DOM node of the active section.
@@ -34,7 +40,6 @@ export interface BuildFieldInteractionsResponse<P extends { shouldUseV6TextField
     getActiveSection: (sectionIndex: number | undefined) => HTMLSpanElement;
     getHiddenInput: () => HTMLInputElement;
   };
-  clickOnField: (container: HTMLDivElement, sectionIndex: number) => void;
   testFieldKeyPress: (
     params: P & {
       key: string;
@@ -52,27 +57,11 @@ export interface BuildFieldInteractionsResponse<P extends { shouldUseV6TextField
 }
 
 export const buildFieldInteractions = <P extends { shouldUseV6TextField?: boolean }>({
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   clock,
   render,
   Component,
 }: BuildFieldInteractionsParams<P>): BuildFieldInteractionsResponse<P> => {
-  const clickOnField: BuildFieldInteractionsResponse<P>['clickOnField'] = (
-    container,
-    sectionIndex,
-  ) => {
-    const inputToClick = container.querySelector<HTMLInputElement>(
-      `data[data-sectionindex="${sectionIndex}"] input`,
-    )!;
-
-    act(() => {
-      fireEvent.mouseDown(inputToClick);
-      fireEvent.mouseUp(inputToClick);
-      fireEvent.click(inputToClick);
-
-      clock.runToLast();
-    });
-  };
-
   const renderWithProps: BuildFieldInteractionsResponse<P>['renderWithProps'] = (
     props,
     hook,
@@ -121,6 +110,11 @@ export const buildFieldInteractions = <P extends { shouldUseV6TextField?: boolea
 
     const result = render(<WrappedComponent {...(props as any)} />);
 
+    const getSection = (sectionIndex: number) =>
+      fieldContainerRef.current!.querySelector<HTMLSpanElement>(
+        `span[data-sectionindex="${sectionIndex}"] .content`,
+      )!;
+
     const selectSection: FieldSectionSelector = (selectedSection, index = 'first') => {
       let sectionIndexToSelect: number;
       if (selectedSection === undefined) {
@@ -143,11 +137,7 @@ export const buildFieldInteractions = <P extends { shouldUseV6TextField?: boolea
 
       act(() => {
         if (!props.shouldUseV6TextField) {
-          fieldContainerRef
-            .current!.querySelector<HTMLSpanElement>(
-              `span[data-sectionindex="${sectionIndexToSelect}"] .content`,
-            )!
-            .focus();
+          getSection(sectionIndexToSelect).focus();
         }
       });
     };
@@ -165,6 +155,7 @@ export const buildFieldInteractions = <P extends { shouldUseV6TextField?: boolea
     return {
       selectSection,
       getActiveSection,
+      getSection,
       getHiddenInput: () => fieldContainerRef.current!.querySelector<HTMLInputElement>('input')!,
       fieldContainer: fieldContainerRef.current!,
       ...result,
@@ -232,7 +223,7 @@ export const buildFieldInteractions = <P extends { shouldUseV6TextField?: boolea
     v6Response.unmount();
   };
 
-  return { clickOnField, testFieldKeyPress, testFieldChange, renderWithProps };
+  return { testFieldKeyPress, testFieldChange, renderWithProps };
 };
 
 export const cleanText = (text: string, specialCase?: 'singleDigit' | 'RTL') => {
@@ -247,5 +238,5 @@ export const cleanText = (text: string, specialCase?: 'singleDigit' | 'RTL') => 
   }
 };
 
-export const getCleanedSelectedContent = (input: HTMLInputElement) =>
+export const getCleanedSelectedContentV6 = (input: HTMLInputElement) =>
   cleanText(input.value.slice(input.selectionStart ?? 0, input.selectionEnd ?? 0));
