@@ -5,7 +5,7 @@ import { act, userEvent } from '@mui-internal/test-utils';
 import {
   adapterToUse,
   buildFieldInteractions,
-  getCleanedSelectedContentV6,
+  getCleanedSelectedContent,
   getTextbox,
   createPickerRenderer,
   expectFieldValue,
@@ -25,7 +25,7 @@ describe('<SingleInputDateRangeField /> - Selection', () => {
       const input = getTextbox();
 
       expectFieldValue(input, 'MM/DD/YYYY – MM/DD/YYYY');
-      expect(getCleanedSelectedContentV6(input)).to.equal('MM/DD/YYYY – MM/DD/YYYY');
+      expect(getCleanedSelectedContent(input)).to.equal('MM/DD/YYYY – MM/DD/YYYY');
     });
 
     it('should select all on <Tab> focus', () => {
@@ -39,7 +39,7 @@ describe('<SingleInputDateRangeField /> - Selection', () => {
       input.select();
 
       expectFieldValue(input, 'MM/DD/YYYY – MM/DD/YYYY');
-      expect(getCleanedSelectedContentV6(input)).to.equal('MM/DD/YYYY – MM/DD/YYYY');
+      expect(getCleanedSelectedContent(input)).to.equal('MM/DD/YYYY – MM/DD/YYYY');
     });
   });
 
@@ -51,17 +51,17 @@ describe('<SingleInputDateRangeField /> - Selection', () => {
 
       // Start date
       selectSection('day');
-      expect(getCleanedSelectedContentV6(input)).to.equal('DD');
+      expect(getCleanedSelectedContent(input)).to.equal('DD');
 
       selectSection('month');
-      expect(getCleanedSelectedContentV6(input)).to.equal('MM');
+      expect(getCleanedSelectedContent(input)).to.equal('MM');
 
       // End date
       selectSection('month', 'last');
-      expect(getCleanedSelectedContentV6(input)).to.equal('02');
+      expect(getCleanedSelectedContent(input)).to.equal('02');
 
       selectSection('day', 'last');
-      expect(getCleanedSelectedContentV6(input)).to.equal('24');
+      expect(getCleanedSelectedContent(input)).to.equal('24');
     });
 
     it('should not change the selection when clicking on the only already selected section', () => {
@@ -71,17 +71,17 @@ describe('<SingleInputDateRangeField /> - Selection', () => {
 
       // Start date
       selectSection('day');
-      expect(getCleanedSelectedContentV6(input)).to.equal('DD');
+      expect(getCleanedSelectedContent(input)).to.equal('DD');
 
       selectSection('day');
-      expect(getCleanedSelectedContentV6(input)).to.equal('DD');
+      expect(getCleanedSelectedContent(input)).to.equal('DD');
 
       // End date
       selectSection('day', 'last');
-      expect(getCleanedSelectedContentV6(input)).to.equal('24');
+      expect(getCleanedSelectedContent(input)).to.equal('24');
 
       selectSection('day', 'last');
-      expect(getCleanedSelectedContentV6(input)).to.equal('24');
+      expect(getCleanedSelectedContent(input)).to.equal('24');
     });
   });
 
@@ -90,31 +90,31 @@ describe('<SingleInputDateRangeField /> - Selection', () => {
       const { input, selectSection } = renderWithProps({});
 
       selectSection('month');
-      expect(getCleanedSelectedContentV6(input)).to.equal('MM');
+      expect(getCleanedSelectedContent(input)).to.equal('MM');
 
       userEvent.keyPress(input, { key: 'ArrowRight' });
-      expect(getCleanedSelectedContentV6(input)).to.equal('DD');
+      expect(getCleanedSelectedContent(input)).to.equal('DD');
 
       userEvent.keyPress(input, { key: 'ArrowRight' });
-      expect(getCleanedSelectedContentV6(input)).to.equal('YYYY');
+      expect(getCleanedSelectedContent(input)).to.equal('YYYY');
 
       userEvent.keyPress(input, { key: 'ArrowRight' });
-      expect(getCleanedSelectedContentV6(input)).to.equal('MM');
+      expect(getCleanedSelectedContent(input)).to.equal('MM');
 
       userEvent.keyPress(input, { key: 'ArrowRight' });
-      expect(getCleanedSelectedContentV6(input)).to.equal('DD');
+      expect(getCleanedSelectedContent(input)).to.equal('DD');
 
       userEvent.keyPress(input, { key: 'ArrowRight' });
-      expect(getCleanedSelectedContentV6(input)).to.equal('YYYY');
+      expect(getCleanedSelectedContent(input)).to.equal('YYYY');
     });
 
     it('should stay on the current section when the last section is selected', () => {
       const { input, selectSection } = renderWithProps({});
 
       selectSection('year', 'last');
-      expect(getCleanedSelectedContentV6(input)).to.equal('YYYY');
+      expect(getCleanedSelectedContent(input)).to.equal('YYYY');
       userEvent.keyPress(input, { key: 'ArrowRight' });
-      expect(getCleanedSelectedContentV6(input)).to.equal('YYYY');
+      expect(getCleanedSelectedContent(input)).to.equal('YYYY');
     });
   });
 
@@ -123,30 +123,30 @@ describe('<SingleInputDateRangeField /> - Selection', () => {
       const { input, selectSection } = renderWithProps({});
 
       selectSection('year', 'last');
-      expect(getCleanedSelectedContentV6(input)).to.equal('YYYY');
+      expect(getCleanedSelectedContent(input)).to.equal('YYYY');
       userEvent.keyPress(input, { key: 'ArrowLeft' });
-      expect(getCleanedSelectedContentV6(input)).to.equal('DD');
+      expect(getCleanedSelectedContent(input)).to.equal('DD');
 
       userEvent.keyPress(input, { key: 'ArrowLeft' });
-      expect(getCleanedSelectedContentV6(input)).to.equal('MM');
+      expect(getCleanedSelectedContent(input)).to.equal('MM');
 
       userEvent.keyPress(input, { key: 'ArrowLeft' });
-      expect(getCleanedSelectedContentV6(input)).to.equal('YYYY');
+      expect(getCleanedSelectedContent(input)).to.equal('YYYY');
 
       userEvent.keyPress(input, { key: 'ArrowLeft' });
-      expect(getCleanedSelectedContentV6(input)).to.equal('DD');
+      expect(getCleanedSelectedContent(input)).to.equal('DD');
 
       userEvent.keyPress(input, { key: 'ArrowLeft' });
-      expect(getCleanedSelectedContentV6(input)).to.equal('MM');
+      expect(getCleanedSelectedContent(input)).to.equal('MM');
     });
 
     it('should stay on the current section when the first section is selected', () => {
       const { input, selectSection } = renderWithProps({});
 
       selectSection('month');
-      expect(getCleanedSelectedContentV6(input)).to.equal('MM');
+      expect(getCleanedSelectedContent(input)).to.equal('MM');
       userEvent.keyPress(input, { key: 'ArrowLeft' });
-      expect(getCleanedSelectedContentV6(input)).to.equal('MM');
+      expect(getCleanedSelectedContent(input)).to.equal('MM');
     });
   });
 });

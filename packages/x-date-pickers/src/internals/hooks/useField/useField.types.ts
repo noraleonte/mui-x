@@ -140,6 +140,10 @@ export interface UseFieldInternalProps<TValue, TDate, TSection extends FieldSect
    * @defauilt false
    */
   shouldUseV6TextField?: boolean;
+  /**
+   * If `true`, the `input` element is focused during the first mount.
+   */
+  autoFocus?: boolean;
 }
 
 export interface UseFieldForwardedProps {
@@ -172,6 +176,7 @@ export type UseFieldResponse<
     ? {
         textField: 'v6';
         inputRef: React.Ref<HTMLInputElement>;
+        autoFocus?: boolean;
       }
     : {
         textField: 'v7';
@@ -413,7 +418,6 @@ export interface UseFieldTextFieldInteractions {
    * @returns {number | null} The index of the active section.
    */
   getActiveSectionIndexFromDOM: () => number | null;
-  isFocused: () => boolean;
   focusField: () => void;
 }
 

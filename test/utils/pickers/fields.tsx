@@ -238,5 +238,4 @@ export const cleanText = (text: string, specialCase?: 'singleDigit' | 'RTL') => 
   }
 };
 
-export const getCleanedSelectedContentV6 = (input: HTMLInputElement) =>
-  cleanText(input.value.slice(input.selectionStart ?? 0, input.selectionEnd ?? 0));
+export const getCleanedSelectedContent = () => cleanText(document.getSelection()?.toString() ?? '');

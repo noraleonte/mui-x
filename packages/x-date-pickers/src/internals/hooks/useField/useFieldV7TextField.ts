@@ -38,7 +38,7 @@ export const useFieldV7TextField = <
   params: UseFieldV7TextFieldParams<TValue, TDate, TSection, TForwardedProps, TInternalProps>,
 ) => {
   const {
-    internalProps: { readOnly, disabled },
+    internalProps: { readOnly, disabled, autoFocus },
     forwardedProps: { ref: inContainerRef, onPaste, onBlur, onFocus = noop, onClick = noop },
     fieldValueManager,
     applyCharacterEditing,
@@ -106,7 +106,6 @@ export const useFieldV7TextField = <
           getActiveElement(document) as HTMLSpanElement | undefined,
         );
       },
-      isFocused: () => isFocusInsideContainer(containerRef),
       focusField: () => containerRef.current?.focus(),
     }),
     [containerRef, parsedSelectedSections],
@@ -365,6 +364,13 @@ export const useFieldV7TextField = <
     () => fieldValueManager.getV7HiddenInputValueFromSections(state.sections),
     [state.sections, fieldValueManager],
   );
+
+  React.useEffect(() => {
+    if (autoFocus && containerRef.current) {
+      setSelectedSections('all');
+      containerRef.current.focus();
+    }
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   return {
     interactions,

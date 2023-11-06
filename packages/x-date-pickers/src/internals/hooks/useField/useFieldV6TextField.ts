@@ -86,7 +86,7 @@ export const useFieldV6TextField = <
   const focusTimeoutRef = React.useRef<NodeJS.Timeout | undefined>(undefined);
 
   const {
-    internalProps: { readOnly },
+    internalProps: { readOnly, autoFocus },
     forwardedProps: { onFocus, onClick, onPaste, onBlur, inputRef: inputRefProp },
     parsedSelectedSections,
     activeSectionIndex,
@@ -176,7 +176,6 @@ export const useFieldV6TextField = <
               );
         return nextSectionIndex === -1 ? sections.length - 1 : nextSectionIndex - 1;
       },
-      isFocused: () => !!inputRef.current && inputRef.current === getActiveElement(document),
       focusField: () => inputRef.current?.focus(),
     }),
     [inputRef, parsedSelectedSections, sections],
@@ -388,8 +387,13 @@ export const useFieldV6TextField = <
   );
 
   React.useEffect(() => {
+    // Select the all the sections when focused on mount (`autoFocus = true` on the input)
+    if (inputRef.current && inputRef.current === getActiveElement(document)) {
+      setSelectedSections('all');
+    }
+
     return () => window.clearTimeout(focusTimeoutRef.current);
-  }, []);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const inputHasFocus = inputRef.current && inputRef.current === getActiveElement(document);
   const shouldShowPlaceholder = !inputHasFocus && areAllSectionsEmpty;
@@ -407,6 +411,7 @@ export const useFieldV6TextField = <
       onPaste: handleInputPaste,
       onBlur: handleContainerBlur,
       inputRef: handleRef,
+      autoFocus,
     },
   };
 };

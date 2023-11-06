@@ -222,13 +222,6 @@ export const useField = <
     }
   }, [state.referenceValue, activeSectionIndex, inputError]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  React.useEffect(() => {
-    // Select the all the sections when focused on mount (`autoFocus = true` on the input)
-    if (interactions.isFocused()) {
-      setSelectedSections('all');
-    }
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
-
   // If `tempValueStrAndroid` is still defined for some section when running `useEffect`,
   // Then `onChange` has only been called once, which means the user pressed `Backspace` to reset the section.
   // This causes a small flickering on Android,

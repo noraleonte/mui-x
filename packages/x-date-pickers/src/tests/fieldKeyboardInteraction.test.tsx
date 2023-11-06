@@ -6,7 +6,7 @@ import { userEvent } from '@mui-internal/test-utils';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import {
   buildFieldInteractions,
-  getCleanedSelectedContentV6,
+  getCleanedSelectedContent,
   getTextbox,
   createPickerRenderer,
   expectFieldValue,
@@ -89,7 +89,7 @@ describe(`RTL - test arrows navigation`, () => {
     const expectedValues = ['hh', 'mm', 'YYYY', 'MM', 'DD', 'DD'];
 
     expectedValues.forEach((expectedValue) => {
-      expect(getCleanedSelectedContentV6(input)).to.equal(expectedValue);
+      expect(getCleanedSelectedContent(input)).to.equal(expectedValue);
       userEvent.keyPress(input, { key: 'ArrowRight' });
     });
   });
@@ -106,7 +106,7 @@ describe(`RTL - test arrows navigation`, () => {
     const expectedValues = ['DD', 'MM', 'YYYY', 'mm', 'hh', 'hh'];
 
     expectedValues.forEach((expectedValue) => {
-      expect(getCleanedSelectedContentV6(input)).to.equal(expectedValue);
+      expect(getCleanedSelectedContent(input)).to.equal(expectedValue);
       userEvent.keyPress(input, { key: 'ArrowLeft' });
     });
   });
@@ -124,7 +124,7 @@ describe(`RTL - test arrows navigation`, () => {
     const expectedValues = ['11', '54', '1397', '02', '05', '05'];
 
     expectedValues.forEach((expectedValue) => {
-      expect(getCleanedSelectedContentV6(input)).to.equal(expectedValue);
+      expect(getCleanedSelectedContent(input)).to.equal(expectedValue);
       userEvent.keyPress(input, { key: 'ArrowRight' });
     });
   });
@@ -142,7 +142,7 @@ describe(`RTL - test arrows navigation`, () => {
     const expectedValues = ['05', '02', '1397', '54', '11', '11'];
 
     expectedValues.forEach((expectedValue) => {
-      expect(getCleanedSelectedContentV6(input)).to.equal(expectedValue);
+      expect(getCleanedSelectedContent(input)).to.equal(expectedValue);
       userEvent.keyPress(input, { key: 'ArrowLeft' });
     });
   });

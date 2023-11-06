@@ -1,7 +1,9 @@
 import * as React from 'react';
+import useEnhancedEffect from '@mui/utils/useEnhancedEffect';
 import Box from '@mui/material/Box';
 import { styled } from '@mui/material/styles';
 import { visuallyHidden } from '@mui/utils';
+import useForkRef from '@mui/utils/useForkRef';
 
 export interface FakeTextFieldElement {
   container: React.HTMLAttributes<HTMLSpanElement>;
@@ -52,6 +54,9 @@ export const FakeTextField = React.forwardRef(function FakeTextField(
     ...other
   } = props;
 
+  const rootRef = React.useRef<HTMLDivElement>(null);
+  const handleRef = useForkRef(ref, rootRef);
+
   let children: React.ReactNode;
   if (other.contentEditable) {
     children = elements
@@ -72,6 +77,7 @@ export const FakeTextField = React.forwardRef(function FakeTextField(
           onChange={onValueStrChange}
           id={id}
           aria-hidden="true"
+          tabIndex={-1}
         />
       </React.Fragment>
     );
@@ -79,7 +85,7 @@ export const FakeTextField = React.forwardRef(function FakeTextField(
 
   return (
     <Box
-      ref={ref}
+      ref={handleRef}
       {...other}
       style={{
         display: 'inline-block',
