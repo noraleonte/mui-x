@@ -455,6 +455,10 @@ DesktopDateTimePicker.propTypes = {
    */
   shouldDisableYear: PropTypes.func,
   /**
+   * @defauilt false
+   */
+  shouldUseV6TextField: PropTypes.bool,
+  /**
    * If `true`, days outside the current month are rendered:
    *
    * - if `fixedWeekNumber` is defined, renders days to have the weeks requested.

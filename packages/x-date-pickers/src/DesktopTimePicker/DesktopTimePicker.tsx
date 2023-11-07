@@ -348,6 +348,10 @@ DesktopTimePicker.propTypes = {
    */
   shouldDisableTime: PropTypes.func,
   /**
+   * @defauilt false
+   */
+  shouldUseV6TextField: PropTypes.bool,
+  /**
    * If `true`, disabled digital clock items will not be rendered.
    * @default false
    */

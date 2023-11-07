@@ -311,6 +311,10 @@ MobileTimePicker.propTypes = {
    */
   shouldDisableTime: PropTypes.func,
   /**
+   * @defauilt false
+   */
+  shouldUseV6TextField: PropTypes.bool,
+  /**
    * The props used for each component slot.
    * @default {}
    */
