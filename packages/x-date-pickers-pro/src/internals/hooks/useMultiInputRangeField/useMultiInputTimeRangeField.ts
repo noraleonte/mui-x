@@ -70,6 +70,7 @@ export const useMultiInputTimeRangeField = <TDate, TTextFieldSlotProps extends {
     onChange,
     disabled,
     readOnly,
+    autoFocus,
   } = sharedProps;
 
   const { value, handleValueChange, timezone } = useControlledValueWithTimezone({
@@ -132,6 +133,7 @@ export const useMultiInputTimeRangeField = <TDate, TTextFieldSlotProps extends {
     value: valueProp === undefined ? undefined : valueProp[0],
     defaultValue: defaultValue === undefined ? undefined : defaultValue[0],
     onChange: handleStartDateChange,
+    autoFocus, // Do not add on end field.
   };
 
   const endFieldProps: UseTimeFieldComponentProps<

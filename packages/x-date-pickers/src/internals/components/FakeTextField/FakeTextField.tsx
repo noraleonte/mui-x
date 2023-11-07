@@ -1,5 +1,4 @@
 import * as React from 'react';
-import useEnhancedEffect from '@mui/utils/useEnhancedEffect';
 import Box from '@mui/material/Box';
 import { styled } from '@mui/material/styles';
 import { visuallyHidden } from '@mui/utils';
@@ -25,6 +24,7 @@ interface FakeTextFieldProps {
   ownerState?: any;
   valueType: 'value' | 'placeholder';
   contentEditable?: boolean;
+  fullWidth?: boolean;
 }
 
 const FakeTextFieldRoot = styled(Box, {
@@ -56,6 +56,7 @@ export const FakeTextField = React.forwardRef(function FakeTextField(
     autoFocus,
     disabled,
     valueType,
+    fullWidth,
     ownerState,
     ...other
   } = props;

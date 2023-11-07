@@ -16,6 +16,7 @@ import {
   FieldsTextFieldProps,
   uncapitalizeObjectKeys,
   FakeTextField,
+  useConvertFieldResponseIntoMuiTextFieldProps,
 } from '@mui/x-date-pickers/internals';
 import { MultiInputDateRangeFieldProps } from './MultiInputDateRangeField.types';
 import { useMultiInputDateRangeField } from '../internals/hooks/useMultiInputRangeField/useMultiInputDateRangeField';
@@ -83,14 +84,13 @@ const MultiInputDateRangeField = React.forwardRef(function MultiInputDateRangeFi
     name: 'MuiMultiInputDateRangeField',
   });
 
-  const { internalProps: dateFieldInternalProps, forwardedProps } =
-    splitFieldInternalAndForwardedProps<
-      typeof themeProps,
-      keyof Omit<
-        UseDateRangeFieldProps<any>,
-        'unstableFieldRef' | 'disabled' | 'clearable' | 'onClear'
-      >
-    >(themeProps, 'date');
+  const { internalProps, forwardedProps } = splitFieldInternalAndForwardedProps<
+    typeof themeProps,
+    keyof Omit<
+      UseDateRangeFieldProps<any>,
+      'unstableFieldRef' | 'disabled' | 'clearable' | 'onClear'
+    >
+  >(themeProps, 'date');
 
   const {
     slots: innerSlots,
@@ -98,7 +98,6 @@ const MultiInputDateRangeField = React.forwardRef(function MultiInputDateRangeFi
     components,
     componentsProps,
     disabled,
-    autoFocus,
     unstableStartFieldRef,
     unstableEndFieldRef,
     className,
@@ -130,7 +129,6 @@ const MultiInputDateRangeField = React.forwardRef(function MultiInputDateRangeFi
   const startTextFieldProps: FieldsTextFieldProps = useSlotProps({
     elementType: TextField,
     externalSlotProps: slotProps?.textField,
-    additionalProps: { autoFocus },
     ownerState: { ...ownerState, position: 'start' },
   });
   const endTextFieldProps: FieldsTextFieldProps = useSlotProps({
@@ -148,18 +146,21 @@ const MultiInputDateRangeField = React.forwardRef(function MultiInputDateRangeFi
   });
 
   const fieldResponse = useMultiInputDateRangeField<TDate, FieldsTextFieldProps>({
-    sharedProps: { ...dateFieldInternalProps, disabled },
+    sharedProps: { ...internalProps, disabled },
     startTextFieldProps,
     endTextFieldProps,
     unstableStartFieldRef,
     unstableEndFieldRef,
   });
 
+  const startDateProps = useConvertFieldResponseIntoMuiTextFieldProps(fieldResponse.startDate);
+  const endDateProps = useConvertFieldResponseIntoMuiTextFieldProps(fieldResponse.endDate);
+
   return (
     <Root {...rootProps}>
-      <TextField fullWidth {...fieldResponse.startDate} />
+      <TextField fullWidth {...startDateProps} />
       <Separator {...separatorProps} />
-      <TextField fullWidth {...fieldResponse.endDate} />
+      <TextField fullWidth {...endDateProps} />
     </Root>
   );
 }) as MultiInputDateRangeFieldComponent;

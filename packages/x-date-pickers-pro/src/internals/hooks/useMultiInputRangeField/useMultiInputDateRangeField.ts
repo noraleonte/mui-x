@@ -54,6 +54,7 @@ export const useMultiInputDateRangeField = <TDate, TTextFieldSlotProps extends {
     onSelectedSectionsChange,
     timezone: timezoneProp,
     shouldUseV6TextField,
+    autoFocus,
   } = sharedProps;
 
   const { value, handleValueChange, timezone } = useControlledValueWithTimezone({
@@ -120,6 +121,7 @@ export const useMultiInputDateRangeField = <TDate, TTextFieldSlotProps extends {
     selectedSections,
     onSelectedSectionsChange,
     shouldUseV6TextField,
+    autoFocus, // Do not add on end field.
   };
 
   const endFieldProps: UseDateFieldComponentProps<

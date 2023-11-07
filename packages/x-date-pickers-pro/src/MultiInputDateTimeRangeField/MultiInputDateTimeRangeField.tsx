@@ -16,6 +16,7 @@ import {
   FieldsTextFieldProps,
   uncapitalizeObjectKeys,
   FakeTextField,
+  useConvertFieldResponseIntoMuiTextFieldProps,
 } from '@mui/x-date-pickers/internals';
 import { MultiInputDateTimeRangeFieldProps } from './MultiInputDateTimeRangeField.types';
 import { useMultiInputDateTimeRangeField } from '../internals/hooks/useMultiInputRangeField/useMultiInputDateTimeRangeField';
@@ -96,7 +97,6 @@ const MultiInputDateTimeRangeField = React.forwardRef(function MultiInputDateTim
     components,
     componentsProps,
     disabled,
-    autoFocus,
     unstableStartFieldRef,
     unstableEndFieldRef,
     className,
@@ -128,7 +128,6 @@ const MultiInputDateTimeRangeField = React.forwardRef(function MultiInputDateTim
   const startTextFieldProps: FieldsTextFieldProps = useSlotProps({
     elementType: TextField,
     externalSlotProps: slotProps?.textField,
-    additionalProps: { autoFocus },
     ownerState: { ...ownerState, position: 'start' },
   });
   const endTextFieldProps: FieldsTextFieldProps = useSlotProps({
@@ -153,11 +152,14 @@ const MultiInputDateTimeRangeField = React.forwardRef(function MultiInputDateTim
     unstableEndFieldRef,
   });
 
+  const startDateProps = useConvertFieldResponseIntoMuiTextFieldProps(fieldResponse.startDate);
+  const endDateProps = useConvertFieldResponseIntoMuiTextFieldProps(fieldResponse.endDate);
+
   return (
     <Root {...rootProps}>
-      <TextField fullWidth {...fieldResponse.startDate} />
+      <TextField fullWidth {...startDateProps} />
       <Separator {...separatorProps} />
-      <TextField fullWidth {...fieldResponse.endDate} />
+      <TextField fullWidth {...endDateProps} />
     </Root>
   );
 }) as MultiInputDateTimeRangeFieldComponent;

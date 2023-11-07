@@ -28,10 +28,6 @@ import {
   SingleInputDateRangeFieldProps,
 } from '@mui/x-date-pickers-pro/SingleInputDateRangeField';
 import { useClearableField } from '@mui/x-date-pickers/hooks';
-import type {
-  SingleInputDateRangeFieldSlotsComponent,
-  SingleInputDateRangeFieldSlotsComponentsProps,
-} from '@mui/x-date-pickers-pro/SingleInputDateRangeField/SingleInputDateRangeField.types';
 
 const joyTheme = extendJoyTheme();
 
