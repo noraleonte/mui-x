@@ -173,7 +173,7 @@ export const useFieldV7TextField = <
     containerRef.current.innerHTML = state.sections
       .map(
         (section) =>
-          `${section.startSeparator}${section.value ?? section.placeholder}${section.endSeparator}`,
+          `${section.startSeparator}${section.value || section.placeholder}${section.endSeparator}`,
       )
       .join('');
     interactions.syncSelectionToDOM();
@@ -181,7 +181,7 @@ export const useFieldV7TextField = <
     if (keyPressed.length === 0 || keyPressed.charCodeAt(0) === 10) {
       resetCharacterQuery();
       clearValue();
-      setSelectedSections(0);
+      setSelectedSections('all');
     } else {
       applyCharacterEditing({
         keyPressed,

@@ -14,7 +14,7 @@ export const testTextFieldValidation: DescribeValidationTestSuite = (ElementToTe
 
   const getFieldRoot = () => document.querySelector('.fake-text-field');
 
-  describe.only('text field:', () => {
+  describe('text field:', () => {
     it('should apply shouldDisableDate', function test() {
       if (['picker', 'field'].includes(componentFamily) && !withDate) {
         return;
