@@ -114,7 +114,7 @@ export const useDesktopPicker = <
       label,
       autoFocus: autoFocus && !props.open,
       focused: open ? true : undefined,
-      inputRef,
+      ...(inputRef ? { inputRef } : {}),
     },
     ownerState: props,
   });

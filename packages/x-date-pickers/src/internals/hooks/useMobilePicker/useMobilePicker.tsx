@@ -84,7 +84,7 @@ export const useMobilePicker = <
       formatDensity,
       timezone,
       label,
-      inputRef,
+      ...(inputRef ? { inputRef } : {}),
     },
     ownerState: props,
   });

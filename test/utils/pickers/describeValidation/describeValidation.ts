@@ -7,6 +7,7 @@ import { testTextFieldValidation } from './testTextFieldValidation';
 import { testYearViewValidation } from './testYearViewValidation';
 import { DescribeValidationInputOptions } from './describeValidation.types';
 import { testMinutesViewValidation } from './testMinutesViewValidation';
+import { PickerComponentFamily } from '../describe.types';
 
 const TEST_SUITES = [
   testYearViewValidation,

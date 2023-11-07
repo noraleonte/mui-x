@@ -27,6 +27,12 @@ interface FakeTextFieldProps {
   contentEditable?: boolean;
 }
 
+const FakeTextFieldRoot = styled(Box, {
+  name: 'MuiFakeTextField',
+  slot: 'Root',
+  overridesResolver: (props, styles) => styles.root,
+})({});
+
 const FakeTextFieldHiddenInput = styled('input', {
   name: 'MuiFakeTextField',
   slot: 'HiddenInput',
@@ -84,7 +90,7 @@ export const FakeTextField = React.forwardRef(function FakeTextField(
   }
 
   return (
-    <Box
+    <FakeTextFieldRoot
       ref={handleRef}
       {...other}
       style={{
@@ -94,8 +100,11 @@ export const FakeTextField = React.forwardRef(function FakeTextField(
         padding: '2px 4px',
         color: valueType === 'placeholder' ? 'grey' : 'black',
       }}
+      aria-invalid={error}
+      // TODO: Stop hard-coding
+      className="fake-text-field"
     >
       {children}
-    </Box>
+    </FakeTextFieldRoot>
   );
 });

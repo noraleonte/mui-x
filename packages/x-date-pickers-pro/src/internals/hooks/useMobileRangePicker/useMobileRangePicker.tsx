@@ -102,7 +102,7 @@ export const useMobileRangePicker = <
       format,
       formatDensity,
       timezone,
-      ...(fieldType === 'single-input' && { inputRef }),
+      ...(inputRef ? { inputRef } : {}),
     },
     ownerState: props,
   });
