@@ -121,8 +121,7 @@ export const buildFieldInteractions = <P extends { shouldUseV6TextField?: boolea
         sectionIndexToSelect = 0;
       } else {
         const sections = fieldRef.current!.getSections();
-        const cleanSections = index === 'first' ? sections : [...sections].reverse();
-        sectionIndexToSelect = cleanSections.findIndex(
+        sectionIndexToSelect = sections[index === 'first' ? 'findIndex' : 'findLastIndex'](
           (section) => section.type === selectedSection,
         );
       }

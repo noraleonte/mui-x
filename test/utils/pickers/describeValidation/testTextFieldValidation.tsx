@@ -24,7 +24,7 @@ export const testTextFieldValidation: DescribeValidationTestSuite = (ElementToTe
         <ElementToTest
           onError={onErrorMock}
           value={adapterToUse.date(new Date(2018, 2, 12))}
-          shouldDisableDate={(date) =>
+          shouldDisableDate={(date: any) =>
             adapterToUse.isAfter(date, adapterToUse.date(new Date(2018, 2, 10)))
           }
         />,
@@ -57,7 +57,7 @@ export const testTextFieldValidation: DescribeValidationTestSuite = (ElementToTe
         <ElementToTest
           onError={onErrorMock}
           value={adapterToUse.date(new Date(2018, 2, 12))}
-          shouldDisableYear={(date) => adapterToUse.getYear(date) === 2018}
+          shouldDisableYear={(date: any) => adapterToUse.getYear(date) === 2018}
         />,
       );
 
@@ -82,7 +82,7 @@ export const testTextFieldValidation: DescribeValidationTestSuite = (ElementToTe
       const { setProps } = render(
         <ElementToTest
           onError={onErrorMock}
-          shouldDisableMonth={(date) => adapterToUse.getMonth(date) === 2}
+          shouldDisableMonth={(date: any) => adapterToUse.getMonth(date) === 2}
           value={adapterToUse.date(new Date(2018, 2, 12))}
         />,
       );
@@ -155,7 +155,7 @@ export const testTextFieldValidation: DescribeValidationTestSuite = (ElementToTe
       const { setProps } = render(
         <ElementToTest
           onError={onErrorMock}
-          shouldDisableTime={(value, view: TimeView) => {
+          shouldDisableTime={(value: any, view: TimeView) => {
             let comparingValue = adapterToUse.getHours(value);
             if (view === 'minutes') {
               comparingValue = adapterToUse.getMinutes(value);
@@ -203,7 +203,7 @@ export const testTextFieldValidation: DescribeValidationTestSuite = (ElementToTe
       }
 
       let now;
-      function WithFakeTimer(props) {
+      function WithFakeTimer(props: any) {
         now = adapterToUse.date(new Date());
         return <ElementToTest value={now} {...props} />;
       }
@@ -236,7 +236,7 @@ export const testTextFieldValidation: DescribeValidationTestSuite = (ElementToTe
       }
 
       let now;
-      function WithFakeTimer(props) {
+      function WithFakeTimer(props: any) {
         now = adapterToUse.date(new Date());
         return <ElementToTest value={now} {...props} />;
       }

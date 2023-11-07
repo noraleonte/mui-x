@@ -67,7 +67,7 @@ describe('<DateField /> - Selection', () => {
       expect(getCleanedSelectedContent()).to.equal('MM/DD/YYYY');
     });
 
-    it('should select all on <Tab> focus with start separator', () => {
+    it('should select all on <Tab> focus with start separator (v6 only)', () => {
       // Text with v6 input
       renderWithProps({ shouldUseV6TextField: true, format: `- ${adapterToUse.formats.year}` });
       const input = getTextbox();
