@@ -142,6 +142,7 @@ export interface UseFieldInternalProps<TValue, TDate, TSection extends FieldSect
   shouldUseV6TextField?: boolean;
   /**
    * If `true`, the `input` element is focused during the first mount.
+   * @default false
    */
   autoFocus?: boolean;
 }

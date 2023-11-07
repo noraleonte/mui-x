@@ -46,6 +46,7 @@ export interface DesktopRangeOnlyPickerProps<TDate>
     UseRangePositionProps {
   /**
    * If `true`, the start `input` element is focused during the first mount.
+   * @default false
    */
   autoFocus?: boolean;
 }

@@ -19,9 +19,9 @@ export type FieldSectionSelector = (
   index?: 'first' | 'last',
 ) => void;
 
-export interface BuildFieldInteractionsResponse<P extends { shouldUseV6TextField?: boolean }> {
+export interface BuildFieldInteractionsResponse<P extends {}> {
   renderWithProps: (
-    props: P,
+    props: P & { shouldUseV6TextField?: boolean },
     config?: {
       hook?: (props: P) => Record<string, any>;
       componentFamily?: 'picker' | 'field';
@@ -64,7 +64,7 @@ const RTL_THEME = createTheme({
   direction: 'rtl',
 });
 
-export const buildFieldInteractions = <P extends { shouldUseV6TextField?: boolean }>({
+export const buildFieldInteractions = <P extends {}>({
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   clock,
   render,
@@ -87,9 +87,10 @@ export const buildFieldInteractions = <P extends { shouldUseV6TextField?: boolea
         ...hookResult,
       } as any;
 
+      allProps.ref = fieldContainerRef;
+
       if (componentFamily === 'field') {
         allProps.unstableFieldRef = fieldRef;
-        allProps.ref = fieldContainerRef;
       } else {
         if (!allProps.slotProps) {
           allProps.slotProps = {};
@@ -108,8 +109,6 @@ export const buildFieldInteractions = <P extends { shouldUseV6TextField?: boolea
         } else {
           allProps.slotProps.field.unstableFieldRef = fieldRef;
         }
-
-        allProps.slotProps.field.ref = fieldContainerRef;
       }
 
       if (direction === 'rtl') {
