@@ -37,11 +37,11 @@ function innerDescribeValue<TValue, C extends PickerComponentFamily>(
   if (componentFamily === 'field' || componentFamily === 'picker') {
     const interactions = buildFieldInteractions({ clock, render, Component: ElementToTest });
 
-    renderWithProps = (props: any, hook?: any) =>
-      interactions.renderWithProps({ ...defaultProps, ...props }, hook, componentFamily);
+    renderWithProps = (props: any, config?: any) =>
+      interactions.renderWithProps({ ...defaultProps, ...props }, { ...config, componentFamily });
   } else {
-    renderWithProps = (props: any, hook?: any) => {
-      const response = render(<WrappedElementToTest {...props} hook={hook} />);
+    renderWithProps = (props: any) => {
+      const response = render(<WrappedElementToTest {...props} />);
 
       return {
         ...response,

@@ -80,7 +80,7 @@ export const testControlledUnControlled: DescribeValueTestSuite<any, any> = (
 
       const { selectSection } = renderWithProps(
         { value: values[0], onChange },
-        useControlledElement,
+        { hook: useControlledElement },
       );
       const newValue = setNewValue(values[0], { selectSection });
 

@@ -77,7 +77,7 @@ export const useFieldV7TextField = <
           return;
         }
 
-        const range = new Range();
+        const range = new window.Range();
 
         if (parsedSelectedSections === 'all') {
           range.selectNodeContents(containerRef.current);

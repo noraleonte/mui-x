@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { expect } from 'chai';
+import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { createRenderer, screen, userEvent, act, fireEvent } from '@mui-internal/test-utils';
 import { FieldRef, FieldSection, FieldSectionType } from '@mui/x-date-pickers/models';
 import { expectFieldValue, expectFieldValueV6 } from './assertions';
@@ -21,8 +22,11 @@ export type FieldSectionSelector = (
 export interface BuildFieldInteractionsResponse<P extends { shouldUseV6TextField?: boolean }> {
   renderWithProps: (
     props: P,
-    hook?: (props: P) => Record<string, any>,
-    componentFamily?: 'picker' | 'field',
+    config?: {
+      hook?: (props: P) => Record<string, any>;
+      componentFamily?: 'picker' | 'field';
+      direction?: 'rtl' | 'ltr';
+    },
   ) => ReturnType<ReturnType<typeof createRenderer>['render']> & {
     selectSection: FieldSectionSelector;
     fieldContainer: HTMLDivElement;
@@ -56,6 +60,10 @@ export interface BuildFieldInteractionsResponse<P extends { shouldUseV6TextField
   ) => void;
 }
 
+const RTL_THEME = createTheme({
+  direction: 'rtl',
+});
+
 export const buildFieldInteractions = <P extends { shouldUseV6TextField?: boolean }>({
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   clock,
@@ -64,8 +72,7 @@ export const buildFieldInteractions = <P extends { shouldUseV6TextField?: boolea
 }: BuildFieldInteractionsParams<P>): BuildFieldInteractionsResponse<P> => {
   const renderWithProps: BuildFieldInteractionsResponse<P>['renderWithProps'] = (
     props,
-    hook,
-    componentFamily = 'field',
+    { hook, componentFamily = 'field', direction = 'ltr' } = {},
   ) => {
     let fieldRef: React.RefObject<FieldRef<FieldSection>> = { current: null };
     let fieldContainerRef: React.RefObject<HTMLDivElement> = { current: null };
@@ -103,6 +110,14 @@ export const buildFieldInteractions = <P extends { shouldUseV6TextField?: boolea
         }
 
         allProps.slotProps.field.ref = fieldContainerRef;
+      }
+
+      if (direction === 'rtl') {
+        return (
+          <ThemeProvider theme={RTL_THEME}>
+            <Component {...(allProps as P)} />
+          </ThemeProvider>
+        );
       }
 
       return <Component {...(allProps as P)} />;

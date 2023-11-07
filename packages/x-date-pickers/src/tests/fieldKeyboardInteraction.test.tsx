@@ -75,16 +75,12 @@ describe(`RTL - test arrows navigation`, () => {
     moment.locale('en');
   });
 
-  const { clickOnField } = buildFieldInteractions({ clock, render, Component: DateTimeField });
+  const { renderWithProps } = buildFieldInteractions({ clock, render, Component: DateTimeField });
 
   it('should move selected section to the next section respecting RTL order in empty field', () => {
-    render(
-      <ThemeProvider theme={theme}>
-        <DateTimeField />
-      </ThemeProvider>,
-    );
-    const input = getTextbox();
-    clickOnField(input, 3);
+    const v7Response = renderWithProps({}, { direction: 'rtl' });
+
+    v7Response.selectSection('hours');
 
     const expectedValues = ['hh', 'mm', 'YYYY', 'MM', 'DD', 'DD'];
 

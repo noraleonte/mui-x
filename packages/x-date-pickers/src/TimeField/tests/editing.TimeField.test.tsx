@@ -10,7 +10,7 @@ import {
   getTextbox,
 } from 'test/utils/pickers';
 
-describe.only('<TimeField /> - Editing', () => {
+describe('<TimeField /> - Editing', () => {
   describeAdapters('key: ArrowDown', TimeField, ({ adapter, testFieldKeyPress }) => {
     describe('24 hours format (ArrowDown)', () => {
       it('should set the hour to 23 when no value is provided', () => {
