@@ -10,9 +10,23 @@ import {
   describePicker,
 } from 'test/utils/pickers';
 import { DesktopDateTimePicker } from '@mui/x-date-pickers/DesktopDateTimePicker';
+import { expect } from 'chai';
+import * as React from 'react';
 
 describe('<DesktopDateTimePicker /> - Describes', () => {
   const { render, clock } = createPickerRenderer({ clock: 'fake' });
+
+  it('should respect the `localeText` prop', function test() {
+    render(
+      <DesktopDateTimePicker
+        open
+        localeText={{ cancelButtonLabel: 'Custom cancel' }}
+        slotProps={{ actionBar: { actions: ['cancel'] } }}
+      />,
+    );
+
+    expect(screen.queryByText('Custom cancel')).not.to.equal(null);
+  });
 
   describePicker(DesktopDateTimePicker, { render, fieldType: 'single-input', variant: 'desktop' });
 

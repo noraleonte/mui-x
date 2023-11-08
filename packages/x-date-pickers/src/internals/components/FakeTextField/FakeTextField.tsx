@@ -27,11 +27,17 @@ interface FakeTextFieldProps {
   fullWidth?: boolean;
 }
 
-const FakeTextFieldRoot = styled(Box, {
+const FakeTextFieldRoot = styled('div', {
   name: 'MuiFakeTextField',
   slot: 'Root',
   overridesResolver: (props, styles) => styles.root,
-})({});
+})({
+  display: 'flex',
+  border: '1px solid black',
+  alignItems: 'center',
+  borderRadius: 4,
+  padding: '0 8px',
+});
 
 const FakeTextFieldInputContent = styled('div', {
   name: 'MuiFakeTextField',
@@ -41,6 +47,7 @@ const FakeTextFieldInputContent = styled('div', {
   /*! @noflip */
   direction: ltr;
   display: inline-block;
+  padding: 6px 0;
 `;
 
 const FakeTextFieldHiddenInput = styled('input', {
@@ -67,6 +74,7 @@ export const FakeTextField = React.forwardRef(function FakeTextField(
     disabled,
     valueType,
     fullWidth,
+    focused,
     ownerState,
     ...other
   } = props;
@@ -77,7 +85,7 @@ export const FakeTextField = React.forwardRef(function FakeTextField(
   let children: React.ReactNode;
   if (other.contentEditable) {
     children = (
-      <FakeTextFieldInputContent className="fake-text-field-input-content">
+      <FakeTextFieldInputContent className="fake-text-field-input-content" ref={InputProps.ref}>
         {elements
           .map(
             ({ content, before, after }) =>
@@ -89,7 +97,7 @@ export const FakeTextField = React.forwardRef(function FakeTextField(
   } else {
     children = (
       <React.Fragment>
-        <FakeTextFieldInputContent className="fake-text-field-input-content">
+        <FakeTextFieldInputContent className="fake-text-field-input-content" ref={InputProps.ref}>
           {elements.map(({ container, content, before, after }, elementIndex) => (
             <span {...container} key={elementIndex}>
               <span {...before} />
@@ -114,10 +122,6 @@ export const FakeTextField = React.forwardRef(function FakeTextField(
       ref={handleRef}
       {...other}
       style={{
-        display: 'inline-block',
-        border: '1px solid black',
-        borderRadius: 4,
-        padding: '2px 4px',
         color: valueType === 'placeholder' ? 'grey' : 'black',
       }}
       aria-invalid={error}
@@ -125,6 +129,7 @@ export const FakeTextField = React.forwardRef(function FakeTextField(
       className="fake-text-field"
     >
       {children}
+      {InputProps.endAdornment}
     </FakeTextFieldRoot>
   );
 });
