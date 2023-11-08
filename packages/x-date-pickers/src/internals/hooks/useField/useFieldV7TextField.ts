@@ -66,16 +66,15 @@ export const useFieldV7TextField = <
 
         const range = new window.Range();
 
-        if (parsedSelectedSections === 'all') {
-          range.selectNodeContents(containerRef.current);
-        } else {
-          range.selectNodeContents(
-            containerRef.current.querySelector(
-              `span[data-sectionindex="${parsedSelectedSections}"] .content`,
-            )!,
-          );
-        }
+        const target =
+          parsedSelectedSections === 'all'
+            ? containerRef.current.querySelector<HTMLDivElement>('.fake-text-field-input-content')!
+            : containerRef.current.querySelector<HTMLSpanElement>(
+                `span[data-sectionindex="${parsedSelectedSections}"] .content`,
+              )!;
 
+        range.selectNodeContents(target);
+        target.focus();
         selection.removeAllRanges();
         selection.addRange(range);
       },
@@ -162,7 +161,7 @@ export const useFieldV7TextField = <
     }
 
     const target = event.target as HTMLSpanElement;
-    const keyPressed = target.innerText;
+    const keyPressed = target.textContent;
 
     containerRef.current.innerHTML = state.sections
       .map(
@@ -270,7 +269,7 @@ export const useFieldV7TextField = <
 
   const handleInputContentInput = useEventCallback((event: React.FormEvent<HTMLSpanElement>) => {
     const target = event.target as HTMLSpanElement;
-    const keyPressed = target.innerText;
+    const keyPressed = target.textContent ?? '';
     const sectionIndex = getSectionIndexFromDOMElement(target)!;
     const section = state.sections[sectionIndex];
 

@@ -7,10 +7,9 @@ export const expectFieldValueV7 = (
   expectedValue: string,
   specialCase?: 'singleDigit' | 'RTL',
 ) => {
-  const value = cleanText(
-    fieldContainer.querySelector<HTMLDivElement>('.fake-text-field-input-content')!.innerText,
-    specialCase,
-  );
+  const content = fieldContainer.querySelector<HTMLDivElement>('.fake-text-field-input-content')!;
+
+  const value = cleanText(content.textContent ?? '', specialCase);
   return expect(value).to.equal(expectedValue);
 };
 

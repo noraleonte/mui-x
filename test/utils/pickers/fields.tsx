@@ -42,6 +42,12 @@ export interface BuildFieldInteractionsResponse<P extends {}> {
      * @returns {HTMLSpanElement} The contentEditable DOM node of the active section.
      */
     getActiveSection: (sectionIndex: number | undefined) => HTMLSpanElement;
+    /**
+     * Press a character on the active section.
+     * @param {number | undefined | null} sectionIndex If null presses on the fieldContainer, otherwise if defined asserts that the active section is the expected one
+     * @param {string} character The character to press.
+     */
+    pressCharacter: (sectionIndex: number | undefined | null, character: string) => void;
     getHiddenInput: () => HTMLInputElement;
   };
   testFieldKeyPress: (
@@ -159,16 +165,28 @@ export const buildFieldInteractions = <P extends {}>({
       const activeElement = document.activeElement! as HTMLSpanElement;
 
       if (sectionIndex !== undefined) {
-        expect(activeElement.parentElement!.dataset.sectionindex).to.equal(sectionIndex.toString());
+        const activeSectionIndex = activeElement.parentElement!.dataset.sectionindex;
+        expect(activeSectionIndex).to.equal(
+          sectionIndex.toString(),
+          `The active section should be ${sectionIndex.toString()} instead of ${activeSectionIndex}`,
+        );
       }
 
       return activeElement;
+    };
+
+    const pressCharacter = (sectionIndex: number | undefined | null, character: string) => {
+      const target =
+        sectionIndex === null ? fieldContainerRef.current! : getActiveSection(sectionIndex);
+
+      fireEvent.input(target, { target: { textContent: character } });
     };
 
     return {
       selectSection,
       getActiveSection,
       getSection,
+      pressCharacter,
       getHiddenInput: () => fieldContainerRef.current!.querySelector<HTMLInputElement>('input')!,
       fieldContainer: fieldContainerRef.current!,
       ...result,
@@ -208,9 +226,7 @@ export const buildFieldInteractions = <P extends {}>({
       const v7Response = renderWithProps(props as any as P);
       v7Response.selectSection(selectedSection);
       keyStrokes.forEach((keyStroke) => {
-        fireEvent.input(v7Response.getActiveSection(undefined), {
-          target: { innerText: keyStroke.value },
-        });
+        v7Response.pressCharacter(undefined, keyStroke.value);
         expectFieldValueV7(
           v7Response.fieldContainer,
           keyStroke.expected,
@@ -251,4 +267,12 @@ export const cleanText = (text: string, specialCase?: 'singleDigit' | 'RTL') => 
   }
 };
 
-export const getCleanedSelectedContent = () => cleanText(document.getSelection()?.toString() ?? '');
+export const getCleanedSelectedContent = () => {
+  // In JSDOM env, document.getSelection() does not work on inputs.
+  if (document.activeElement?.tagName === 'INPUT') {
+    const input = document.activeElement as HTMLInputElement;
+    return cleanText(input.value.slice(input.selectionStart ?? 0, input.selectionEnd ?? 0));
+  }
+
+  return cleanText(document.getSelection()?.toString() ?? '');
+};

@@ -1,4 +1,3 @@
-import * as React from 'react';
 import {
   createPickerRenderer,
   getTextbox,
@@ -20,24 +19,26 @@ describe('<DesktopDateTimePicker /> - Field', () => {
   });
 
   it('should pass the ampm prop to the field', () => {
-    const { setProps } = render(<DesktopDateTimePicker ampm />);
+    const v7Response = renderWithProps({ ampm: true });
 
-    const input = getTextbox();
-    expectInputPlaceholderV6(input, 'MM/DD/YYYY hh:mm aa');
+    expectFieldValueV7(v7Response.fieldContainer, 'MM/DD/YYYY hh:mm aa');
 
-    setProps({ ampm: false });
-    expectInputPlaceholderV6(input, 'MM/DD/YYYY hh:mm');
+    v7Response.setProps({ ampm: false });
+    expectFieldValueV7(v7Response.fieldContainer, 'MM/DD/YYYY hh:mm');
   });
 
   it('should adapt the default field format based on the props of the picker', () => {
     const testFormat = (props: DesktopDateTimePickerProps<any>, expectedFormat: string) => {
       // Test with v7 input
-      const v7Response = renderWithProps(props);
+      const v7Response = renderWithProps(props, { componentFamily: 'picker' });
       expectFieldValueV7(v7Response.fieldContainer, expectedFormat);
       v7Response.unmount();
 
       // Test with v6 input
-      const v6Response = renderWithProps({ ...props, shouldUseV6TextField: true });
+      const v6Response = renderWithProps(
+        { ...props, shouldUseV6TextField: true },
+        { componentFamily: 'picker' },
+      );
       const input = getTextbox();
       expectInputPlaceholderV6(input, expectedFormat);
       v6Response.unmount();

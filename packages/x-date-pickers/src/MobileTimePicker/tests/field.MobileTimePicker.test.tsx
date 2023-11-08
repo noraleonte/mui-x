@@ -1,17 +1,24 @@
-import * as React from 'react';
-import { createPickerRenderer, getTextbox, expectInputPlaceholderV6 } from 'test/utils/pickers';
+import {
+  createPickerRenderer,
+  buildFieldInteractions,
+  expectFieldValueV7,
+} from 'test/utils/pickers';
 import { MobileTimePicker } from '@mui/x-date-pickers/MobileTimePicker';
 
 describe('<MobileTimePicker /> - Field', () => {
-  const { render } = createPickerRenderer();
+  const { render, clock } = createPickerRenderer();
+  const { renderWithProps } = buildFieldInteractions({
+    render,
+    clock,
+    Component: MobileTimePicker,
+  });
 
   it('should pass the ampm prop to the field', () => {
-    const { setProps } = render(<MobileTimePicker ampm />);
+    const v7Response = renderWithProps({ ampm: true }, { componentFamily: 'picker' });
 
-    const input = getTextbox();
-    expectInputPlaceholderV6(input, 'hh:mm aa');
+    expectFieldValueV7(v7Response.fieldContainer, 'hh:mm aa');
 
-    setProps({ ampm: false });
-    expectInputPlaceholderV6(input, 'hh:mm');
+    v7Response.setProps({ ampm: false });
+    expectFieldValueV7(v7Response.fieldContainer, 'hh:mm');
   });
 });

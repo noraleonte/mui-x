@@ -33,13 +33,13 @@ describe('<DesktopDatePicker /> - Field', () => {
       v7Response.selectSection('month');
       expectFieldValueV7(v7Response.fieldContainer, 'MMMM DD');
 
-      fireEvent.input(v7Response.getActiveSection(0), { target: { innerText: 'N' } });
+      v7Response.pressCharacter(0, 'N');
       expectFieldValueV7(v7Response.fieldContainer, 'November DD');
 
-      fireEvent.input(v7Response.getActiveSection(1), { target: { innerText: '4' } });
+      v7Response.pressCharacter(1, '4');
       expectFieldValueV7(v7Response.fieldContainer, 'November 04');
 
-      fireEvent.input(v7Response.getActiveSection(1), { target: { innerText: '' } });
+      v7Response.pressCharacter(1, '');
       expectFieldValueV7(v7Response.fieldContainer, 'November DD');
 
       v7Response.unmount();
@@ -70,12 +70,15 @@ describe('<DesktopDatePicker /> - Field', () => {
     it('should adapt the default field format based on the props of the picker', () => {
       const testFormat = (props: DesktopDatePickerProps<any>, expectedFormat: string) => {
         // Test with v7 input
-        const v7Response = renderWithProps(props);
+        const v7Response = renderWithProps(props, { componentFamily: 'picker' });
         expectFieldValueV7(v7Response.fieldContainer, expectedFormat);
         v7Response.unmount();
 
         // Test with v6 input
-        const v6Response = renderWithProps({ ...props, shouldUseV6TextField: true });
+        const v6Response = renderWithProps(
+          { ...props, shouldUseV6TextField: true },
+          { componentFamily: 'picker' },
+        );
         const input = getTextbox();
         expectInputPlaceholderV6(input, expectedFormat);
         v6Response.unmount();
@@ -105,7 +108,7 @@ describe('<DesktopDatePicker /> - Field', () => {
       expectFieldValueV7(v7Response.fieldContainer, 'June 2022');
       v7Response.selectSection('month');
 
-      fireEvent.input(v7Response.getActiveSection(0), { target: { innerText: '' } });
+      v7Response.pressCharacter(0, '');
       expectFieldValueV7(v7Response.fieldContainer, 'MMMM 2022');
     });
   });

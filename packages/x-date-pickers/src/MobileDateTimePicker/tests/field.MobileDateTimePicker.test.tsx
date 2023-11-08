@@ -1,17 +1,24 @@
-import * as React from 'react';
 import { MobileDateTimePicker } from '@mui/x-date-pickers/MobileDateTimePicker';
-import { createPickerRenderer, getTextbox, expectInputPlaceholderV6 } from 'test/utils/pickers';
+import {
+  createPickerRenderer,
+  expectFieldValueV7,
+  buildFieldInteractions,
+} from 'test/utils/pickers';
 
 describe('<MobileDateTimePicker /> - Field', () => {
-  const { render } = createPickerRenderer();
+  const { render, clock } = createPickerRenderer();
+  const { renderWithProps } = buildFieldInteractions({
+    clock,
+    render,
+    Component: MobileDateTimePicker,
+  });
 
   it('should pass the ampm prop to the field', () => {
-    const { setProps } = render(<MobileDateTimePicker ampm />);
+    const v7Response = renderWithProps({ ampm: true });
 
-    const input = getTextbox();
-    expectInputPlaceholderV6(input, 'MM/DD/YYYY hh:mm aa');
+    expectFieldValueV7(v7Response.fieldContainer, 'MM/DD/YYYY hh:mm aa');
 
-    setProps({ ampm: false });
-    expectInputPlaceholderV6(input, 'MM/DD/YYYY hh:mm');
+    v7Response.setProps({ ampm: false });
+    expectFieldValueV7(v7Response.fieldContainer, 'MM/DD/YYYY hh:mm');
   });
 });

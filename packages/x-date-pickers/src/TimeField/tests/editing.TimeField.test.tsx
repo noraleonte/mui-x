@@ -257,7 +257,7 @@ describe('<TimeField /> - Editing', () => {
 
       v7Response.selectSection('hours');
 
-      fireEvent.input(v7Response.getActiveSection(0), { target: { innerText: '2' } });
+      v7Response.pressCharacter(0, '2');
       expectFieldValueV7(v7Response.fieldContainer, '02:mm aa');
       expect(getCleanedSelectedContent()).to.equal('mm');
 
@@ -284,12 +284,12 @@ describe('<TimeField /> - Editing', () => {
 
       v7Response.selectSection('hours');
 
-      fireEvent.input(v7Response.getActiveSection(0), { target: { innerText: '1' } });
+      v7Response.pressCharacter(0, '1');
       expectFieldValueV7(v7Response.fieldContainer, '01:mm aa');
       expect(getCleanedSelectedContent()).to.equal('01');
 
       // Press "3"
-      fireEvent.input(v7Response.getActiveSection(0), { target: { innerText: '3' } });
+      v7Response.pressCharacter(0, '3');
       expectFieldValueV7(v7Response.fieldContainer, '03:mm aa');
       expect(getCleanedSelectedContent()).to.equal('mm');
 
@@ -421,13 +421,13 @@ describe('<TimeField /> - Editing', () => {
 
         v7Response.selectSection('hours');
         fireEvent.keyDown(v7Response.getActiveSection(0), { key: 'a', ctrlKey: true });
-        fireEvent.input(v7Response.fieldContainer, { target: { innerText: '' } });
+        v7Response.pressCharacter(null, '');
         fireEvent.keyDown(v7Response.fieldContainer, { key: 'ArrowLeft' });
 
-        fireEvent.input(v7Response.getActiveSection(0), { target: { innerText: '3' } });
+        v7Response.pressCharacter(0, '3');
         expectFieldValueV7(v7Response.fieldContainer, '03:mm');
 
-        fireEvent.input(v7Response.getActiveSection(1), { target: { innerText: '4' } });
+        v7Response.pressCharacter(1, '4');
         expectFieldValueV7(v7Response.fieldContainer, '03:04');
         expect(onChangeV7.lastCall.firstArg).toEqualDateTime(new Date(2010, 3, 3, 3, 4, 3));
 
