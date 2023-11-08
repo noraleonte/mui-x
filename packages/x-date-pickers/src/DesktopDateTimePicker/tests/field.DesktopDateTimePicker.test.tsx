@@ -1,12 +1,23 @@
 import * as React from 'react';
-import { createPickerRenderer, getTextbox, expectInputPlaceholderV6 } from 'test/utils/pickers';
+import {
+  createPickerRenderer,
+  getTextbox,
+  expectInputPlaceholderV6,
+  expectFieldValueV7,
+  buildFieldInteractions,
+} from 'test/utils/pickers';
 import {
   DesktopDateTimePicker,
   DesktopDateTimePickerProps,
 } from '@mui/x-date-pickers/DesktopDateTimePicker';
 
 describe('<DesktopDateTimePicker /> - Field', () => {
-  const { render } = createPickerRenderer();
+  const { render, clock } = createPickerRenderer();
+  const { renderWithProps } = buildFieldInteractions({
+    clock,
+    render,
+    Component: DesktopDateTimePicker,
+  });
 
   it('should pass the ampm prop to the field', () => {
     const { setProps } = render(<DesktopDateTimePicker ampm />);
@@ -20,10 +31,16 @@ describe('<DesktopDateTimePicker /> - Field', () => {
 
   it('should adapt the default field format based on the props of the picker', () => {
     const testFormat = (props: DesktopDateTimePickerProps<any>, expectedFormat: string) => {
-      const { unmount } = render(<DesktopDateTimePicker {...props} />);
+      // Test with v7 input
+      const v7Response = renderWithProps(props);
+      expectFieldValueV7(v7Response.fieldContainer, expectedFormat);
+      v7Response.unmount();
+
+      // Test with v6 input
+      const v6Response = renderWithProps({ ...props, shouldUseV6TextField: true });
       const input = getTextbox();
       expectInputPlaceholderV6(input, expectedFormat);
-      unmount();
+      v6Response.unmount();
     };
 
     testFormat({ views: ['day', 'hours', 'minutes'], ampm: false }, 'DD hh:mm');

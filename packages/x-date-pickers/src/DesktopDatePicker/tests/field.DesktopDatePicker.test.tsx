@@ -1,4 +1,3 @@
-import * as React from 'react';
 import { fireEvent } from '@mui-internal/test-utils';
 import { DesktopDatePicker, DesktopDatePickerProps } from '@mui/x-date-pickers/DesktopDatePicker';
 import {
@@ -70,10 +69,16 @@ describe('<DesktopDatePicker /> - Field', () => {
 
     it('should adapt the default field format based on the props of the picker', () => {
       const testFormat = (props: DesktopDatePickerProps<any>, expectedFormat: string) => {
-        const { unmount } = render(<DesktopDatePicker {...props} />);
+        // Test with v7 input
+        const v7Response = renderWithProps(props);
+        expectFieldValueV7(v7Response.fieldContainer, expectedFormat);
+        v7Response.unmount();
+
+        // Test with v6 input
+        const v6Response = renderWithProps({ ...props, shouldUseV6TextField: true });
         const input = getTextbox();
         expectInputPlaceholderV6(input, expectedFormat);
-        unmount();
+        v6Response.unmount();
       };
 
       testFormat({ views: ['year'] }, 'YYYY');
