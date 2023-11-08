@@ -2,7 +2,7 @@ import * as React from 'react';
 import { expect } from 'chai';
 import moment from 'moment/moment';
 import jMoment from 'moment-jalaali';
-import { userEvent } from '@mui-internal/test-utils';
+import { fireEvent } from '@mui-internal/test-utils';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import {
   buildFieldInteractions,
@@ -78,32 +78,56 @@ describe(`RTL - test arrows navigation`, () => {
   const { renderWithProps } = buildFieldInteractions({ clock, render, Component: DateTimeField });
 
   it('should move selected section to the next section respecting RTL order in empty field', () => {
+    const expectedValues = ['hh', 'mm', 'YYYY', 'MM', 'DD', 'DD'];
+
+    // Test with v7 input
     const v7Response = renderWithProps({}, { direction: 'rtl' });
 
     v7Response.selectSection('hours');
 
-    const expectedValues = ['hh', 'mm', 'YYYY', 'MM', 'DD', 'DD'];
+    expectedValues.forEach((expectedValue) => {
+      expect(getCleanedSelectedContent()).to.equal(expectedValue);
+      fireEvent.keyDown(v7Response.getActiveSection(undefined), { key: 'ArrowRight' });
+    });
+
+    v7Response.unmount();
+
+    // Test with v6 input
+    const v6Response = renderWithProps({ shouldUseV6TextField: true }, { direction: 'rtl' });
+
+    const input = getTextbox();
+    v6Response.selectSection('hours');
 
     expectedValues.forEach((expectedValue) => {
-      expect(getCleanedSelectedContent(input)).to.equal(expectedValue);
-      userEvent.keyPress(input, { key: 'ArrowRight' });
+      expect(getCleanedSelectedContent()).to.equal(expectedValue);
+      fireEvent.keyDown(input, { key: 'ArrowRight' });
     });
   });
 
   it('should move selected section to the previous section respecting RTL order in empty field', () => {
-    render(
-      <ThemeProvider theme={theme}>
-        <DateTimeField />
-      </ThemeProvider>,
-    );
-    const input = getTextbox();
-    clickOnField(input, 2);
-
     const expectedValues = ['DD', 'MM', 'YYYY', 'mm', 'hh', 'hh'];
 
+    // Test with v7 input
+    const v7Response = renderWithProps({}, { direction: 'rtl' });
+
+    v7Response.selectSection('day');
+
     expectedValues.forEach((expectedValue) => {
-      expect(getCleanedSelectedContent(input)).to.equal(expectedValue);
-      userEvent.keyPress(input, { key: 'ArrowLeft' });
+      expect(getCleanedSelectedContent()).to.equal(expectedValue);
+      fireEvent.keyDown(v7Response.getActiveSection(undefined), { key: 'ArrowLeft' });
+    });
+
+    v7Response.unmount();
+
+    // Test with v6 input
+    const v6Response = renderWithProps({ shouldUseV6TextField: true }, { direction: 'rtl' });
+
+    const input = getTextbox();
+    v6Response.selectSection('day');
+
+    expectedValues.forEach((expectedValue) => {
+      expect(getCleanedSelectedContent()).to.equal(expectedValue);
+      fireEvent.keyDown(input, { key: 'ArrowLeft' });
     });
   });
 
@@ -121,7 +145,7 @@ describe(`RTL - test arrows navigation`, () => {
 
     expectedValues.forEach((expectedValue) => {
       expect(getCleanedSelectedContent(input)).to.equal(expectedValue);
-      userEvent.keyPress(input, { key: 'ArrowRight' });
+      fireEvent.keyDown(input, { key: 'ArrowRight' });
     });
   });
 
@@ -139,7 +163,7 @@ describe(`RTL - test arrows navigation`, () => {
 
     expectedValues.forEach((expectedValue) => {
       expect(getCleanedSelectedContent(input)).to.equal(expectedValue);
-      userEvent.keyPress(input, { key: 'ArrowLeft' });
+      fireEvent.keyDown(input, { key: 'ArrowLeft' });
     });
   });
 });
@@ -194,7 +218,7 @@ adapterToTest.forEach((adapterName) => {
       render(<DateTimeField defaultValue={initialValue} format={format} />);
       const input = getTextbox();
       clickOnField(input, 1);
-      userEvent.keyPress(input, { key });
+      fireEvent.keyDown(input, { key });
 
       expectFieldValueV7(
         input,
