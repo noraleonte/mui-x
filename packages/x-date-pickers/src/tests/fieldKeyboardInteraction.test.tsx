@@ -1,9 +1,7 @@
-import * as React from 'react';
 import { expect } from 'chai';
 import moment from 'moment/moment';
 import jMoment from 'moment-jalaali';
 import { fireEvent } from '@mui-internal/test-utils';
-import { createTheme, ThemeProvider } from '@mui/material/styles';
 import {
   buildFieldInteractions,
   getCleanedSelectedContent,
@@ -56,10 +54,6 @@ const adapterToTest = [
   // 'moment-hijri',
   'moment-jalaali',
 ] as const;
-
-const theme = createTheme({
-  direction: 'rtl',
-});
 
 describe(`RTL - test arrows navigation`, () => {
   const { render, clock, adapter } = createPickerRenderer({
@@ -132,37 +126,69 @@ describe(`RTL - test arrows navigation`, () => {
   });
 
   it('should move selected section to the next section respecting RTL order in non-empty field', () => {
-    render(
-      <ThemeProvider theme={theme}>
-        <DateTimeField defaultValue={adapter.date(new Date(2018, 3, 25, 11, 54))} />
-      </ThemeProvider>,
-    );
-    const input = getTextbox();
-    clickOnField(input, 3);
-
     // 25/04/2018 => 1397/02/05
     const expectedValues = ['11', '54', '1397', '02', '05', '05'];
 
+    // Test with v7 input
+    const v7Response = renderWithProps(
+      { defaultValue: adapter.date(new Date(2018, 3, 25, 11, 54)) },
+      { direction: 'rtl' },
+    );
+
+    v7Response.selectSection('hours');
+
     expectedValues.forEach((expectedValue) => {
-      expect(getCleanedSelectedContent(input)).to.equal(expectedValue);
+      expect(getCleanedSelectedContent()).to.equal(expectedValue);
+      fireEvent.keyDown(v7Response.getActiveSection(undefined), { key: 'ArrowRight' });
+    });
+
+    v7Response.unmount();
+
+    // Test with v6 input
+    const v6Response = renderWithProps(
+      { defaultValue: adapter.date(new Date(2018, 3, 25, 11, 54)), shouldUseV6TextField: true },
+      { direction: 'rtl' },
+    );
+
+    const input = getTextbox();
+    v6Response.selectSection('hours');
+
+    expectedValues.forEach((expectedValue) => {
+      expect(getCleanedSelectedContent()).to.equal(expectedValue);
       fireEvent.keyDown(input, { key: 'ArrowRight' });
     });
   });
 
   it('should move selected section to the previous section respecting RTL order in non-empty field', () => {
-    render(
-      <ThemeProvider theme={theme}>
-        <DateTimeField defaultValue={adapter.date(new Date(2018, 3, 25, 11, 54))} />
-      </ThemeProvider>,
-    );
-    const input = getTextbox();
-    clickOnField(input, 2);
-
     // 25/04/2018 => 1397/02/05
     const expectedValues = ['05', '02', '1397', '54', '11', '11'];
 
+    // Test with v7 input
+    const v7Response = renderWithProps(
+      { defaultValue: adapter.date(new Date(2018, 3, 25, 11, 54)) },
+      { direction: 'rtl' },
+    );
+
+    v7Response.selectSection('day');
+
     expectedValues.forEach((expectedValue) => {
-      expect(getCleanedSelectedContent(input)).to.equal(expectedValue);
+      expect(getCleanedSelectedContent()).to.equal(expectedValue);
+      fireEvent.keyDown(v7Response.getActiveSection(undefined), { key: 'ArrowLeft' });
+    });
+
+    v7Response.unmount();
+
+    // Test with v6 input
+    const v6Response = renderWithProps(
+      { defaultValue: adapter.date(new Date(2018, 3, 25, 11, 54)), shouldUseV6TextField: true },
+      { direction: 'rtl' },
+    );
+
+    const input = getTextbox();
+    v6Response.selectSection('day');
+
+    expectedValues.forEach((expectedValue) => {
+      expect(getCleanedSelectedContent()).to.equal(expectedValue);
       fireEvent.keyDown(input, { key: 'ArrowLeft' });
     });
   });
@@ -189,7 +215,7 @@ adapterToTest.forEach((adapterName) => {
       }
     });
 
-    const { clickOnField } = buildFieldInteractions({ clock, render, Component: DateTimeField });
+    const { renderWithProps } = buildFieldInteractions({ clock, render, Component: DateTimeField });
 
     const cleanValueStr = (
       valueStr: string,
@@ -215,13 +241,12 @@ adapterToTest.forEach((adapterName) => {
       expectedValue: TDate;
       sectionConfig: ReturnType<typeof getDateSectionConfigFromFormatToken>;
     }) => {
-      render(<DateTimeField defaultValue={initialValue} format={format} />);
-      const input = getTextbox();
-      clickOnField(input, 1);
-      fireEvent.keyDown(input, { key });
+      const v7Response = renderWithProps({ defaultValue: initialValue, format });
+      v7Response.selectSection(sectionConfig.type);
+      fireEvent.keyDown(v7Response.getActiveSection(0), { key });
 
       expectFieldValueV7(
-        input,
+        v7Response.fieldContainer,
         cleanValueStr(adapter.formatByString(expectedValue, format), sectionConfig),
       );
     };
