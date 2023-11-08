@@ -85,7 +85,7 @@ export const FakeTextField = React.forwardRef(function FakeTextField(
   let children: React.ReactNode;
   if (other.contentEditable) {
     children = (
-      <FakeTextFieldInputContent className="fake-text-field-input-content" ref={InputProps.ref}>
+      <FakeTextFieldInputContent className="fake-text-field-input-content" ref={InputProps?.ref}>
         {elements
           .map(
             ({ content, before, after }) =>
@@ -97,7 +97,7 @@ export const FakeTextField = React.forwardRef(function FakeTextField(
   } else {
     children = (
       <React.Fragment>
-        <FakeTextFieldInputContent className="fake-text-field-input-content" ref={InputProps.ref}>
+        <FakeTextFieldInputContent className="fake-text-field-input-content" ref={InputProps?.ref}>
           {elements.map(({ container, content, before, after }, elementIndex) => (
             <span {...container} key={elementIndex}>
               <span {...before} />
@@ -126,10 +126,10 @@ export const FakeTextField = React.forwardRef(function FakeTextField(
       }}
       aria-invalid={error}
       // TODO: Stop hard-coding
-      className="fake-text-field"
+      className="fake-text-field-root"
     >
       {children}
-      {InputProps.endAdornment}
+      {InputProps?.endAdornment}
     </FakeTextFieldRoot>
   );
 });

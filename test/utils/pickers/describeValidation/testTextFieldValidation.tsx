@@ -12,7 +12,7 @@ export const testTextFieldValidation: DescribeValidationTestSuite = (ElementToTe
     return;
   }
 
-  const getFieldRoot = () => document.querySelector('.fake-text-field');
+  const getFieldRoot = () => document.querySelector('.fake-text-field-root');
 
   describe('text field:', () => {
     it('should apply shouldDisableDate', function test() {

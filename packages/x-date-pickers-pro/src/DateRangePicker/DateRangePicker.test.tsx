@@ -12,7 +12,7 @@ describe('<DateRangePicker />', () => {
 
   it('should not open mobile picker dialog when clicked on input', () => {
     render(<DateRangePicker />);
-    fireEvent.click(screen.getAllByRole('textbox')[0]);
+    fireEvent.click(screen.getAllByRole('.fake-text-field-root')[0]);
     clock.runToLast();
 
     expect(screen.queryByRole('tooltip')).not.to.equal(null);
@@ -24,7 +24,7 @@ describe('<DateRangePicker />', () => {
     window.matchMedia = stubMatchMedia(false);
 
     render(<DateRangePicker />);
-    fireEvent.click(screen.getAllByRole('textbox')[0]);
+    fireEvent.click(screen.getAllByRole('.fake-text-field-root')[0]);
     clock.runToLast();
 
     expect(screen.getByRole('dialog')).not.to.equal(null);
