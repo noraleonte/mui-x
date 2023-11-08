@@ -58,6 +58,9 @@ function innerDescribeValue<TValue, C extends PickerComponentFamily>(
         getSection: () => {
           throw new Error('You can only use `getSection` on components that render a field');
         },
+        pressCharacter: () => {
+          throw new Error('You can only use `pressCharacter` on components that render a field');
+        },
       };
     };
   }
