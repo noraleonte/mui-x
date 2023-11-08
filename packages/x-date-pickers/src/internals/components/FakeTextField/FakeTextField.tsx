@@ -25,6 +25,7 @@ interface FakeTextFieldProps {
   valueType: 'value' | 'placeholder';
   contentEditable?: boolean;
   fullWidth?: boolean;
+  focused?: boolean;
 }
 
 const FakeTextFieldRoot = styled('div', {
