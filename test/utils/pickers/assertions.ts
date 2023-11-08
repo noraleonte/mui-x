@@ -7,7 +7,6 @@ export const expectFieldValue = (
   expectedValue: string,
   specialCase?: 'singleDigit' | 'RTL',
 ) => {
-  // TODO fields: The cleaning of RTL chars is no longer needed
   const value = cleanText(fieldContainer.innerText, specialCase);
   return expect(value).to.equal(expectedValue);
 };
