@@ -85,17 +85,18 @@ export const useField = <
 
   const useFieldTextField = shouldUseV6TextField ? useFieldV6TextField : useFieldV7TextField;
 
+  const sectionOrder = React.useMemo(
+    () => getSectionOrder(state.sections, isRTL),
+    [state.sections, isRTL],
+  );
+
   const { returnedValue, interactions } = useFieldTextField({
     ...params,
     ...stateResponse,
     ...characterEditingResponse,
     areAllSectionsEmpty,
+    sectionOrder,
   });
-
-  const sectionOrder = React.useMemo(
-    () => getSectionOrder(state.sections, isRTL),
-    [state.sections, isRTL],
-  );
 
   const handleContainerKeyDown = useEventCallback((event: React.KeyboardEvent<HTMLSpanElement>) => {
     // eslint-disable-next-line default-case
@@ -116,7 +117,7 @@ export const useField = <
         if (parsedSelectedSections == null) {
           setSelectedSections(sectionOrder.startIndex);
         } else if (parsedSelectedSections === 'all') {
-          setSelectedSections(state.sections.length - 1);
+          setSelectedSections(sectionOrder.endIndex);
         } else {
           const nextSectionIndex = sectionOrder.neighbors[parsedSelectedSections].rightIndex;
           if (nextSectionIndex !== null) {
@@ -133,7 +134,7 @@ export const useField = <
         if (parsedSelectedSections == null) {
           setSelectedSections(sectionOrder.endIndex);
         } else if (parsedSelectedSections === 'all') {
-          setSelectedSections(0);
+          setSelectedSections(sectionOrder.startIndex);
         } else {
           const nextSectionIndex = sectionOrder.neighbors[parsedSelectedSections].leftIndex;
           if (nextSectionIndex !== null) {
@@ -244,7 +245,7 @@ export const useField = <
     event.preventDefault();
     onClear?.(event, ...(args as []));
     clearValue();
-    setSelectedSections(0);
+    setSelectedSections(sectionOrder.startIndex);
     // TODO: Add back the v6 focus
   });
 

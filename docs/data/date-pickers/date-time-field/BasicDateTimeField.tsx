@@ -8,7 +8,9 @@ export default function BasicDateTimeField() {
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
       <DemoContainer components={['DateTimeField']}>
-        <DateTimeField label="Basic date time field" />
+        <DateTimeField />
+        <DateTimeField shouldUseV6TextField />
+        <input type="datetime-local" />
       </DemoContainer>
     </LocalizationProvider>
   );

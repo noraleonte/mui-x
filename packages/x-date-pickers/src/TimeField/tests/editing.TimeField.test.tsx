@@ -3,7 +3,7 @@ import { spy } from 'sinon';
 import { TimeField } from '@mui/x-date-pickers/TimeField';
 import { fireEvent } from '@mui-internal/test-utils';
 import {
-  expectFieldValue,
+  expectFieldValueV7,
   expectFieldValueV6,
   getCleanedSelectedContent,
   describeAdapters,
@@ -258,7 +258,7 @@ describe('<TimeField /> - Editing', () => {
       v7Response.selectSection('hours');
 
       fireEvent.input(v7Response.getActiveSection(0), { target: { innerText: '2' } });
-      expectFieldValue(v7Response.fieldContainer, '02:mm aa');
+      expectFieldValueV7(v7Response.fieldContainer, '02:mm aa');
       expect(getCleanedSelectedContent()).to.equal('mm');
 
       v7Response.unmount();
@@ -285,12 +285,12 @@ describe('<TimeField /> - Editing', () => {
       v7Response.selectSection('hours');
 
       fireEvent.input(v7Response.getActiveSection(0), { target: { innerText: '1' } });
-      expectFieldValue(v7Response.fieldContainer, '01:mm aa');
+      expectFieldValueV7(v7Response.fieldContainer, '01:mm aa');
       expect(getCleanedSelectedContent()).to.equal('01');
 
       // Press "3"
       fireEvent.input(v7Response.getActiveSection(0), { target: { innerText: '3' } });
-      expectFieldValue(v7Response.fieldContainer, '03:mm aa');
+      expectFieldValueV7(v7Response.fieldContainer, '03:mm aa');
       expect(getCleanedSelectedContent()).to.equal('mm');
 
       v7Response.unmount();
@@ -425,10 +425,10 @@ describe('<TimeField /> - Editing', () => {
         fireEvent.keyDown(v7Response.fieldContainer, { key: 'ArrowLeft' });
 
         fireEvent.input(v7Response.getActiveSection(0), { target: { innerText: '3' } });
-        expectFieldValue(v7Response.fieldContainer, '03:mm');
+        expectFieldValueV7(v7Response.fieldContainer, '03:mm');
 
         fireEvent.input(v7Response.getActiveSection(1), { target: { innerText: '4' } });
-        expectFieldValue(v7Response.fieldContainer, '03:04');
+        expectFieldValueV7(v7Response.fieldContainer, '03:04');
         expect(onChangeV7.lastCall.firstArg).toEqualDateTime(new Date(2010, 3, 3, 3, 4, 3));
 
         v7Response.unmount();

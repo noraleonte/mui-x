@@ -5,26 +5,12 @@ import { getSectionIndexFromDOMElement, isFocusInsideContainer } from './useFiel
 import {
   UseFieldForwardedProps,
   UseFieldInternalProps,
-  UseFieldParams,
   UseFieldTextFieldInteractions,
+  UseFieldTextFieldParams,
 } from './useField.types';
-import { UseFieldStateResponse } from './useFieldState';
-import { UseFieldCharacterEditingResponse } from './useFieldCharacterEditing';
 import { FakeTextFieldElement } from '../../components/FakeTextField/FakeTextField';
 import { FieldSection } from '../../../models';
 import { getActiveElement } from '../../utils/utils';
-
-interface UseFieldV7TextFieldParams<
-  TValue,
-  TDate,
-  TSection extends FieldSection,
-  TForwardedProps extends UseFieldForwardedProps,
-  TInternalProps extends UseFieldInternalProps<any, any, any, any>,
-> extends UseFieldParams<TValue, TDate, TSection, TForwardedProps, TInternalProps>,
-    UseFieldStateResponse<TValue, TDate, TSection>,
-    UseFieldCharacterEditingResponse {
-  areAllSectionsEmpty: boolean;
-}
 
 const noop = () => {};
 
@@ -35,7 +21,7 @@ export const useFieldV7TextField = <
   TForwardedProps extends UseFieldForwardedProps,
   TInternalProps extends UseFieldInternalProps<any, any, any, any>,
 >(
-  params: UseFieldV7TextFieldParams<TValue, TDate, TSection, TForwardedProps, TInternalProps>,
+  params: UseFieldTextFieldParams<TValue, TDate, TSection, TForwardedProps, TInternalProps>,
 ) => {
   const {
     internalProps: { readOnly, disabled, autoFocus },
@@ -51,6 +37,7 @@ export const useFieldV7TextField = <
     updateSectionValue,
     updateValueFromValueStr,
     areAllSectionsEmpty,
+    sectionOrder,
   } = params;
 
   const containerRef = React.useRef<HTMLDivElement>(null);
@@ -131,7 +118,7 @@ export const useFieldV7TextField = <
   const handleContainerClick = useEventCallback((event: React.MouseEvent, ...args) => {
     // The click event on the clear button would propagate to the input, trigger this handler and result in a wrong section selection.
     // We avoid this by checking if the call of `handleContainerClick` is actually intended, or a side effect.
-    if (event.isDefaultPrevented()) {
+    if (event.isDefaultPrevented() || !containerRef.current) {
       return;
     }
 
@@ -159,6 +146,13 @@ export const useFieldV7TextField = <
 
         setSelectedSections(sectionIndex - 1);
       });
+    } else {
+      const hasClickedOnASection = containerRef.current
+        .querySelector('.fake-text-field-input-content')!
+        .contains(event.target as Node);
+      if (!hasClickedOnASection) {
+        setSelectedSections(sectionOrder.startIndex);
+      }
     }
   });
 
@@ -305,56 +299,62 @@ export const useFieldV7TextField = <
     revertDOMSectionChange(sectionIndex);
   });
 
-  const elements = React.useMemo<FakeTextFieldElement[]>(
-    () =>
-      state.sections.map((section, sectionIndex) => {
-        return {
-          container: {
-            'data-sectionindex': sectionIndex,
-            onClick: getInputContainerClickHandler(sectionIndex),
-          } as React.HTMLAttributes<HTMLSpanElement>,
-          content: {
-            tabIndex: parsedSelectedSections === 'all' ? undefined : 0,
-            className: 'content',
-            contentEditable: parsedSelectedSections === sectionIndex && !disabled && !readOnly,
-            suppressContentEditableWarning: true,
-            role: 'textbox',
-            children: section.value || section.placeholder,
-            onInput: handleInputContentInput,
-            onPaste: handleInputContentPaste,
-            onFocus: getInputContentFocusHandler(sectionIndex),
-            onDragOver: handleInputContentDragOver,
-            onMouseUp: handleInputContentMouseUp,
-            inputMode: section.contentType === 'letter' ? 'text' : 'numeric',
-            style: {
-              outline: 'none',
-            },
+  const elements = React.useMemo<FakeTextFieldElement[]>(() => {
+    const orderedSections: { section: TSection; index: number }[] = [];
+    let sectionIndex: number | null = sectionOrder.startIndex;
+    while (sectionIndex != null) {
+      orderedSections.push({ section: state.sections[sectionIndex], index: sectionIndex });
+      sectionIndex = sectionOrder.neighbors[sectionIndex].rightIndex;
+    }
+
+    return orderedSections.map(({ section, index }) => {
+      return {
+        container: {
+          'data-sectionindex': index,
+          onClick: getInputContainerClickHandler(index),
+        } as React.HTMLAttributes<HTMLSpanElement>,
+        content: {
+          tabIndex: parsedSelectedSections === 'all' ? undefined : 0,
+          className: 'content',
+          contentEditable: parsedSelectedSections === index && !disabled && !readOnly,
+          suppressContentEditableWarning: true,
+          role: 'textbox',
+          children: section.value || section.placeholder,
+          onInput: handleInputContentInput,
+          onPaste: handleInputContentPaste,
+          onFocus: getInputContentFocusHandler(index),
+          onDragOver: handleInputContentDragOver,
+          onMouseUp: handleInputContentMouseUp,
+          inputMode: section.contentType === 'letter' ? 'text' : 'numeric',
+          style: {
+            outline: 'none',
           },
-          before: {
-            className: 'before',
-            children: section.startSeparator,
-            style: { height: 16, fontSize: 12, whiteSpace: 'pre' },
-          },
-          after: {
-            className: 'after',
-            children: section.endSeparator,
-            style: { height: 16, fontSize: 12, whiteSpace: 'pre' },
-          },
-        };
-      }),
-    [
-      state.sections,
-      getInputContentFocusHandler,
-      handleInputContentPaste,
-      handleInputContentDragOver,
-      handleInputContentInput,
-      getInputContainerClickHandler,
-      handleInputContentMouseUp,
-      disabled,
-      readOnly,
-      parsedSelectedSections,
-    ],
-  );
+        },
+        before: {
+          className: 'before',
+          children: section.startSeparator,
+          style: { height: 16, fontSize: 12, whiteSpace: 'pre' },
+        },
+        after: {
+          className: 'after',
+          children: section.endSeparator,
+          style: { height: 16, fontSize: 12, whiteSpace: 'pre' },
+        },
+      };
+    });
+  }, [
+    state.sections,
+    getInputContentFocusHandler,
+    handleInputContentPaste,
+    handleInputContentDragOver,
+    handleInputContentInput,
+    getInputContainerClickHandler,
+    handleInputContentMouseUp,
+    disabled,
+    readOnly,
+    parsedSelectedSections,
+    sectionOrder,
+  ]);
 
   const handleValueStrChange = useEventCallback((event: React.ChangeEvent<HTMLInputElement>) =>
     updateValueFromValueStr(event.target.value),

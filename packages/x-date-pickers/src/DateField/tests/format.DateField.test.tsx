@@ -1,7 +1,7 @@
 import {
   expectInputPlaceholderV6,
   expectFieldValueV6,
-  expectFieldValue,
+  expectFieldValueV7,
   getTextbox,
   describeAdapters,
 } from 'test/utils/pickers';
@@ -16,10 +16,10 @@ describeAdapters('<DateField /> - Format', DateField, ({ adapter, renderWithProp
       // For Day.js: "[Escaped] YYYY"
       format: `${startChar}Escaped${endChar} ${adapter.formats.year}`,
     });
-    expectFieldValue(v7Response.fieldContainer, 'Escaped YYYY');
+    expectFieldValueV7(v7Response.fieldContainer, 'Escaped YYYY');
 
     v7Response.setProps({ value: adapter.date(new Date(2019, 0, 1)) });
-    expectFieldValue(v7Response.fieldContainer, 'Escaped 2019');
+    expectFieldValueV7(v7Response.fieldContainer, 'Escaped 2019');
 
     v7Response.unmount();
 
@@ -45,10 +45,10 @@ describeAdapters('<DateField /> - Format', DateField, ({ adapter, renderWithProp
       format: `${adapter.formats.month} ${startChar}Escaped${endChar} ${adapter.formats.year}`,
     });
 
-    expectFieldValue(v7Response.fieldContainer, 'MMMM Escaped YYYY');
+    expectFieldValueV7(v7Response.fieldContainer, 'MMMM Escaped YYYY');
 
     v7Response.setProps({ value: adapter.date(new Date(2019, 0, 1)) });
-    expectFieldValue(v7Response.fieldContainer, 'January Escaped 2019');
+    expectFieldValueV7(v7Response.fieldContainer, 'January Escaped 2019');
 
     v7Response.unmount();
 
@@ -80,10 +80,10 @@ describeAdapters('<DateField /> - Format', DateField, ({ adapter, renderWithProp
       format: `${adapter.formats.month} ${startChar}Escaped ${startChar}${endChar} ${adapter.formats.year}`,
     });
 
-    expectFieldValue(v7Response.fieldContainer, 'MMMM Escaped [ YYYY');
+    expectFieldValueV7(v7Response.fieldContainer, 'MMMM Escaped [ YYYY');
 
     v7Response.setProps({ value: adapter.date(new Date(2019, 0, 1)) });
-    expectFieldValue(v7Response.fieldContainer, 'January Escaped [ 2019');
+    expectFieldValueV7(v7Response.fieldContainer, 'January Escaped [ 2019');
 
     v7Response.unmount();
 
@@ -110,10 +110,10 @@ describeAdapters('<DateField /> - Format', DateField, ({ adapter, renderWithProp
       format: `${startChar}Escaped${endChar} ${adapter.formats.month} ${startChar}Escaped${endChar} ${adapter.formats.year}`,
     });
 
-    expectFieldValue(v7Response.fieldContainer, 'Escaped MMMM Escaped YYYY');
+    expectFieldValueV7(v7Response.fieldContainer, 'Escaped MMMM Escaped YYYY');
 
     v7Response.setProps({ value: adapter.date(new Date(2019, 0, 1)) });
-    expectFieldValue(v7Response.fieldContainer, 'Escaped January Escaped 2019');
+    expectFieldValueV7(v7Response.fieldContainer, 'Escaped January Escaped 2019');
 
     v7Response.unmount();
 
@@ -137,10 +137,10 @@ describeAdapters('<DateField /> - Format', DateField, ({ adapter, renderWithProp
       formatDensity: `spacious`,
     });
 
-    expectFieldValue(v7Response.fieldContainer, 'MM / DD / YYYY');
+    expectFieldValueV7(v7Response.fieldContainer, 'MM / DD / YYYY');
 
     v7Response.setProps({ value: adapter.date(new Date(2019, 0, 1)) });
-    expectFieldValue(v7Response.fieldContainer, '01 / 01 / 2019');
+    expectFieldValueV7(v7Response.fieldContainer, '01 / 01 / 2019');
 
     v7Response.unmount();
 
@@ -164,10 +164,10 @@ describeAdapters('<DateField /> - Format', DateField, ({ adapter, renderWithProp
       format: adapter.expandFormat(adapter.formats.keyboardDate).replace(/\//g, '.'),
     });
 
-    expectFieldValue(v7Response.fieldContainer, 'MM . DD . YYYY');
+    expectFieldValueV7(v7Response.fieldContainer, 'MM . DD . YYYY');
 
     v7Response.setProps({ value: adapter.date(new Date(2019, 0, 1)) });
-    expectFieldValue(v7Response.fieldContainer, '01 . 01 . 2019');
+    expectFieldValueV7(v7Response.fieldContainer, '01 . 01 . 2019');
 
     v7Response.unmount();
 
@@ -192,10 +192,10 @@ describeAdapters('<DateField /> - Format', DateField, ({ adapter, renderWithProp
       format: adapter.expandFormat(adapter.formats.keyboardDate).replace(/\//g, '-'),
     });
 
-    expectFieldValue(v7Response.fieldContainer, 'MM - DD - YYYY');
+    expectFieldValueV7(v7Response.fieldContainer, 'MM - DD - YYYY');
 
     v7Response.setProps({ value: adapter.date(new Date(2019, 0, 1)) });
-    expectFieldValue(v7Response.fieldContainer, '01 - 01 - 2019');
+    expectFieldValueV7(v7Response.fieldContainer, '01 - 01 - 2019');
 
     v7Response.unmount();
 

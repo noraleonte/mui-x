@@ -9,7 +9,7 @@ import {
   createPickerRenderer,
   adapterToUse,
   getTextbox,
-  expectFieldValue,
+  expectFieldValueV7,
 } from 'test/utils/pickers';
 
 describe('<MobileDatePicker />', () => {
@@ -173,11 +173,11 @@ describe('<MobileDatePicker />', () => {
       const { setProps } = render(<MobileDatePicker value={value} />);
 
       // Set a date
-      expectFieldValue(getTextbox(), '01/01/2019');
+      expectFieldValueV7(getTextbox(), '01/01/2019');
 
       // Clean value using external control
       setProps({ value: null });
-      expectFieldValue(getTextbox(), '');
+      expectFieldValueV7(getTextbox(), '');
 
       // Open and Dismiss the picker
       userEvent.mousePress(screen.getByRole('textbox'));
@@ -185,7 +185,7 @@ describe('<MobileDatePicker />', () => {
       clock.runToLast();
 
       // Verify it's still a clean value
-      expectFieldValue(getTextbox(), '');
+      expectFieldValueV7(getTextbox(), '');
     });
   });
 });

@@ -6,7 +6,7 @@ import {
   adapterToUse,
   buildFieldInteractions,
   createPickerRenderer,
-  expectFieldValue,
+  expectFieldValueV7,
 } from 'test/utils/pickers';
 
 describe('<DateTimeField /> - Editing', () => {
@@ -200,12 +200,12 @@ describe('<DateTimeField /> - Editing', () => {
 
   it('should correctly update `value` when both `format` and `value` are changed', () => {
     const v7Response = renderWithProps({ value: null, format: 'P' });
-    expectFieldValue(v7Response.fieldContainer, 'MM/DD/YYYY');
+    expectFieldValueV7(v7Response.fieldContainer, 'MM/DD/YYYY');
 
     v7Response.setProps({
       format: 'Pp',
       value: adapterToUse.date(new Date(2012, 4, 3, 14, 30)),
     });
-    expectFieldValue(v7Response.fieldContainer, '05/03/2012, 02:30 PM');
+    expectFieldValueV7(v7Response.fieldContainer, '05/03/2012, 02:30 PM');
   });
 });

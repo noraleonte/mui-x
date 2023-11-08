@@ -12,7 +12,7 @@ import {
   wrapPickerMount,
   openPicker,
   expectInputPlaceholderV6,
-  expectFieldValue,
+  expectFieldValueV7,
   describeRangeValidation,
   describeValue,
   describePicker,
@@ -79,7 +79,7 @@ describe('<MobileDateRangePicker /> - Describes', () => {
         if (!value) {
           expectInputPlaceholderV6(input, 'MM/DD/YYYY');
         }
-        expectFieldValue(input, value ? adapterToUse.format(value, 'keyboardDate') : '');
+        expectFieldValueV7(input, value ? adapterToUse.format(value, 'keyboardDate') : '');
       });
     },
     setNewValue: (value, { isOpened, applySameValue, setEndDate = false }) => {

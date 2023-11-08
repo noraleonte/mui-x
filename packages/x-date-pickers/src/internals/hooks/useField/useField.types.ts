@@ -432,4 +432,5 @@ export interface UseFieldTextFieldParams<
     UseFieldStateResponse<TValue, TDate, TSection>,
     UseFieldCharacterEditingResponse {
   areAllSectionsEmpty: boolean;
+  sectionOrder: SectionOrdering;
 }

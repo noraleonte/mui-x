@@ -2,7 +2,7 @@ import { screen, userEvent } from '@mui-internal/test-utils';
 import {
   createPickerRenderer,
   adapterToUse,
-  expectFieldValue,
+  expectFieldValueV7,
   expectInputPlaceholderV6,
   getTextbox,
   describeValidation,
@@ -48,7 +48,7 @@ describe('<DesktopDateTimePicker /> - Describes', () => {
           )
         : '';
 
-      expectFieldValue(input, expectedValueStr);
+      expectFieldValueV7(input, expectedValueStr);
     },
     setNewValue: (value, { isOpened, applySameValue, selectSection }) => {
       const newValue = applySameValue

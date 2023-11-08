@@ -3,7 +3,7 @@ import { expect } from 'chai';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { createRenderer, screen, userEvent, act, fireEvent } from '@mui-internal/test-utils';
 import { FieldRef, FieldSection, FieldSectionType } from '@mui/x-date-pickers/models';
-import { expectFieldValue, expectFieldValueV6 } from './assertions';
+import { expectFieldValueV7, expectFieldValueV6 } from './assertions';
 
 export const getTextbox = (): HTMLInputElement => screen.getByRole('textbox');
 
@@ -185,7 +185,7 @@ export const buildFieldInteractions = <P extends {}>({
     const v7Response = renderWithProps(props as any as P);
     v7Response.selectSection(selectedSection);
     userEvent.keyPress(v7Response.getActiveSection(undefined), { key });
-    expectFieldValue(v7Response.fieldContainer, expectedValue);
+    expectFieldValueV7(v7Response.fieldContainer, expectedValue);
     v7Response.unmount();
 
     // Test with v6 input
@@ -211,7 +211,7 @@ export const buildFieldInteractions = <P extends {}>({
         fireEvent.input(v7Response.getActiveSection(undefined), {
           target: { innerText: keyStroke.value },
         });
-        expectFieldValue(
+        expectFieldValueV7(
           v7Response.fieldContainer,
           keyStroke.expected,
           (props as any).shouldRespectLeadingZeros ? 'singleDigit' : undefined,

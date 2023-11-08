@@ -3,7 +3,7 @@ import { spy } from 'sinon';
 import { SingleInputDateRangeField } from '@mui/x-date-pickers-pro/SingleInputDateRangeField';
 import { fireEvent } from '@mui-internal/test-utils';
 import {
-  expectFieldValue,
+  expectFieldValueV7,
   expectFieldValueV6,
   describeAdapters,
   getTextbox,
@@ -24,7 +24,7 @@ describe('<SingleInputDateRangeField /> - Editing', () => {
       fireEvent.keyDown(v7Response.getActiveSection(0), { key: 'a', ctrlKey: true });
 
       fireEvent.keyDown(v7Response.fieldContainer, { key: 'Delete' });
-      expectFieldValue(v7Response.fieldContainer, 'MMMM YYYY – MMMM YYYY');
+      expectFieldValueV7(v7Response.fieldContainer, 'MMMM YYYY – MMMM YYYY');
 
       v7Response.unmount();
 
@@ -55,13 +55,13 @@ describe('<SingleInputDateRangeField /> - Editing', () => {
 
       // Set a value for the "month" section
       fireEvent.input(v7Response.getActiveSection(0), { target: { innerHTML: 'j' } });
-      expectFieldValue(v7Response.fieldContainer, 'January YYYY – MMMM YYYY');
+      expectFieldValueV7(v7Response.fieldContainer, 'January YYYY – MMMM YYYY');
 
       // Select all sections
       fireEvent.keyDown(v7Response.getActiveSection(0), { key: 'a', ctrlKey: true });
 
       fireEvent.keyDown(v7Response.fieldContainer, { key: 'Delete' });
-      expectFieldValue(v7Response.fieldContainer, 'MMMM YYYY – MMMM YYYY');
+      expectFieldValueV7(v7Response.fieldContainer, 'MMMM YYYY – MMMM YYYY');
 
       v7Response.unmount();
 
@@ -259,7 +259,7 @@ describe('<SingleInputDateRangeField /> - Editing', () => {
         fireEvent.keyDown(v7Response.getActiveSection(0), { key: 'a', ctrlKey: true });
 
         fireEvent.input(v7Response.fieldContainer, { target: { innerText: '' } });
-        expectFieldValue(v7Response.fieldContainer, 'MMMM YYYY – MMMM YYYY');
+        expectFieldValueV7(v7Response.fieldContainer, 'MMMM YYYY – MMMM YYYY');
 
         v7Response.unmount();
 
@@ -290,13 +290,13 @@ describe('<SingleInputDateRangeField /> - Editing', () => {
 
         // Set a value for the "month" section
         fireEvent.input(v7Response.getActiveSection(0), { target: { innerHTML: 'j' } });
-        expectFieldValue(v7Response.fieldContainer, 'January YYYY – MMMM YYYY');
+        expectFieldValueV7(v7Response.fieldContainer, 'January YYYY – MMMM YYYY');
 
         // Select all sections
         fireEvent.keyDown(v7Response.getActiveSection(0), { key: 'a', ctrlKey: true });
 
         fireEvent.input(v7Response.fieldContainer, { target: { innerText: '' } });
-        expectFieldValue(v7Response.fieldContainer, 'MMMM YYYY – MMMM YYYY');
+        expectFieldValueV7(v7Response.fieldContainer, 'MMMM YYYY – MMMM YYYY');
 
         v7Response.unmount();
 

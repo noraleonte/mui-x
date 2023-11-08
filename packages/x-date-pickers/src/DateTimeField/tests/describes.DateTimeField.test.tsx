@@ -6,7 +6,7 @@ import {
   adapterToUse,
   createPickerRenderer,
   wrapPickerMount,
-  expectFieldValue,
+  expectFieldValueV7,
   expectInputPlaceholderV6,
   getTextbox,
   describeValidation,
@@ -60,7 +60,7 @@ describe('<DateTimeField /> - Describes', () => {
           )
         : '';
 
-      expectFieldValue(input, expectedValueStr);
+      expectFieldValueV7(input, expectedValueStr);
     },
     setNewValue: (value, { selectSection }) => {
       const newValue = adapterToUse.addDays(value, 1);

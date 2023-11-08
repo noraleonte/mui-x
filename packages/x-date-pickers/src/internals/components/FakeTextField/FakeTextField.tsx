@@ -33,6 +33,16 @@ const FakeTextFieldRoot = styled(Box, {
   overridesResolver: (props, styles) => styles.root,
 })({});
 
+const FakeTextFieldInputContent = styled('div', {
+  name: 'MuiFakeTextField',
+  slot: 'InputContent',
+  overridesResolver: (props, styles) => styles.inputContent,
+})`
+  /*! @noflip */
+  direction: ltr;
+  display: inline-block;
+`;
+
 const FakeTextFieldHiddenInput = styled('input', {
   name: 'MuiFakeTextField',
   slot: 'HiddenInput',
@@ -66,19 +76,28 @@ export const FakeTextField = React.forwardRef(function FakeTextField(
 
   let children: React.ReactNode;
   if (other.contentEditable) {
-    children = elements
-      .map(({ content, before, after }) => `${before.children}${content.children}${after.children}`)
-      .join('');
+    children = (
+      <FakeTextFieldInputContent className="fake-text-field-input-content">
+        {elements
+          .map(
+            ({ content, before, after }) =>
+              `${before.children}${content.children}${after.children}`,
+          )
+          .join('')}
+      </FakeTextFieldInputContent>
+    );
   } else {
     children = (
       <React.Fragment>
-        {elements.map(({ container, content, before, after }, elementIndex) => (
-          <span {...container} key={elementIndex}>
-            <span {...before} />
-            <span {...content} />
-            <span {...after} />
-          </span>
-        ))}
+        <FakeTextFieldInputContent className="fake-text-field-input-content">
+          {elements.map(({ container, content, before, after }, elementIndex) => (
+            <span {...container} key={elementIndex}>
+              <span {...before} />
+              <span {...content} />
+              <span {...after} />
+            </span>
+          ))}
+        </FakeTextFieldInputContent>
         <FakeTextFieldHiddenInput
           value={valueStr}
           onChange={onValueStrChange}

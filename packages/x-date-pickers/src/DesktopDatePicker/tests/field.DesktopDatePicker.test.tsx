@@ -5,7 +5,7 @@ import {
   createPickerRenderer,
   buildFieldInteractions,
   getTextbox,
-  expectFieldValue,
+  expectFieldValueV7,
   expectFieldValueV6,
   expectInputPlaceholderV6,
   adapterToUse,
@@ -32,16 +32,16 @@ describe('<DesktopDatePicker /> - Field', () => {
       );
 
       v7Response.selectSection('month');
-      expectFieldValue(v7Response.fieldContainer, 'MMMM DD');
+      expectFieldValueV7(v7Response.fieldContainer, 'MMMM DD');
 
       fireEvent.input(v7Response.getActiveSection(0), { target: { innerText: 'N' } });
-      expectFieldValue(v7Response.fieldContainer, 'November DD');
+      expectFieldValueV7(v7Response.fieldContainer, 'November DD');
 
       fireEvent.input(v7Response.getActiveSection(1), { target: { innerText: '4' } });
-      expectFieldValue(v7Response.fieldContainer, 'November 04');
+      expectFieldValueV7(v7Response.fieldContainer, 'November 04');
 
       fireEvent.input(v7Response.getActiveSection(1), { target: { innerText: '' } });
-      expectFieldValue(v7Response.fieldContainer, 'November DD');
+      expectFieldValueV7(v7Response.fieldContainer, 'November DD');
 
       v7Response.unmount();
 
@@ -97,11 +97,11 @@ describe('<DesktopDatePicker /> - Field', () => {
         { componentFamily: 'picker' },
       );
 
-      expectFieldValue(v7Response.fieldContainer, 'June 2022');
+      expectFieldValueV7(v7Response.fieldContainer, 'June 2022');
       v7Response.selectSection('month');
 
       fireEvent.input(v7Response.getActiveSection(0), { target: { innerText: '' } });
-      expectFieldValue(v7Response.fieldContainer, 'MMMM 2022');
+      expectFieldValueV7(v7Response.fieldContainer, 'MMMM 2022');
     });
   });
 });

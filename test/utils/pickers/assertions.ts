@@ -2,12 +2,15 @@ import { expect } from 'chai';
 import { SinonSpy } from 'sinon';
 import { cleanText } from 'test/utils/pickers';
 
-export const expectFieldValue = (
+export const expectFieldValueV7 = (
   fieldContainer: HTMLDivElement,
   expectedValue: string,
   specialCase?: 'singleDigit' | 'RTL',
 ) => {
-  const value = cleanText(fieldContainer.innerText, specialCase);
+  const value = cleanText(
+    fieldContainer.querySelector<HTMLDivElement>('.fake-text-field-input-content')!.innerText,
+    specialCase,
+  );
   return expect(value).to.equal(expectedValue);
 };
 

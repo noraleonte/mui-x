@@ -4,7 +4,7 @@ import { fireEvent } from '@mui-internal/test-utils';
 import { DateTimeField } from '@mui/x-date-pickers/DateTimeField';
 import {
   createPickerRenderer,
-  expectFieldValue,
+  expectFieldValueV7,
   describeAdapters,
   buildFieldInteractions,
 } from 'test/utils/pickers';
@@ -51,7 +51,7 @@ describe('<DateTimeField /> - Timezone', () => {
       const expectedDate = fillEmptyValue(v7Response, 'default');
 
       // Check the rendered value (uses default timezone, e.g: UTC, see TZ env variable)
-      expectFieldValue(v7Response.fieldContainer, '12/31/2022 23');
+      expectFieldValueV7(v7Response.fieldContainer, '12/31/2022 23');
 
       // Check the `onChange` value (uses default timezone, e.g: UTC, see TZ env variable)
       const actualDate = onChange.lastCall.firstArg;
@@ -70,7 +70,7 @@ describe('<DateTimeField /> - Timezone', () => {
           const expectedDate = fillEmptyValue(v7Response, timezone);
 
           // Check the rendered value (uses timezone prop)
-          expectFieldValue(v7Response.fieldContainer, '12/31/2022 23');
+          expectFieldValueV7(v7Response.fieldContainer, '12/31/2022 23');
 
           // Check the `onChange` value (uses timezone prop)
           const actualDate = onChange.lastCall.firstArg;
@@ -91,7 +91,7 @@ describe('<DateTimeField /> - Timezone', () => {
           fireEvent.keyDown(v7Response.getActiveSection(0), { key: 'ArrowDown' });
 
           // Check the rendered value (uses America/Chicago timezone)
-          expectFieldValue(v7Response.fieldContainer, '05/14/2022 19');
+          expectFieldValueV7(v7Response.fieldContainer, '05/14/2022 19');
 
           // Check the `onChange` value (uses timezone prop)
           const expectedDate = adapter.addMonths(adapter.dateWithTimezone(undefined, timezone), -1);
@@ -120,11 +120,11 @@ describe('<DateTimeField /> - Timezone', () => {
       const date = adapter.date(new Date('2020-06-18T14:30:10.000Z')).setZone('UTC');
       v7Response.setProps({ value: date });
 
-      expectFieldValue(v7Response.fieldContainer, '06/18/2020 02:30 PM');
+      expectFieldValueV7(v7Response.fieldContainer, '06/18/2020 02:30 PM');
 
       v7Response.setProps({ value: date.setZone('America/Los_Angeles') });
 
-      expectFieldValue(v7Response.fieldContainer, '06/18/2020 07:30 AM');
+      expectFieldValueV7(v7Response.fieldContainer, '06/18/2020 07:30 AM');
     });
   });
 });

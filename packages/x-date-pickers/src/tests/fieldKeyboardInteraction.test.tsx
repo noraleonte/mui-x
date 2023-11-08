@@ -9,7 +9,7 @@ import {
   getCleanedSelectedContent,
   getTextbox,
   createPickerRenderer,
-  expectFieldValue,
+  expectFieldValueV7,
 } from 'test/utils/pickers';
 import { DateTimeField } from '@mui/x-date-pickers/DateTimeField';
 import { FieldSectionType, MuiPickersAdapter } from '@mui/x-date-pickers/models';
@@ -196,7 +196,7 @@ adapterToTest.forEach((adapterName) => {
       clickOnField(input, 1);
       userEvent.keyPress(input, { key });
 
-      expectFieldValue(
+      expectFieldValueV7(
         input,
         cleanValueStr(adapter.formatByString(expectedValue, format), sectionConfig),
       );

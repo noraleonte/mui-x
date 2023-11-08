@@ -7,7 +7,7 @@ import {
   getCleanedSelectedContent,
   getTextbox,
   createPickerRenderer,
-  expectFieldValue,
+  expectFieldValueV7,
   expectFieldValueV6,
 } from 'test/utils/pickers';
 
@@ -23,7 +23,7 @@ describe('<SingleInputDateRangeField /> - Selection', () => {
     it('should select all on mount focus (`autoFocus = true`)', () => {
       // Test with v7 input
       const v7Response = renderWithProps({ autoFocus: true });
-      expectFieldValue(v7Response.fieldContainer, 'MM/DD/YYYY – MM/DD/YYYY');
+      expectFieldValueV7(v7Response.fieldContainer, 'MM/DD/YYYY – MM/DD/YYYY');
       expect(getCleanedSelectedContent()).to.equal('MM/DD/YYYY – MM/DD/YYYY');
 
       v7Response.unmount();

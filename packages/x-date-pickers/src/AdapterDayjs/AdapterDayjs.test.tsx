@@ -11,7 +11,7 @@ import {
   buildPickerDragInteractions,
   MockedDataTransfer,
   expectInputPlaceholderV6,
-  expectFieldValue,
+  expectFieldValueV7,
   createPickerRenderer,
   describeGregorianAdapter,
   TEST_DATE_ISO_STRING,
@@ -165,7 +165,7 @@ describe('<AdapterDayjs />', () => {
         it('should have well formatted value', () => {
           render(<DateTimePicker value={adapter.date(testDate)} />);
 
-          expectFieldValue(screen.getByRole('textbox'), localizedTexts[localeKey].value);
+          expectFieldValueV7(screen.getByRole('textbox'), localizedTexts[localeKey].value);
         });
       });
     });

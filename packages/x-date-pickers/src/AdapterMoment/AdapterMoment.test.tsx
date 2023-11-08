@@ -10,7 +10,7 @@ import { spy } from 'sinon';
 import {
   createPickerRenderer,
   expectInputPlaceholderV6,
-  expectFieldValue,
+  expectFieldValueV7,
   describeGregorianAdapter,
   TEST_DATE_ISO_STRING,
 } from 'test/utils/pickers';
@@ -197,7 +197,7 @@ describe('<AdapterMoment />', () => {
         it('should have well formatted value', () => {
           render(<DateTimePicker value={adapter.date(testDate)} />);
 
-          expectFieldValue(screen.getByRole('textbox'), localizedTexts[localeKey].value);
+          expectFieldValueV7(screen.getByRole('textbox'), localizedTexts[localeKey].value);
         });
       });
     });
