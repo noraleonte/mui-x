@@ -5,7 +5,6 @@ import {
   PickersPopperSlotsComponentsProps,
   ExportedBaseToolbarProps,
   UsePickerViewsProps,
-  UncapitalizeObjectKeys,
   BaseNonStaticPickerProps,
   UsePickerValueNonStaticProps,
   UsePickerViewsNonStaticProps,
@@ -69,7 +68,7 @@ export interface UseDesktopRangePickerProps<
    * Overridable component slots.
    * @default {}
    */
-  slots: UncapitalizeObjectKeys<UseDesktopRangePickerSlotsComponent<TDate, TView>>;
+  slots: UseDesktopRangePickerSlotsComponent<TDate, TView>;
   /**
    * The props used for each component slot.
    * @default {}

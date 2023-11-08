@@ -161,7 +161,7 @@ export const useFieldV7TextField = <
     }
 
     const target = event.target as HTMLSpanElement;
-    const keyPressed = target.textContent;
+    const keyPressed = target.textContent ?? '';
 
     containerRef.current.innerHTML = state.sections
       .map(

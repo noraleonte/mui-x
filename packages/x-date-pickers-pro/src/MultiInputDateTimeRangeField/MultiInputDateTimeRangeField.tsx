@@ -14,7 +14,6 @@ import {
 import {
   splitFieldInternalAndForwardedProps,
   FieldsTextFieldProps,
-  uncapitalizeObjectKeys,
   FakeTextField,
   useConvertFieldResponseIntoMuiTextFieldProps,
 } from '@mui/x-date-pickers/internals';
@@ -92,19 +91,14 @@ const MultiInputDateTimeRangeField = React.forwardRef(function MultiInputDateTim
     >(themeProps, 'date-time');
 
   const {
-    slots: innerSlots,
-    slotProps: innerSlotProps,
-    components,
-    componentsProps,
+    slots,
+    slotProps,
     disabled,
     unstableStartFieldRef,
     unstableEndFieldRef,
     className,
     ...otherForwardedProps
   } = forwardedProps;
-
-  const slots = innerSlots ?? uncapitalizeObjectKeys(components);
-  const slotProps = innerSlotProps ?? componentsProps;
 
   const ownerState = themeProps;
   const classes = useUtilityClasses(ownerState);
@@ -122,9 +116,7 @@ const MultiInputDateTimeRangeField = React.forwardRef(function MultiInputDateTim
   });
 
   const TextField =
-    slots?.textField ??
-    components?.TextField ??
-    (inProps.shouldUseV6TextField ? MuiTextField : FakeTextField);
+    slots?.textField ?? (inProps.shouldUseV6TextField ? MuiTextField : FakeTextField);
   const startTextFieldProps: FieldsTextFieldProps = useSlotProps({
     elementType: TextField,
     externalSlotProps: slotProps?.textField,
@@ -184,18 +176,6 @@ MultiInputDateTimeRangeField.propTypes = {
   classes: PropTypes.object,
   className: PropTypes.string,
   component: PropTypes.elementType,
-  /**
-   * Overridable components.
-   * @default {}
-   * @deprecated Please use `slots`.
-   */
-  components: PropTypes.object,
-  /**
-   * The props used for each component slot.
-   * @default {}
-   * @deprecated Please use `slotProps`.
-   */
-  componentsProps: PropTypes.object,
   /**
    * The default value. Use when the component is not controlled.
    */
