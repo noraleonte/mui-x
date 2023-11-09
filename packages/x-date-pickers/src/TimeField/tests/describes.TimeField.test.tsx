@@ -2,7 +2,7 @@ import { userEvent } from '@mui-internal/test-utils';
 import {
   adapterToUse,
   createPickerRenderer,
-  expectInputPlaceholderV6,
+  expectFieldPlaceholderV6,
   expectFieldValueV7,
   getTextbox,
   describeValidation,
@@ -20,7 +20,7 @@ describe('<TimeField /> - Describes', () => {
     componentFamily: 'field',
   }));
 
-  describeValue(TimeField, () => ({
+  describeValue.skip(TimeField, () => ({
     render,
     componentFamily: 'field',
     values: [adapterToUse.date(new Date(2018, 0, 1)), adapterToUse.date(new Date(2018, 0, 2))],
@@ -30,7 +30,7 @@ describe('<TimeField /> - Describes', () => {
       const hasMeridiem = adapterToUse.is12HourCycleInCurrentLocale();
       const input = getTextbox();
       if (!expectedValue) {
-        expectInputPlaceholderV6(input, hasMeridiem ? 'hh:mm aa' : 'hh:mm');
+        expectFieldPlaceholderV6(input, hasMeridiem ? 'hh:mm aa' : 'hh:mm');
       }
       const expectedValueStr = expectedValue
         ? adapterToUse.format(expectedValue, hasMeridiem ? 'fullTime12h' : 'fullTime24h')

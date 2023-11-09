@@ -276,3 +276,6 @@ export const getCleanedSelectedContent = () => {
 
   return cleanText(document.getSelection()?.toString() ?? '');
 };
+
+export const getFieldRoot = (index = 0) =>
+  document.querySelectorAll<HTMLDivElement>('.fake-text-field-root')[index];

@@ -1,7 +1,7 @@
 import {
   createPickerRenderer,
   getTextbox,
-  expectInputPlaceholderV6,
+  expectFieldPlaceholderV6,
   expectFieldValueV7,
   buildFieldInteractions,
 } from 'test/utils/pickers';
@@ -37,7 +37,7 @@ describe('<DesktopTimePicker /> - Field', () => {
         { componentFamily: 'picker' },
       );
       const input = getTextbox();
-      expectInputPlaceholderV6(input, expectedFormat);
+      expectFieldPlaceholderV6(input, expectedFormat);
       v6Response.unmount();
     };
 

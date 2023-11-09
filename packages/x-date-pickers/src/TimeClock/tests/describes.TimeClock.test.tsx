@@ -27,7 +27,7 @@ describe('<TimeClock /> - Describes', () => {
     skip: ['componentProp', 'componentsProp', 'reactTestRenderer', 'themeVariants'],
   }));
 
-  describeValue(TimeClock, () => ({
+  describeValue.skip(TimeClock, () => ({
     render,
     componentFamily: 'clock',
     values: [

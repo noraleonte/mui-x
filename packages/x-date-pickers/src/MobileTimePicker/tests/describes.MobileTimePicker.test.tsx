@@ -10,13 +10,12 @@ import {
   wrapPickerMount,
   adapterToUse,
   expectFieldValueV7,
-  expectInputPlaceholderV6,
   openPicker,
   getClockTouchEvent,
-  getTextbox,
   describeValidation,
   describeValue,
   describePicker,
+  getFieldRoot,
 } from 'test/utils/pickers';
 import { MobileTimePicker } from '@mui/x-date-pickers/MobileTimePicker';
 
@@ -55,7 +54,7 @@ describe('<MobileTimePicker /> - Describes', () => {
     ],
   }));
 
-  describeValue(MobileTimePicker, () => ({
+  describeValue.only(MobileTimePicker, () => ({
     render,
     componentFamily: 'picker',
     type: 'time',
@@ -68,15 +67,15 @@ describe('<MobileTimePicker /> - Describes', () => {
     clock,
     assertRenderedValue: (expectedValue: any) => {
       const hasMeridiem = adapterToUse.is12HourCycleInCurrentLocale();
-      const input = getTextbox();
+      const fieldRoot = getFieldRoot();
       if (!expectedValue) {
-        expectInputPlaceholderV6(input, hasMeridiem ? 'hh:mm aa' : 'hh:mm');
+        expectFieldValueV7(fieldRoot, hasMeridiem ? 'hh:mm aa' : 'hh:mm');
       }
       const expectedValueStr = expectedValue
         ? adapterToUse.format(expectedValue, hasMeridiem ? 'fullTime12h' : 'fullTime24h')
         : '';
 
-      expectFieldValueV7(input, expectedValueStr);
+      expectFieldValueV7(fieldRoot, expectedValueStr);
     },
     setNewValue: (value, { isOpened, applySameValue }) => {
       if (!isOpened) {

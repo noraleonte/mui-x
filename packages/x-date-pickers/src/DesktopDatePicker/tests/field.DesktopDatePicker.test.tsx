@@ -6,7 +6,7 @@ import {
   getTextbox,
   expectFieldValueV7,
   expectFieldValueV6,
-  expectInputPlaceholderV6,
+  expectFieldPlaceholderV6,
   adapterToUse,
   describeAdapters,
 } from 'test/utils/pickers';
@@ -55,7 +55,7 @@ describe('<DesktopDatePicker /> - Field', () => {
 
       const input = getTextbox();
       v6Response.selectSection('month');
-      expectInputPlaceholderV6(input, 'MMMM DD');
+      expectFieldPlaceholderV6(input, 'MMMM DD');
 
       fireEvent.change(input, { target: { value: 'N DD' } }); // Press "N"
       expectFieldValueV6(input, 'November DD');
@@ -80,7 +80,7 @@ describe('<DesktopDatePicker /> - Field', () => {
           { componentFamily: 'picker' },
         );
         const input = getTextbox();
-        expectInputPlaceholderV6(input, expectedFormat);
+        expectFieldPlaceholderV6(input, expectedFormat);
         v6Response.unmount();
       };
 

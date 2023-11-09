@@ -2,7 +2,7 @@ import * as React from 'react';
 import { expect } from 'chai';
 import { spy } from 'sinon';
 import { TimeView } from '@mui/x-date-pickers/models';
-import { adapterToUse } from 'test/utils/pickers';
+import { adapterToUse, getFieldRoot } from 'test/utils/pickers';
 import { DescribeValidationTestSuite } from './describeValidation.types';
 
 export const testTextFieldValidation: DescribeValidationTestSuite = (ElementToTest, getOptions) => {
@@ -11,8 +11,6 @@ export const testTextFieldValidation: DescribeValidationTestSuite = (ElementToTe
   if (!['picker', 'field'].includes(componentFamily)) {
     return;
   }
-
-  const getFieldRoot = () => document.querySelector('.fake-text-field-root');
 
   describe('text field:', () => {
     it('should apply shouldDisableDate', function test() {

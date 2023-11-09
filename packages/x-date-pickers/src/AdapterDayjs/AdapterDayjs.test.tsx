@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { spy } from 'sinon';
 import dayjs, { Dayjs } from 'dayjs';
-import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
+import { DateTimeField } from '@mui/x-date-pickers';
 import { DateCalendar } from '@mui/x-date-pickers/DateCalendar';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { AdapterFormats } from '@mui/x-date-pickers/models';
@@ -10,11 +10,11 @@ import { expect } from 'chai';
 import {
   buildPickerDragInteractions,
   MockedDataTransfer,
-  expectInputPlaceholderV6,
   expectFieldValueV7,
   createPickerRenderer,
   describeGregorianAdapter,
   TEST_DATE_ISO_STRING,
+  buildFieldInteractions,
 } from 'test/utils/pickers';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DateRangeCalendar } from '@mui/x-date-pickers-pro/DateRangeCalendar';
@@ -147,25 +147,28 @@ describe('<AdapterDayjs />', () => {
       const localeObject = localeKey === 'undefined' ? undefined : { code: localeKey };
 
       describe(`test with the ${localeName} locale`, () => {
-        const { render, adapter } = createPickerRenderer({
+        const { render, clock, adapter } = createPickerRenderer({
           clock: 'fake',
           adapterName: 'dayjs',
           locale: localeObject,
         });
 
-        it('should have correct placeholder', () => {
-          render(<DateTimePicker />);
+        const { renderWithProps } = buildFieldInteractions({
+          render,
+          clock,
+          Component: DateTimeField,
+        });
 
-          expectInputPlaceholderV6(
-            screen.getByRole('textbox'),
-            localizedTexts[localeKey].placeholder,
-          );
+        it('should have correct placeholder', () => {
+          const v7Response = renderWithProps({});
+
+          expectFieldValueV7(v7Response.fieldContainer, localizedTexts[localeKey].placeholder);
         });
 
         it('should have well formatted value', () => {
-          render(<DateTimePicker value={adapter.date(testDate)} />);
+          const v7Response = renderWithProps({ value: adapter.date(testDate) });
 
-          expectFieldValueV7(screen.getByRole('textbox'), localizedTexts[localeKey].value);
+          expectFieldValueV7(v7Response.fieldContainer, localizedTexts[localeKey].value);
         });
       });
     });

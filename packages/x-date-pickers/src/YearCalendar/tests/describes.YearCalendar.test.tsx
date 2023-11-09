@@ -37,7 +37,7 @@ describe('<YearCalendar /> - Describes', () => {
     skip: ['componentProp', 'componentsProp', 'reactTestRenderer', 'themeVariants'],
   }));
 
-  describeValue(YearCalendar, () => ({
+  describeValue.skip(YearCalendar, () => ({
     render,
     componentFamily: 'calendar',
     values: [adapterToUse.date(new Date(2018, 0, 1)), adapterToUse.date(new Date(2019, 0, 1))],

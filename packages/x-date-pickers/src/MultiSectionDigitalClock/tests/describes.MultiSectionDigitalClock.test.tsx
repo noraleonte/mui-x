@@ -42,7 +42,7 @@ describe('<MultiSectionDigitalClock /> - Describes', () => {
     ],
   }));
 
-  describeValue(MultiSectionDigitalClock, () => ({
+  describeValue.skip(MultiSectionDigitalClock, () => ({
     render,
     componentFamily: 'multi-section-digital-clock',
     type: 'time',

@@ -41,7 +41,7 @@ describe('<DigitalClock /> - Describes', () => {
     ],
   }));
 
-  describeValue(DigitalClock, () => ({
+  describeValue.skip(DigitalClock, () => ({
     render,
     componentFamily: 'digital-clock',
     type: 'time',

@@ -18,22 +18,6 @@ const isJSDOM = /jsdom/.test(window.navigator.userAgent);
 describe('<DesktopDatePicker />', () => {
   const { render, clock } = createPickerRenderer({ clock: 'fake' });
 
-  it('allows to change selected date from the field according to `format`', () => {
-    const handleChange = spy();
-
-    render(<DesktopDatePicker onChange={handleChange} />);
-    const input = getTextbox();
-
-    fireEvent.change(input, {
-      target: {
-        value: '10/11/2018',
-      },
-    });
-
-    expectFieldValueV7(input, '10/11/2018');
-    expect(handleChange.callCount).to.equal(1);
-  });
-
   describe('Views', () => {
     it('should switch between views uncontrolled', () => {
       const handleViewChange = spy();

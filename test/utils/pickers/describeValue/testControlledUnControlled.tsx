@@ -3,7 +3,7 @@ import { expect } from 'chai';
 import { spy } from 'sinon';
 import { screen, act, userEvent } from '@mui-internal/test-utils';
 import { inputBaseClasses } from '@mui/material/InputBase';
-import { getExpectedOnChangeCount } from 'test/utils/pickers';
+import { getExpectedOnChangeCount, getFieldRoot } from 'test/utils/pickers';
 import { DescribeValueOptions, DescribeValueTestSuite } from './describeValue.types';
 
 export const testControlledUnControlled: DescribeValueTestSuite<any, any> = (
@@ -216,11 +216,15 @@ export const testControlledUnControlled: DescribeValueTestSuite<any, any> = (
         }
         render(<ElementToTest slotProps={{ textField: { error: true } }} />);
 
-        const textBoxes = screen.getAllByRole('textbox');
-        textBoxes.forEach((textbox) => {
-          expect(textbox.parentElement).to.have.class(inputBaseClasses.error);
-          expect(textbox).to.have.attribute('aria-invalid', 'true');
-        });
+        const fieldRoot = getFieldRoot();
+        expect(fieldRoot).to.have.class(inputBaseClasses.error);
+        expect(fieldRoot).to.have.attribute('aria-invalid', 'true');
+
+        if (params.type === 'date-range' && !params.isSingleInput) {
+          const fieldRootEnd = getFieldRoot(1);
+          expect(fieldRootEnd).to.have.class(inputBaseClasses.error);
+          expect(fieldRootEnd).to.have.attribute('aria-invalid', 'true');
+        }
       });
     });
   });

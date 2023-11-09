@@ -1,4 +1,5 @@
 import * as React from 'react';
+import clsx from 'clsx';
 import { styled } from '@mui/material/styles';
 import { visuallyHidden } from '@mui/utils';
 import useForkRef from '@mui/utils/useForkRef';
@@ -126,7 +127,7 @@ export const FakeTextField = React.forwardRef(function FakeTextField(
       }}
       aria-invalid={error}
       // TODO: Stop hard-coding
-      className="fake-text-field-root"
+      className={clsx(['fake-text-field-root', error && 'Mui-error'])}
     >
       {children}
       {InputProps?.endAdornment}

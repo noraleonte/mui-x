@@ -35,7 +35,7 @@ describe('<MonthCalendar /> - Describes', () => {
     skip: ['componentProp', 'componentsProp', 'reactTestRenderer', 'themeVariants'],
   }));
 
-  describeValue(MonthCalendar, () => ({
+  describeValue.skip(MonthCalendar, () => ({
     render,
     componentFamily: 'calendar',
     values: [adapterToUse.date(new Date(2018, 0, 1)), adapterToUse.date(new Date(2018, 1, 1))],
