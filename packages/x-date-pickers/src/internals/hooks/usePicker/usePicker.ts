@@ -28,6 +28,7 @@ export const usePicker = <
   additionalViewProps,
   validator,
   autoFocusView,
+  fieldRef,
 }: UsePickerParams<
   TValue,
   TDate,
@@ -53,12 +54,14 @@ export const usePicker = <
     TValue,
     TDate,
     TView,
+    TSection,
     TExternalProps,
     TAdditionalProps
   >({
     props,
     additionalViewProps,
     autoFocusView,
+    fieldRef,
     propsFromPickerValue: pickerValueResponse.viewProps,
   });
 
@@ -73,7 +76,7 @@ export const usePicker = <
     // Picker value
     open: pickerValueResponse.open,
     actions: pickerValueResponse.actions,
-    fieldProps: { ...pickerValueResponse.fieldProps, ...pickerViewsResponse.fieldProps },
+    fieldProps: pickerValueResponse.fieldProps,
 
     // Picker views
     renderCurrentView: pickerViewsResponse.renderCurrentView,

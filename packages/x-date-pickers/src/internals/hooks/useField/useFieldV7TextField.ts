@@ -59,6 +59,13 @@ export const useFieldV7TextField = <
           return;
         }
 
+        // On multi input range pickers we want to update selection range only for the active input
+        // This helps to avoid the focus jumping on Safari https://github.com/mui/mui-x/issues/9003
+        // because WebKit implements the `setSelectionRange` based on the spec: https://bugs.webkit.org/show_bug.cgi?id=224425
+        if (!isFocusInsideContainer(containerRef)) {
+          return;
+        }
+
         const selection = document.getSelection();
         if (!selection) {
           return;
@@ -92,9 +99,11 @@ export const useFieldV7TextField = <
           getActiveElement(document) as HTMLSpanElement | undefined,
         );
       },
-      focusField: () => containerRef.current?.focus(),
+      focusField: () => {
+        setSelectedSections(sectionOrder.startIndex);
+      },
     }),
-    [containerRef, parsedSelectedSections],
+    [containerRef, parsedSelectedSections, sectionOrder.startIndex, setSelectedSections],
   );
 
   /**
@@ -128,7 +137,7 @@ export const useFieldV7TextField = <
         const cursorPosition = document.getSelection()!.getRangeAt(0).startOffset;
 
         if (cursorPosition === 0) {
-          setSelectedSections(0);
+          setSelectedSections(sectionOrder.startIndex);
           return;
         }
 

@@ -52,8 +52,8 @@ export interface UsePickerParams<
       'valueManager' | 'valueType' | 'wrapperVariant' | 'validator'
     >,
     Pick<
-      UsePickerViewParams<TValue, TDate, TView, TExternalProps, TAdditionalProps>,
-      'additionalViewProps' | 'autoFocusView'
+      UsePickerViewParams<TValue, TDate, TView, TSection, TExternalProps, TAdditionalProps>,
+      'additionalViewProps' | 'autoFocusView' | 'fieldRef'
     > {
   props: TExternalProps;
 }
@@ -63,12 +63,6 @@ export interface UsePickerResponse<
   TView extends DateOrTimeViewWithMeridiem,
   TSection extends FieldSection,
   TError,
-> extends Omit<
-      UsePickerValueResponse<TValue, TSection, TError>,
-      'viewProps' | 'layoutProps' | 'fieldProps'
-    >,
-    Omit<UsePickerViewsResponse<TView>, 'layoutProps' | 'fieldProps'>,
-    UsePickerLayoutPropsResponse<TValue, TView> {
-  fieldProps: UsePickerValueResponse<TValue, TSection, TError>['fieldProps'] &
-    UsePickerViewsResponse<TView>['fieldProps'];
-}
+> extends Omit<UsePickerValueResponse<TValue, TSection, TError>, 'viewProps' | 'layoutProps'>,
+    Omit<UsePickerViewsResponse<TView>, 'layoutProps'>,
+    UsePickerLayoutPropsResponse<TValue, TView> {}

@@ -8,7 +8,6 @@ import type { UsePickerValueViewsResponse } from './usePickerValue.types';
 import { isTimeView } from '../../utils/time-utils';
 import { DateOrTimeViewWithMeridiem } from '../../models';
 import { FieldRef, FieldSection, TimezoneProps } from '../../../models';
-import { UseFieldInternalProps } from '../useField';
 
 interface PickerViewsRendererBaseExternalProps<TView extends DateOrTimeViewWithMeridiem>
   extends Omit<UsePickerViewsProps<any, any, TView, any, any>, 'openTo' | 'viewRenderers'> {}
@@ -108,6 +107,7 @@ export interface UsePickerViewParams<
   TValue,
   TDate,
   TView extends DateOrTimeViewWithMeridiem,
+  TSection extends FieldSection,
   TExternalProps extends UsePickerViewsProps<
     TValue,
     TDate,
@@ -121,6 +121,7 @@ export interface UsePickerViewParams<
   propsFromPickerValue: UsePickerValueViewsResponse<TValue>;
   additionalViewProps: TAdditionalProps;
   autoFocusView: boolean;
+  fieldRef: React.RefObject<FieldRef<TSection>> | undefined;
 }
 
 export interface UsePickerViewsResponse<TView extends DateOrTimeViewWithMeridiem> {
@@ -132,7 +133,6 @@ export interface UsePickerViewsResponse<TView extends DateOrTimeViewWithMeridiem
   renderCurrentView: () => React.ReactNode;
   shouldRestoreFocus: () => boolean;
   layoutProps: UsePickerViewsLayoutResponse<TView>;
-  fieldProps: Required<Pick<UseFieldInternalProps<any, any, any, any>, 'unstableFieldRef'>>;
 }
 
 export interface UsePickerViewsLayoutResponse<TView extends DateOrTimeViewWithMeridiem> {
@@ -151,6 +151,7 @@ export const usePickerViews = <
   TValue,
   TDate,
   TView extends DateOrTimeViewWithMeridiem,
+  TSection extends FieldSection,
   TExternalProps extends UsePickerViewsProps<TValue, TDate, TView, any, any>,
   TAdditionalProps extends {},
 >({
@@ -158,18 +159,18 @@ export const usePickerViews = <
   propsFromPickerValue,
   additionalViewProps,
   autoFocusView,
+  fieldRef,
 }: UsePickerViewParams<
   TValue,
   TDate,
   TView,
+  TSection,
   TExternalProps,
   TAdditionalProps
 >): UsePickerViewsResponse<TView> => {
   const { onChange, open, onSelectedSectionsChange, onClose } = propsFromPickerValue;
   const { views, openTo, onViewChange, disableOpenPicker, viewRenderers, timezone } = props;
   const { className, sx, ...propsToForwardToView } = props;
-
-  const fieldRef = React.useRef<FieldRef<FieldSection>>(null);
 
   const { view, setView, defaultView, focusedView, setFocusedView, setValueAndGoToNextView } =
     useViews({
@@ -234,7 +235,7 @@ export const usePickerViews = <
       setTimeout(() => {
         // focusing the input before the range selection is done
         // calling `onSelectedSectionsChange` outside of timeout results in an inconsistent behavior between Safari And Chrome
-        fieldRef.current?.focusField();
+        fieldRef?.current?.focusField();
         onSelectedSectionsChange(view);
       });
     }
@@ -277,9 +278,6 @@ export const usePickerViews = <
     hasUIView,
     shouldRestoreFocus,
     layoutProps,
-    fieldProps: {
-      unstableFieldRef: fieldRef,
-    },
     renderCurrentView: () => {
       if (popperView == null) {
         return null;
