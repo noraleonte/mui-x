@@ -3,8 +3,6 @@ import {
   createPickerRenderer,
   adapterToUse,
   expectFieldValueV7,
-  expectFieldPlaceholderV6,
-  getTextbox,
   describeValidation,
   describeValue,
   describePicker,

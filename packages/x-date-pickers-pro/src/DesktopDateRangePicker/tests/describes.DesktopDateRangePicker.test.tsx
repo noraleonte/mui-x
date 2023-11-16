@@ -4,7 +4,6 @@ import {
   adapterToUse,
   createPickerRenderer,
   wrapPickerMount,
-  getTextbox,
   expectFieldValueV7,
   describePicker,
   describeValue,

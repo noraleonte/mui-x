@@ -147,25 +147,28 @@ describe('<AdapterLuxon />', () => {
       const localeObject = localeKey === 'undefined' ? undefined : { code: localeKey };
 
       describe(`test with the ${localeName} locale`, () => {
-        const { render, adapter } = createPickerRenderer({
+        const { render, adapter, clock } = createPickerRenderer({
           clock: 'fake',
           adapterName: 'luxon',
           locale: localeObject,
         });
 
-        it('should have correct placeholder', () => {
-          render(<DateTimePicker format="DD" />);
+        const { renderWithProps } = buildFieldInteractions({
+          render,
+          clock,
+          Component: DateTimeField,
+        });
 
-          expectInputPlaceholder(
-            screen.getByRole('textbox'),
-            localizedTexts[localeKey].placeholder,
-          );
+        it('should have correct placeholder', () => {
+          const v7Response = renderWithProps({ format: 'DD' });
+
+          expectFieldValueV7(v7Response.fieldContainer, localizedTexts[localeKey].placeholder);
         });
 
         it('should have well formatted value', () => {
-          render(<DateTimePicker value={adapter.date(testDate)} format="DD" />);
+          const v7Response = renderWithProps({ value: adapter.date(testDate), format: 'DD' });
 
-          expectInputValue(screen.getByRole('textbox'), localizedTexts[localeKey].value);
+          expectFieldValueV7(v7Response.fieldContainer, localizedTexts[localeKey].value);
         });
       });
     });
