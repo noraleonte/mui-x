@@ -5,11 +5,11 @@ import {
   createPickerRenderer,
   wrapPickerMount,
   getTextbox,
-  expectFieldPlaceholderV6,
   expectFieldValueV7,
   describePicker,
   describeValue,
   describeRangeValidation,
+  getFieldRoot,
 } from 'test/utils/pickers';
 import { DesktopDateRangePicker } from '@mui/x-date-pickers-pro/DesktopDateRangePicker';
 import { SingleInputDateRangeField } from '@mui/x-date-pickers-pro/SingleInputDateRangeField';
@@ -48,7 +48,7 @@ describe('<DesktopDateRangePicker /> - Describes', () => {
     ],
   }));
 
-  describeValue.skip(DesktopDateRangePicker, () => ({
+  describeValue(DesktopDateRangePicker, () => ({
     render,
     componentFamily: 'picker',
     type: 'date-range',
@@ -63,16 +63,22 @@ describe('<DesktopDateRangePicker /> - Describes', () => {
     ],
     emptyValue: [null, null],
     assertRenderedValue: (expectedValues: any[]) => {
-      const textBoxes: HTMLInputElement[] = screen.getAllByRole('textbox');
-      expectedValues.forEach((value, index) => {
-        const input = textBoxes[index];
-        if (!value) {
-          expectFieldPlaceholderV6(input, 'MM/DD/YYYY');
-        }
-        expectFieldValueV7(input, value ? adapterToUse.format(value, 'keyboardDate') : '');
-      });
+      const startFieldRoot = getFieldRoot(0);
+      const expectedStartValueStr = expectedValues[0]
+        ? adapterToUse.format(expectedValues[0], 'keyboardDate')
+        : 'MM/DD/YYYY';
+      expectFieldValueV7(startFieldRoot, expectedStartValueStr);
+
+      const endFieldRoot = getFieldRoot(1);
+      const expectedEndValueStr = expectedValues[1]
+        ? adapterToUse.format(expectedValues[1], 'keyboardDate')
+        : 'MM/DD/YYYY';
+      expectFieldValueV7(endFieldRoot, expectedEndValueStr);
     },
-    setNewValue: (value, { isOpened, applySameValue, setEndDate = false, selectSection }) => {
+    setNewValue: (
+      value,
+      { isOpened, applySameValue, setEndDate = false, selectSection, pressKey },
+    ) => {
       let newValue: any[];
       if (applySameValue) {
         newValue = value;
@@ -90,8 +96,7 @@ describe('<DesktopDateRangePicker /> - Describes', () => {
         );
       } else {
         selectSection('day');
-        const input = screen.getAllByRole<HTMLInputElement>('textbox')[0];
-        userEvent.keyPress(input, { key: 'ArrowUp' });
+        pressKey(undefined, 'ArrowUp');
       }
 
       return newValue;
@@ -99,7 +104,7 @@ describe('<DesktopDateRangePicker /> - Describes', () => {
   }));
 
   // With single input field
-  describeValue.skip(DesktopDateRangePicker, () => ({
+  describeValue(DesktopDateRangePicker, () => ({
     render,
     componentFamily: 'picker',
     type: 'date-range',
@@ -118,20 +123,24 @@ describe('<DesktopDateRangePicker /> - Describes', () => {
     ],
     emptyValue: [null, null],
     assertRenderedValue: (expectedValues: any[]) => {
-      const input = screen.getByRole<HTMLInputElement>('textbox');
-      const expectedValueStr = expectedValues
-        .map((value) => (value == null ? 'MM/DD/YYYY' : adapterToUse.format(value, 'keyboardDate')))
-        .join(' – ');
+      const fieldRoot = getFieldRoot(0);
 
-      const isEmpty = expectedValues[0] == null && expectedValues[1] == null;
+      const expectedStartValueStr = expectedValues[0]
+        ? adapterToUse.format(expectedValues[0], 'keyboardDate')
+        : 'MM/DD/YYYY';
 
-      if (isEmpty) {
-        expectFieldPlaceholderV6(input, expectedValueStr);
-      }
+      const expectedEndValueStr = expectedValues[1]
+        ? adapterToUse.format(expectedValues[1], 'keyboardDate')
+        : 'MM/DD/YYYY';
 
-      expectFieldValueV7(input, isEmpty ? '' : expectedValueStr);
+      const expectedValueStr = `${expectedStartValueStr} – ${expectedEndValueStr}`;
+
+      expectFieldValueV7(fieldRoot, expectedValueStr);
     },
-    setNewValue: (value, { isOpened, applySameValue, setEndDate = false, selectSection }) => {
+    setNewValue: (
+      value,
+      { isOpened, applySameValue, setEndDate = false, selectSection, pressKey },
+    ) => {
       let newValue: any[];
       if (applySameValue) {
         newValue = value;
@@ -149,8 +158,7 @@ describe('<DesktopDateRangePicker /> - Describes', () => {
         );
       } else {
         selectSection('day');
-        const input = getTextbox();
-        userEvent.keyPress(input, { key: 'ArrowUp' });
+        pressKey(undefined, 'ArrowUp');
       }
 
       return newValue;

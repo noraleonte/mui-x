@@ -26,6 +26,7 @@ interface FakeTextFieldProps {
   contentEditable?: boolean;
   fullWidth?: boolean;
   focused?: boolean;
+  readOnly?: boolean;
 }
 
 const FakeTextFieldRoot = styled('div', {
@@ -77,6 +78,7 @@ export const FakeTextField = React.forwardRef(function FakeTextField(
     fullWidth,
     focused,
     ownerState,
+    readOnly,
     ...other
   } = props;
 
@@ -85,37 +87,17 @@ export const FakeTextField = React.forwardRef(function FakeTextField(
 
   let children: React.ReactNode;
   if (other.contentEditable) {
-    children = (
-      <FakeTextFieldInputContent className="fake-text-field-input-content" ref={InputProps?.ref}>
-        {elements
-          .map(
-            ({ content, before, after }) =>
-              `${before.children}${content.children}${after.children}`,
-          )
-          .join('')}
-      </FakeTextFieldInputContent>
-    );
+    children = elements
+      .map(({ content, before, after }) => `${before.children}${content.children}${after.children}`)
+      .join('');
   } else {
-    children = (
-      <React.Fragment>
-        <FakeTextFieldInputContent className="fake-text-field-input-content" ref={InputProps?.ref}>
-          {elements.map(({ container, content, before, after }, elementIndex) => (
-            <span {...container} key={elementIndex}>
-              <span {...before} />
-              <span {...content} />
-              <span {...after} />
-            </span>
-          ))}
-        </FakeTextFieldInputContent>
-        <FakeTextFieldHiddenInput
-          value={valueStr}
-          onChange={onValueStrChange}
-          id={id}
-          aria-hidden="true"
-          tabIndex={-1}
-        />
-      </React.Fragment>
-    );
+    children = elements.map(({ container, content, before, after }, elementIndex) => (
+      <span {...container} key={elementIndex}>
+        <span {...before} />
+        <span {...content} />
+        <span {...after} />
+      </span>
+    ));
   }
 
   return (
@@ -127,9 +109,22 @@ export const FakeTextField = React.forwardRef(function FakeTextField(
       }}
       aria-invalid={error}
       // TODO: Stop hard-coding
-      className={clsx(['fake-text-field-root', error && 'Mui-error'])}
+      className={clsx(['fake-text-field-root', error && 'Mui-error', disabled && 'Mui-disabled'])}
     >
-      {children}
+      <FakeTextFieldInputContent
+        ref={InputProps?.ref}
+        // TODO: Stop hard-coding
+        className={clsx(['fake-text-field-input-content', readOnly && 'Mui-readOnly'])}
+      >
+        {children}
+      </FakeTextFieldInputContent>
+      <FakeTextFieldHiddenInput
+        value={valueStr}
+        onChange={onValueStrChange}
+        id={id}
+        aria-hidden="true"
+        tabIndex={-1}
+      />
       {InputProps?.endAdornment}
     </FakeTextFieldRoot>
   );

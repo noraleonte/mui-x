@@ -3,11 +3,11 @@ import {
   createPickerRenderer,
   adapterToUse,
   expectFieldValueV7,
-  expectFieldPlaceholderV6,
   getTextbox,
   describeValidation,
   describeValue,
   describePicker,
+  getFieldRoot,
 } from 'test/utils/pickers';
 import { DesktopDateTimePicker } from '@mui/x-date-pickers/DesktopDateTimePicker';
 import { expect } from 'chai';
@@ -38,7 +38,7 @@ describe('<DesktopDateTimePicker /> - Describes', () => {
     variant: 'desktop',
   }));
 
-  describeValue.skip(DesktopDateTimePicker, () => ({
+  describeValue(DesktopDateTimePicker, () => ({
     render,
     componentFamily: 'picker',
     type: 'date-time',
@@ -51,20 +51,21 @@ describe('<DesktopDateTimePicker /> - Describes', () => {
     clock,
     assertRenderedValue: (expectedValue: any) => {
       const hasMeridiem = adapterToUse.is12HourCycleInCurrentLocale();
-      const input = getTextbox();
-      if (!expectedValue) {
-        expectFieldPlaceholderV6(input, hasMeridiem ? 'MM/DD/YYYY hh:mm aa' : 'MM/DD/YYYY hh:mm');
-      }
-      const expectedValueStr = expectedValue
-        ? adapterToUse.format(
-            expectedValue,
-            hasMeridiem ? 'keyboardDateTime12h' : 'keyboardDateTime24h',
-          )
-        : '';
+      const fieldRoot = getFieldRoot();
 
-      expectFieldValueV7(input, expectedValueStr);
+      let expectedValueStr: string;
+      if (expectedValue) {
+        expectedValueStr = adapterToUse.format(
+          expectedValue,
+          hasMeridiem ? 'keyboardDateTime12h' : 'keyboardDateTime24h',
+        );
+      } else {
+        expectedValueStr = hasMeridiem ? 'MM/DD/YYYY hh:mm aa' : 'MM/DD/YYYY hh:mm';
+      }
+
+      expectFieldValueV7(fieldRoot, expectedValueStr);
     },
-    setNewValue: (value, { isOpened, applySameValue, selectSection }) => {
+    setNewValue: (value, { isOpened, applySameValue, selectSection, pressKey }) => {
       const newValue = applySameValue
         ? value
         : adapterToUse.addMinutes(adapterToUse.addHours(adapterToUse.addDays(value, 1), 1), 5);
@@ -89,25 +90,22 @@ describe('<DesktopDateTimePicker /> - Describes', () => {
         }
       } else {
         selectSection('day');
-        const input = getTextbox();
-        userEvent.keyPress(input, { key: 'ArrowUp' });
-        // move to the hours section
-        userEvent.keyPress(input, { key: 'ArrowRight' });
-        userEvent.keyPress(input, { key: 'ArrowRight' });
-        userEvent.keyPress(input, { key: 'ArrowUp' });
-        // move to the minutes section
-        userEvent.keyPress(input, { key: 'ArrowRight' });
-        // increment by 5 minutes
-        userEvent.keyPress(input, { key: 'PageUp' });
+        pressKey(undefined, 'ArrowUp');
+
+        selectSection('hours');
+        pressKey(undefined, 'ArrowUp');
+
+        selectSection('minutes');
+        pressKey(undefined, 'PageUp'); // increment by 5 minutes
+
         const hasMeridiem = adapterToUse.is12HourCycleInCurrentLocale();
         if (hasMeridiem) {
-          // move to the meridiem section
-          userEvent.keyPress(input, { key: 'ArrowRight' });
+          selectSection('meridiem');
           const previousHours = adapterToUse.getHours(value);
           const newHours = adapterToUse.getHours(newValue);
           // update meridiem section if it changed
           if ((previousHours < 12 && newHours >= 12) || (previousHours >= 12 && newHours < 12)) {
-            userEvent.keyPress(input, { key: 'ArrowUp' });
+            pressKey(undefined, 'ArrowUp');
           }
         }
       }

@@ -3,12 +3,11 @@ import {
   createPickerRenderer,
   adapterToUse,
   expectFieldValueV7,
-  expectFieldPlaceholderV6,
   openPicker,
-  getTextbox,
   describeValidation,
   describeValue,
   describePicker,
+  getFieldRoot,
 } from 'test/utils/pickers';
 import { MobileDatePicker } from '@mui/x-date-pickers/MobileDatePicker';
 
@@ -24,7 +23,7 @@ describe('<MobileDatePicker /> - Describes', () => {
     componentFamily: 'picker',
   }));
 
-  describeValue.skip(MobileDatePicker, () => ({
+  describeValue(MobileDatePicker, () => ({
     render,
     componentFamily: 'picker',
     type: 'date',
@@ -33,14 +32,13 @@ describe('<MobileDatePicker /> - Describes', () => {
     emptyValue: null,
     clock,
     assertRenderedValue: (expectedValue: any) => {
-      const input = getTextbox();
-      if (!expectedValue) {
-        expectFieldPlaceholderV6(input, 'MM/DD/YYYY');
-      }
-      expectFieldValueV7(
-        input,
-        expectedValue ? adapterToUse.format(expectedValue, 'keyboardDate') : '',
-      );
+      const fieldRoot = getFieldRoot();
+
+      const expectedValueStr = expectedValue
+        ? adapterToUse.format(expectedValue, 'keyboardDate')
+        : 'MM/DD/YYYY';
+
+      expectFieldValueV7(fieldRoot, expectedValueStr);
     },
     setNewValue: (value, { isOpened, applySameValue }) => {
       if (!isOpened) {

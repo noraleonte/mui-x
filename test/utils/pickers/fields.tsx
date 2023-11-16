@@ -19,6 +19,11 @@ export type FieldSectionSelector = (
   index?: 'first' | 'last',
 ) => void;
 
+export type FieldPressCharacter = (
+  sectionIndex: number | undefined | null,
+  character: string,
+) => void;
+
 export interface BuildFieldInteractionsResponse<P extends {}> {
   renderWithProps: (
     props: P & { shouldUseV6TextField?: boolean },
@@ -47,7 +52,7 @@ export interface BuildFieldInteractionsResponse<P extends {}> {
      * @param {number | undefined | null} sectionIndex If null presses on the fieldContainer, otherwise if defined asserts that the active section is the expected one
      * @param {string} character The character to press.
      */
-    pressCharacter: (sectionIndex: number | undefined | null, character: string) => void;
+    pressKey: FieldPressCharacter;
     getHiddenInput: () => HTMLInputElement;
   };
   testFieldKeyPress: (
@@ -175,18 +180,38 @@ export const buildFieldInteractions = <P extends {}>({
       return activeElement;
     };
 
-    const pressCharacter = (sectionIndex: number | undefined | null, character: string) => {
+    const pressKey: FieldPressCharacter = (sectionIndex, key) => {
+      if (props.shouldUseV6TextField) {
+        throw new Error('`pressKey` is only available with v7 TextField');
+      }
+
       const target =
         sectionIndex === null ? fieldContainerRef.current! : getActiveSection(sectionIndex);
 
-      fireEvent.input(target, { target: { textContent: character } });
+      if (
+        [
+          'ArrowUp',
+          'ArrowDown',
+          'PageUp',
+          'PageDown',
+          'Home',
+          'End',
+          'Delete',
+          'ArrowLeft',
+          'ArrowRight',
+        ].includes(key)
+      ) {
+        userEvent.keyPress(target, { key });
+      } else {
+        fireEvent.input(target, { target: { textContent: key } });
+      }
     };
 
     return {
       selectSection,
       getActiveSection,
       getSection,
-      pressCharacter,
+      pressKey,
       getHiddenInput: () => fieldContainerRef.current!.querySelector<HTMLInputElement>('input')!,
       fieldContainer: fieldContainerRef.current!,
       ...result,
@@ -202,7 +227,7 @@ export const buildFieldInteractions = <P extends {}>({
     // Test with v7 input
     const v7Response = renderWithProps(props as any as P);
     v7Response.selectSection(selectedSection);
-    userEvent.keyPress(v7Response.getActiveSection(undefined), { key });
+    v7Response.pressKey(undefined, key);
     expectFieldValueV7(v7Response.fieldContainer, expectedValue);
     v7Response.unmount();
 
@@ -226,7 +251,7 @@ export const buildFieldInteractions = <P extends {}>({
       const v7Response = renderWithProps(props as any as P);
       v7Response.selectSection(selectedSection);
       keyStrokes.forEach((keyStroke) => {
-        v7Response.pressCharacter(undefined, keyStroke.value);
+        v7Response.pressKey(undefined, keyStroke.value);
         expectFieldValueV7(
           v7Response.fieldContainer,
           keyStroke.expected,
@@ -277,5 +302,7 @@ export const getCleanedSelectedContent = () => {
   return cleanText(document.getSelection()?.toString() ?? '');
 };
 
-export const getFieldRoot = (index = 0) =>
-  document.querySelectorAll<HTMLDivElement>('.fake-text-field-root')[index];
+export const getAllFieldRoot = () =>
+  document.querySelectorAll<HTMLDivElement>('.fake-text-field-root');
+
+export const getFieldRoot = (index = 0) => getAllFieldRoot()[index];

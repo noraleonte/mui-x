@@ -55,7 +55,7 @@ describe('<MobileTimePicker /> - Describes', () => {
     ],
   }));
 
-  describeValue.only(MobileTimePicker, () => ({
+  describeValue(MobileTimePicker, () => ({
     render,
     componentFamily: 'picker',
     type: 'time',
@@ -69,12 +69,13 @@ describe('<MobileTimePicker /> - Describes', () => {
     assertRenderedValue: (expectedValue: any) => {
       const hasMeridiem = adapterToUse.is12HourCycleInCurrentLocale();
       const fieldRoot = getFieldRoot();
-      if (!expectedValue) {
-        expectFieldValueV7(fieldRoot, hasMeridiem ? 'hh:mm aa' : 'hh:mm');
+
+      let expectedValueStr: string;
+      if (expectedValue) {
+        expectedValueStr = formatFullTimeValue(adapterToUse, expectedValue);
+      } else {
+        expectedValueStr = hasMeridiem ? 'hh:mm aa' : 'hh:mm';
       }
-      const expectedValueStr = expectedValue
-        ? formatFullTimeValue(adapterToUse, expectedValue)
-        : '';
 
       expectFieldValueV7(fieldRoot, expectedValueStr);
     },

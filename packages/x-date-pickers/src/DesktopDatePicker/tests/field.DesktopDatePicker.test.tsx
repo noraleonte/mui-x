@@ -33,13 +33,13 @@ describe('<DesktopDatePicker /> - Field', () => {
       v7Response.selectSection('month');
       expectFieldValueV7(v7Response.fieldContainer, 'MMMM DD');
 
-      v7Response.pressCharacter(0, 'N');
+      v7Response.pressKey(0, 'N');
       expectFieldValueV7(v7Response.fieldContainer, 'November DD');
 
-      v7Response.pressCharacter(1, '4');
+      v7Response.pressKey(1, '4');
       expectFieldValueV7(v7Response.fieldContainer, 'November 04');
 
-      v7Response.pressCharacter(1, '');
+      v7Response.pressKey(1, '');
       expectFieldValueV7(v7Response.fieldContainer, 'November DD');
 
       v7Response.unmount();
@@ -108,7 +108,7 @@ describe('<DesktopDatePicker /> - Field', () => {
       expectFieldValueV7(v7Response.fieldContainer, 'June 2022');
       v7Response.selectSection('month');
 
-      v7Response.pressCharacter(0, '');
+      v7Response.pressKey(0, '');
       expectFieldValueV7(v7Response.fieldContainer, 'MMMM 2022');
     });
   });

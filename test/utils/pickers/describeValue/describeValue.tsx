@@ -40,8 +40,8 @@ function innerDescribeValue<TValue, C extends PickerComponentFamily>(
     renderWithProps = (props: any, config?: any) =>
       interactions.renderWithProps({ ...defaultProps, ...props }, { ...config, componentFamily });
   } else {
-    renderWithProps = (props: any) => {
-      const response = render(<WrappedElementToTest {...props} />);
+    renderWithProps = (props: any, config?: any) => {
+      const response = render(<WrappedElementToTest {...props} hook={config?.hook} />);
 
       return {
         ...response,
@@ -58,8 +58,8 @@ function innerDescribeValue<TValue, C extends PickerComponentFamily>(
         getSection: () => {
           throw new Error('You can only use `getSection` on components that render a field');
         },
-        pressCharacter: () => {
-          throw new Error('You can only use `pressCharacter` on components that render a field');
+        pressKey: () => {
+          throw new Error('You can only use `pressKey` on components that render a field');
         },
       };
     };

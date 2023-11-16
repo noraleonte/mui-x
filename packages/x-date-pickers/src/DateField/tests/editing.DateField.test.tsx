@@ -220,7 +220,7 @@ describe('<DateField /> - Editing', () => {
       v7Response.selectSection('month');
 
       // Set a value for the "month" section
-      v7Response.pressCharacter(0, 'j');
+      v7Response.pressKey(0, 'j');
       expectFieldValueV7(v7Response.fieldContainer, 'January YYYY');
 
       userEvent.keyPress(v7Response.getActiveSection(0), { key: 'Delete' });
@@ -299,7 +299,7 @@ describe('<DateField /> - Editing', () => {
       v7Response.selectSection('month');
 
       // Set a value for the "month" section
-      v7Response.pressCharacter(0, 'j');
+      v7Response.pressKey(0, 'j');
       expectFieldValueV7(v7Response.fieldContainer, 'January YYYY');
 
       // Select all sections
@@ -340,13 +340,13 @@ describe('<DateField /> - Editing', () => {
 
       v7Response.selectSection('year');
 
-      v7Response.pressCharacter(0, '2');
+      v7Response.pressKey(0, '2');
       expectFieldValueV7(v7Response.fieldContainer, '0002');
 
       userEvent.keyPress(v7Response.getActiveSection(0), { key: 'Delete' });
       expectFieldValueV7(v7Response.fieldContainer, 'YYYY');
 
-      v7Response.pressCharacter(0, '2');
+      v7Response.pressKey(0, '2');
       expectFieldValueV7(v7Response.fieldContainer, '0002');
 
       v7Response.unmount();
@@ -678,25 +678,25 @@ describe('<DateField /> - Editing', () => {
 
       v7Response.selectSection('month');
 
-      v7Response.pressCharacter(0, '2');
+      v7Response.pressKey(0, '2');
       expectFieldValueV7(v7Response.fieldContainer, '02/DD/YYYY');
 
-      v7Response.pressCharacter(1, '2');
+      v7Response.pressKey(1, '2');
       expectFieldValueV7(v7Response.fieldContainer, '02/02/YYYY');
 
-      v7Response.pressCharacter(1, '9');
+      v7Response.pressKey(1, '9');
       expectFieldValueV7(v7Response.fieldContainer, '02/29/YYYY');
 
-      v7Response.pressCharacter(2, '1');
+      v7Response.pressKey(2, '1');
       expectFieldValueV7(v7Response.fieldContainer, '02/29/0001');
 
-      v7Response.pressCharacter(2, '9');
+      v7Response.pressKey(2, '9');
       expectFieldValueV7(v7Response.fieldContainer, '02/29/0019');
 
-      v7Response.pressCharacter(2, '8');
+      v7Response.pressKey(2, '8');
       expectFieldValueV7(v7Response.fieldContainer, '02/29/0198');
 
-      v7Response.pressCharacter(2, '8');
+      v7Response.pressKey(2, '8');
       expectFieldValueV7(v7Response.fieldContainer, '02/29/1988');
 
       v7Response.unmount();
@@ -848,10 +848,10 @@ describe('<DateField /> - Editing', () => {
         });
 
         v7Response.selectSection('month');
-        v7Response.pressCharacter(0, 'j');
+        v7Response.pressKey(0, 'j');
         expectFieldValueV7(v7Response.fieldContainer, 'January YYYY');
 
-        v7Response.pressCharacter(0, '');
+        v7Response.pressKey(0, '');
         expectFieldValueV7(v7Response.fieldContainer, 'MMMM YYYY');
 
         v7Response.unmount();
@@ -880,7 +880,7 @@ describe('<DateField /> - Editing', () => {
 
         v7Response.selectSection('month');
 
-        v7Response.pressCharacter(0, '');
+        v7Response.pressKey(0, '');
         expectFieldValueV7(v7Response.fieldContainer, 'MMMM 2022');
 
         v7Response.unmount();
@@ -911,7 +911,7 @@ describe('<DateField /> - Editing', () => {
         // Select all sections
         fireEvent.keyDown(v7Response.getActiveSection(0), { key: 'a', ctrlKey: true });
 
-        v7Response.pressCharacter(null, '');
+        v7Response.pressKey(null, '');
         expectFieldValueV7(v7Response.fieldContainer, 'MMMM YYYY');
 
         v7Response.unmount();
@@ -940,13 +940,13 @@ describe('<DateField /> - Editing', () => {
         });
 
         v7Response.selectSection('month');
-        v7Response.pressCharacter(0, 'j');
+        v7Response.pressKey(0, 'j');
         expectFieldValueV7(v7Response.fieldContainer, 'January YYYY');
 
         // Select all sections
         fireEvent.keyDown(v7Response.getActiveSection(0), { key: 'a', ctrlKey: true });
 
-        v7Response.pressCharacter(null, '');
+        v7Response.pressKey(null, '');
         expectFieldValueV7(v7Response.fieldContainer, 'MMMM YYYY');
 
         v7Response.unmount();
@@ -1012,12 +1012,12 @@ describe('<DateField /> - Editing', () => {
         });
 
         v7Response.selectSection('month');
-        v7Response.pressCharacter(0, '');
+        v7Response.pressKey(0, '');
         expect(onChangeV7.callCount).to.equal(1);
         expect(onChangeV7.lastCall.args[1].validationError).to.equal('invalidDate');
 
         v7Response.selectSection('year');
-        v7Response.pressCharacter(1, '');
+        v7Response.pressKey(1, '');
         expect(onChangeV7.callCount).to.equal(2);
         expect(onChangeV7.lastCall.firstArg).to.equal(null);
         expect(onChangeV7.lastCall.args[1].validationError).to.equal(null);
@@ -1411,7 +1411,7 @@ describe('<DateField /> - Editing', () => {
 
       v7Response.selectSection('day');
 
-      v7Response.pressCharacter(1, '2');
+      v7Response.pressKey(1, '2');
       expectFieldValueV7(v7Response.fieldContainer, '12/02/2018');
 
       // Select all sections
@@ -1422,7 +1422,7 @@ describe('<DateField /> - Editing', () => {
 
       v7Response.selectSection('day');
 
-      v7Response.pressCharacter(1, '2'); // Press 2
+      v7Response.pressKey(1, '2'); // Press 2
       expectFieldValueV7(v7Response.fieldContainer, '09/02/2022'); // If internal state is not reset it would be 22 instead of 02
 
       v7Response.unmount();
@@ -1488,24 +1488,24 @@ describe('<DateField /> - Editing', () => {
 
         v7Response.selectSection('month');
         fireEvent.keyDown(v7Response.getActiveSection(0), { key: 'a', ctrlKey: true });
-        v7Response.pressCharacter(null, '');
+        v7Response.pressKey(null, '');
         expectFieldValueV7(v7Response.fieldContainer, 'MM/DD/YYYY');
         v7Response.selectSection('month');
 
-        v7Response.pressCharacter(0, '1');
+        v7Response.pressKey(0, '1');
         expectFieldValueV7(v7Response.fieldContainer, '01/DD/YYYY');
 
-        v7Response.pressCharacter(0, '1');
+        v7Response.pressKey(0, '1');
         expectFieldValueV7(v7Response.fieldContainer, '11/DD/YYYY');
 
-        v7Response.pressCharacter(1, '2');
-        v7Response.pressCharacter(1, '5');
+        v7Response.pressKey(1, '2');
+        v7Response.pressKey(1, '5');
         expectFieldValueV7(v7Response.fieldContainer, '11/25/YYYY');
 
-        v7Response.pressCharacter(2, '2');
-        v7Response.pressCharacter(2, '0');
-        v7Response.pressCharacter(2, '0');
-        v7Response.pressCharacter(2, '9');
+        v7Response.pressKey(2, '2');
+        v7Response.pressKey(2, '0');
+        v7Response.pressKey(2, '0');
+        v7Response.pressKey(2, '9');
         expectFieldValueV7(v7Response.fieldContainer, '11/25/2009');
         expect(onChangeV7.lastCall.firstArg).toEqualDateTime(new Date(2009, 10, 25, 3, 3, 3));
 
@@ -1796,18 +1796,18 @@ describe('<DateField /> - Editing', () => {
 
       v7Response.selectSection('month');
 
-      v7Response.pressCharacter(0, '1');
+      v7Response.pressKey(0, '1');
       expectFieldValueV7(v7Response.fieldContainer, '01/DD/YYYY');
 
-      v7Response.pressCharacter(0, '1');
+      v7Response.pressKey(0, '1');
       expectFieldValueV7(v7Response.fieldContainer, '11/DD/YYYY');
 
-      v7Response.pressCharacter(1, '2');
-      v7Response.pressCharacter(1, '5');
+      v7Response.pressKey(1, '2');
+      v7Response.pressKey(1, '5');
       expectFieldValueV7(v7Response.fieldContainer, '11/25/YYYY');
 
-      v7Response.pressCharacter(2, '2');
-      v7Response.pressCharacter(2, '0');
+      v7Response.pressKey(2, '2');
+      v7Response.pressKey(2, '0');
       expectFieldValueV7(v7Response.fieldContainer, '11/25/0020');
 
       act(() => {
@@ -1821,9 +1821,9 @@ describe('<DateField /> - Editing', () => {
 
       v7Response.selectSection('year');
 
-      v7Response.pressCharacter(2, '2');
+      v7Response.pressKey(2, '2');
       expectFieldValueV7(v7Response.fieldContainer, '11/23/0002');
-      v7Response.pressCharacter(2, '1');
+      v7Response.pressKey(2, '1');
       expectFieldValueV7(v7Response.fieldContainer, '11/23/0021');
 
       v7Response.unmount();
@@ -1879,7 +1879,7 @@ describe('<DateField /> - Editing', () => {
       fireEvent.keyDown(v7Response.getActiveSection(0), { key: 'a', ctrlKey: true });
 
       // When all sections are selected, the value only contains the key pressed
-      v7Response.pressCharacter(null, '9');
+      v7Response.pressKey(null, '9');
 
       expectFieldValueV7(v7Response.fieldContainer, '09/DD/YYYY');
 

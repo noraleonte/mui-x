@@ -11,11 +11,11 @@ import {
   createPickerRenderer,
   wrapPickerMount,
   openPicker,
-  expectFieldPlaceholderV6,
   expectFieldValueV7,
   describeRangeValidation,
   describeValue,
   describePicker,
+  getFieldRoot,
 } from 'test/utils/pickers';
 
 describe('<MobileDateRangePicker /> - Describes', () => {
@@ -53,7 +53,7 @@ describe('<MobileDateRangePicker /> - Describes', () => {
     ],
   }));
 
-  describeValue.skip(MobileDateRangePicker, () => ({
+  describeValue(MobileDateRangePicker, () => ({
     render,
     componentFamily: 'picker',
     type: 'date-range',
@@ -68,19 +68,17 @@ describe('<MobileDateRangePicker /> - Describes', () => {
     ],
     emptyValue: [null, null],
     assertRenderedValue: (expectedValues: any[]) => {
-      // `getAllByRole('textbox')` does not work here, because inputs are `readonly`
-      const textBoxes: HTMLInputElement[] = [
-        screen.getByLabelText('Start'),
-        screen.getByLabelText('End'),
-      ];
-      expectedValues.forEach((value, index) => {
-        const input = textBoxes[index];
-        // TODO: Support single range input
-        if (!value) {
-          expectFieldPlaceholderV6(input, 'MM/DD/YYYY');
-        }
-        expectFieldValueV7(input, value ? adapterToUse.format(value, 'keyboardDate') : '');
-      });
+      const startFieldRoot = getFieldRoot(0);
+      const expectedStartValueStr = expectedValues[0]
+        ? adapterToUse.format(expectedValues[0], 'keyboardDate')
+        : 'MM/DD/YYYY';
+      expectFieldValueV7(startFieldRoot, expectedStartValueStr);
+
+      const endFieldRoot = getFieldRoot(1);
+      const expectedEndValueStr = expectedValues[1]
+        ? adapterToUse.format(expectedValues[1], 'keyboardDate')
+        : 'MM/DD/YYYY';
+      expectFieldValueV7(endFieldRoot, expectedEndValueStr);
     },
     setNewValue: (value, { isOpened, applySameValue, setEndDate = false }) => {
       let newValue: any[];

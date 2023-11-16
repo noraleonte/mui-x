@@ -258,7 +258,7 @@ describe('<SingleInputDateRangeField /> - Editing', () => {
         // Select all sections
         fireEvent.keyDown(v7Response.getActiveSection(0), { key: 'a', ctrlKey: true });
 
-        v7Response.pressCharacter(null, '');
+        v7Response.pressKey(null, '');
         expectFieldValueV7(v7Response.fieldContainer, 'MMMM YYYY – MMMM YYYY');
 
         v7Response.unmount();
@@ -295,7 +295,7 @@ describe('<SingleInputDateRangeField /> - Editing', () => {
         // Select all sections
         fireEvent.keyDown(v7Response.getActiveSection(0), { key: 'a', ctrlKey: true });
 
-        v7Response.pressCharacter(null, '');
+        v7Response.pressKey(null, '');
         expectFieldValueV7(v7Response.fieldContainer, 'MMMM YYYY – MMMM YYYY');
 
         v7Response.unmount();
@@ -336,7 +336,7 @@ describe('<SingleInputDateRangeField /> - Editing', () => {
         // Select all sections
         fireEvent.keyDown(v7Response.getActiveSection(0), { key: 'a', ctrlKey: true });
 
-        v7Response.pressCharacter(null, '');
+        v7Response.pressKey(null, '');
         expect(onChangeV7.callCount).to.equal(0);
 
         v7Response.unmount();
@@ -372,13 +372,13 @@ describe('<SingleInputDateRangeField /> - Editing', () => {
         v7Response.selectSection('month');
 
         // Start date
-        v7Response.pressCharacter(0, '');
+        v7Response.pressKey(0, '');
         expect(onChangeV7.callCount).to.equal(1);
         fireEvent.keyDown(v7Response.getActiveSection(0), { key: 'ArrowRight' });
-        v7Response.pressCharacter(1, '');
+        v7Response.pressKey(1, '');
         expect(onChangeV7.callCount).to.equal(1);
         fireEvent.keyDown(v7Response.getActiveSection(1), { key: 'ArrowRight' });
-        v7Response.pressCharacter(2, '');
+        v7Response.pressKey(2, '');
         expect(onChangeV7.callCount).to.equal(2);
         expect(onChangeV7.lastCall.firstArg[0]).to.equal(null);
         expect(onChangeV7.lastCall.firstArg[1]).toEqualDateTime(
@@ -387,13 +387,13 @@ describe('<SingleInputDateRangeField /> - Editing', () => {
 
         // End date
         fireEvent.keyDown(v7Response.getActiveSection(2), { key: 'ArrowRight' });
-        v7Response.pressCharacter(3, '');
+        v7Response.pressKey(3, '');
         expect(onChangeV7.callCount).to.equal(3);
         fireEvent.keyDown(v7Response.getActiveSection(3), { key: 'ArrowRight' });
-        v7Response.pressCharacter(4, '');
+        v7Response.pressKey(4, '');
         expect(onChangeV7.callCount).to.equal(3);
         fireEvent.keyDown(v7Response.getActiveSection(4), { key: 'ArrowRight' });
-        v7Response.pressCharacter(5, '');
+        v7Response.pressKey(5, '');
         expect(onChangeV7.callCount).to.equal(4);
         expect(onChangeV7.lastCall.firstArg[0]).to.equal(null);
         expect(onChangeV7.lastCall.firstArg[1]).to.equal(null);
@@ -452,10 +452,10 @@ describe('<SingleInputDateRangeField /> - Editing', () => {
 
         v7Response.selectSection('month');
 
-        v7Response.pressCharacter(0, '');
+        v7Response.pressKey(0, '');
         expect(onChangeV7.callCount).to.equal(1);
 
-        v7Response.pressCharacter(0, '');
+        v7Response.pressKey(0, '');
         expect(onChangeV7.callCount).to.equal(1);
 
         v7Response.unmount();
