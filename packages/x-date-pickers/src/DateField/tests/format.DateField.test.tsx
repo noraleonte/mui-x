@@ -18,7 +18,7 @@ describeAdapters('<DateField /> - Format', DateField, ({ adapter, renderWithProp
     });
     expectFieldValueV7(v7Response.fieldContainer, 'Escaped YYYY');
 
-    v7Response.setProps({ value: adapter.date(new Date(2019, 0, 1)) });
+    v7Response.setProps({ value: adapter.date('2019-01-01') });
     expectFieldValueV7(v7Response.fieldContainer, 'Escaped 2019');
 
     v7Response.unmount();
@@ -32,7 +32,7 @@ describeAdapters('<DateField /> - Format', DateField, ({ adapter, renderWithProp
     const input = getTextbox();
     expectFieldPlaceholderV6(input, 'Escaped YYYY');
 
-    v6Response.setProps({ value: adapter.date(new Date(2019, 0, 1)) });
+    v6Response.setProps({ value: adapter.date('2019-01-01') });
     expectFieldValueV6(input, 'Escaped 2019');
   });
 
@@ -47,7 +47,7 @@ describeAdapters('<DateField /> - Format', DateField, ({ adapter, renderWithProp
 
     expectFieldValueV7(v7Response.fieldContainer, 'MMMM Escaped YYYY');
 
-    v7Response.setProps({ value: adapter.date(new Date(2019, 0, 1)) });
+    v7Response.setProps({ value: adapter.date('2019-01-01') });
     expectFieldValueV7(v7Response.fieldContainer, 'January Escaped 2019');
 
     v7Response.unmount();
@@ -62,7 +62,7 @@ describeAdapters('<DateField /> - Format', DateField, ({ adapter, renderWithProp
     const input = getTextbox();
     expectFieldPlaceholderV6(input, 'MMMM Escaped YYYY');
 
-    v6Response.setProps({ value: adapter.date(new Date(2019, 0, 1)) });
+    v6Response.setProps({ value: adapter.date('2019-01-01') });
     expectFieldValueV6(input, 'January Escaped 2019');
   });
 
@@ -82,7 +82,7 @@ describeAdapters('<DateField /> - Format', DateField, ({ adapter, renderWithProp
 
     expectFieldValueV7(v7Response.fieldContainer, 'MMMM Escaped [ YYYY');
 
-    v7Response.setProps({ value: adapter.date(new Date(2019, 0, 1)) });
+    v7Response.setProps({ value: adapter.date('2019-01-01') });
     expectFieldValueV7(v7Response.fieldContainer, 'January Escaped [ 2019');
 
     v7Response.unmount();
@@ -97,7 +97,7 @@ describeAdapters('<DateField /> - Format', DateField, ({ adapter, renderWithProp
     const input = getTextbox();
     expectFieldPlaceholderV6(input, 'MMMM Escaped [ YYYY');
 
-    v6Response.setProps({ value: adapter.date(new Date(2019, 0, 1)) });
+    v6Response.setProps({ value: adapter.date('2019-01-01') });
     expectFieldValueV6(input, 'January Escaped [ 2019');
   });
 
@@ -112,7 +112,7 @@ describeAdapters('<DateField /> - Format', DateField, ({ adapter, renderWithProp
 
     expectFieldValueV7(v7Response.fieldContainer, 'Escaped MMMM Escaped YYYY');
 
-    v7Response.setProps({ value: adapter.date(new Date(2019, 0, 1)) });
+    v7Response.setProps({ value: adapter.date('2019-01-01') });
     expectFieldValueV7(v7Response.fieldContainer, 'Escaped January Escaped 2019');
 
     v7Response.unmount();
@@ -127,7 +127,7 @@ describeAdapters('<DateField /> - Format', DateField, ({ adapter, renderWithProp
     const input = getTextbox();
     expectFieldPlaceholderV6(input, 'Escaped MMMM Escaped YYYY');
 
-    v6Response.setProps({ value: adapter.date(new Date(2019, 0, 1)) });
+    v6Response.setProps({ value: adapter.date('2019-01-01') });
     expectFieldValueV6(input, 'Escaped January Escaped 2019');
   });
 
@@ -139,7 +139,7 @@ describeAdapters('<DateField /> - Format', DateField, ({ adapter, renderWithProp
 
     expectFieldValueV7(v7Response.fieldContainer, 'MM / DD / YYYY');
 
-    v7Response.setProps({ value: adapter.date(new Date(2019, 0, 1)) });
+    v7Response.setProps({ value: adapter.date('2019-01-01') });
     expectFieldValueV7(v7Response.fieldContainer, '01 / 01 / 2019');
 
     v7Response.unmount();
@@ -153,7 +153,7 @@ describeAdapters('<DateField /> - Format', DateField, ({ adapter, renderWithProp
     const input = getTextbox();
     expectFieldPlaceholderV6(input, 'MM / DD / YYYY');
 
-    v6Response.setProps({ value: adapter.date(new Date(2019, 0, 1)) });
+    v6Response.setProps({ value: adapter.date('2019-01-01') });
     expectFieldValueV6(input, '01 / 01 / 2019');
   });
 
@@ -166,7 +166,7 @@ describeAdapters('<DateField /> - Format', DateField, ({ adapter, renderWithProp
 
     expectFieldValueV7(v7Response.fieldContainer, 'MM . DD . YYYY');
 
-    v7Response.setProps({ value: adapter.date(new Date(2019, 0, 1)) });
+    v7Response.setProps({ value: adapter.date('2019-01-01') });
     expectFieldValueV7(v7Response.fieldContainer, '01 . 01 . 2019');
 
     v7Response.unmount();
@@ -181,7 +181,7 @@ describeAdapters('<DateField /> - Format', DateField, ({ adapter, renderWithProp
     const input = getTextbox();
     expectFieldPlaceholderV6(input, 'MM . DD . YYYY');
 
-    v6Response.setProps({ value: adapter.date(new Date(2019, 0, 1)) });
+    v6Response.setProps({ value: adapter.date('2019-01-01') });
     expectFieldValueV6(input, '01 . 01 . 2019');
   });
 
@@ -194,7 +194,7 @@ describeAdapters('<DateField /> - Format', DateField, ({ adapter, renderWithProp
 
     expectFieldValueV7(v7Response.fieldContainer, 'MM - DD - YYYY');
 
-    v7Response.setProps({ value: adapter.date(new Date(2019, 0, 1)) });
+    v7Response.setProps({ value: adapter.date('2019-01-01') });
     expectFieldValueV7(v7Response.fieldContainer, '01 - 01 - 2019');
 
     v7Response.unmount();
@@ -209,7 +209,7 @@ describeAdapters('<DateField /> - Format', DateField, ({ adapter, renderWithProp
     const input = getTextbox();
     expectFieldPlaceholderV6(input, 'MM - DD - YYYY');
 
-    v6Response.setProps({ value: adapter.date(new Date(2019, 0, 1)) });
+    v6Response.setProps({ value: adapter.date('2019-01-01') });
     expectFieldValueV6(input, '01 - 01 - 2019');
   });
 });

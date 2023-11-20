@@ -264,7 +264,7 @@ export const useFieldState = <
       nonEmptySectionCountBefore === (activeSection.value === '' ? 0 : 1);
 
     const newSections = setSectionValue(activeSectionIndex, '');
-    const newActiveDate = hasNoOtherNonEmptySections ? null : utils.date(new Date(''));
+    const newActiveDate = hasNoOtherNonEmptySections ? null : utils.getInvalidDate();
     const newValues = activeDateManager.getNewValuesFromNewActiveDate(newActiveDate);
 
     publishValue({ ...newValues, sections: newSections });

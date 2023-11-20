@@ -55,7 +55,7 @@ describe('<SingleInputDateRangeField /> - Selection', () => {
     it('should select the clicked selection when the input is already focused', () => {
       // Test with v7 input
       const v7Response = renderWithProps({
-        value: [null, adapterToUse.date(new Date(2022, 1, 24))],
+        value: [null, adapterToUse.date('2022-02-24')],
       });
 
       // Start date
@@ -120,7 +120,7 @@ describe('<SingleInputDateRangeField /> - Selection', () => {
       // Test with v6 input
       const v6Response = renderWithProps({
         shouldUseV6TextField: true,
-        value: [null, adapterToUse.date(new Date(2022, 1, 24))],
+        value: [null, adapterToUse.date('2022-02-24')],
       });
 
       // Start date

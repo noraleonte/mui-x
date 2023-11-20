@@ -16,7 +16,7 @@ import {
   cleanLeadingZeros,
 } from '../internals/hooks/useField/useField.utils';
 
-const testDate = new Date(2018, 4, 15, 9, 35, 10);
+const testDate = '2018-05-15T09:35:10';
 
 function updateDate<TDate>(
   date: TDate,
@@ -131,7 +131,7 @@ describe(`RTL - test arrows navigation`, () => {
 
     // Test with v7 input
     const v7Response = renderWithProps(
-      { defaultValue: adapter.date(new Date(2018, 3, 25, 11, 54)) },
+      { defaultValue: adapter.date('2018-04-25T11:54:00') },
       { direction: 'rtl' },
     );
 
@@ -146,7 +146,7 @@ describe(`RTL - test arrows navigation`, () => {
 
     // Test with v6 input
     const v6Response = renderWithProps(
-      { defaultValue: adapter.date(new Date(2018, 3, 25, 11, 54)), shouldUseV6TextField: true },
+      { defaultValue: adapter.date('2018-04-25T11:54:00'), shouldUseV6TextField: true },
       { direction: 'rtl' },
     );
 
@@ -165,7 +165,7 @@ describe(`RTL - test arrows navigation`, () => {
 
     // Test with v7 input
     const v7Response = renderWithProps(
-      { defaultValue: adapter.date(new Date(2018, 3, 25, 11, 54)) },
+      { defaultValue: adapter.date('2018-04-25T11:54:00') },
       { direction: 'rtl' },
     );
 
@@ -180,7 +180,7 @@ describe(`RTL - test arrows navigation`, () => {
 
     // Test with v6 input
     const v6Response = renderWithProps(
-      { defaultValue: adapter.date(new Date(2018, 3, 25, 11, 54)), shouldUseV6TextField: true },
+      { defaultValue: adapter.date('2018-04-25T11:54:00'), shouldUseV6TextField: true },
       { direction: 'rtl' },
     );
 

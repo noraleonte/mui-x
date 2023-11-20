@@ -39,7 +39,7 @@ describe('<DateTimeField /> - Timezone', () => {
       fireEvent.keyDown(v7Response.getActiveSection(3), { key: 'ArrowRight' });
 
       return adapter.setHours(
-        adapter.setDate(adapter.setMonth(adapter.dateWithTimezone(undefined, timezone), 11), 31),
+        adapter.setDate(adapter.setMonth(adapter.date(undefined, timezone), 11), 31),
         23,
       );
     };
@@ -81,7 +81,7 @@ describe('<DateTimeField /> - Timezone', () => {
         it('should use timezone prop for rendering and value timezone for onChange when a value is provided', () => {
           const onChange = spy();
           const v7Response = renderWithProps({
-            value: adapter.dateWithTimezone(undefined, timezone),
+            value: adapter.date(undefined, timezone),
             onChange,
             format,
             timezone: 'America/Chicago',
@@ -94,7 +94,7 @@ describe('<DateTimeField /> - Timezone', () => {
           expectFieldValueV7(v7Response.fieldContainer, '05/14/2022 19');
 
           // Check the `onChange` value (uses timezone prop)
-          const expectedDate = adapter.addMonths(adapter.dateWithTimezone(undefined, timezone), -1);
+          const expectedDate = adapter.addMonths(adapter.date(undefined, timezone), -1);
           const actualDate = onChange.lastCall.firstArg;
           expect(adapter.getTimezone(actualDate)).to.equal(timezone);
           expect(actualDate).toEqualDateTime(expectedDate);
@@ -117,7 +117,7 @@ describe('<DateTimeField /> - Timezone', () => {
     it('should update the field when time zone changes (timestamp remains the same)', () => {
       const v7Response = renderWithProps({});
 
-      const date = adapter.date(new Date('2020-06-18T14:30:10.000Z')).setZone('UTC');
+      const date = adapter.date('2020-06-18T14:30:10.000Z').setZone('UTC');
       v7Response.setProps({ value: date });
 
       expectFieldValueV7(v7Response.fieldContainer, '06/18/2020 02:30 PM');

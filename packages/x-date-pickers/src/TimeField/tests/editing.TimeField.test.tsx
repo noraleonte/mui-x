@@ -24,7 +24,7 @@ describe('<TimeField /> - Editing', () => {
       it('should decrement the hour when a value is provided', () => {
         testFieldKeyPress({
           format: adapter.formats.hours24h,
-          defaultValue: adapter.date(new Date(2022, 5, 15, 14, 12, 25)),
+          defaultValue: adapter.date('2022-06-15T14:12:25'),
           key: 'ArrowDown',
           expectedValue: '13',
         });
@@ -33,7 +33,7 @@ describe('<TimeField /> - Editing', () => {
       it('should go to the last hour of the previous day when a value in the first hour is provided', () => {
         testFieldKeyPress({
           format: adapter.formats.fullTime24h,
-          defaultValue: adapter.date(new Date(2022, 5, 15, 0, 12, 25)),
+          defaultValue: adapter.date('2022-06-15T00:12:25'),
           key: 'ArrowDown',
           expectedValue: '23:12',
         });
@@ -50,7 +50,7 @@ describe('<TimeField /> - Editing', () => {
       it('should decrement the minutes when a value is provided', () => {
         testFieldKeyPress({
           format: adapter.formats.minutes,
-          defaultValue: adapter.date(new Date(2022, 5, 15, 14, 12, 25)),
+          defaultValue: adapter.date('2022-06-15T14:12:25'),
           key: 'ArrowDown',
           expectedValue: '11',
         });
@@ -59,7 +59,7 @@ describe('<TimeField /> - Editing', () => {
       it('should go to the last minute of the current hour when a value with 0 minutes is provided', () => {
         testFieldKeyPress({
           format: adapter.formats.fullTime24h,
-          defaultValue: adapter.date(new Date(2022, 5, 15, 14, 0, 25)),
+          defaultValue: adapter.date('2022-06-15T14:00:25'),
           key: 'ArrowDown',
           expectedValue: '14:59',
           selectedSection: 'minutes',
@@ -79,7 +79,7 @@ describe('<TimeField /> - Editing', () => {
       it('should go to the last hour of the current morning when a value in the first hour is provided', () => {
         testFieldKeyPress({
           format: adapter.formats.fullTime12h,
-          defaultValue: adapter.date(new Date(2022, 5, 15, 0, 12, 25)),
+          defaultValue: adapter.date('2022-06-15T00:12:25'),
           key: 'ArrowDown',
           expectedValue: '11:12 AM',
         });
@@ -97,7 +97,7 @@ describe('<TimeField /> - Editing', () => {
       it('should set the meridiem to PM when a value in AM is provided', () => {
         testFieldKeyPress({
           format: adapter.formats.fullTime12h,
-          defaultValue: adapter.date(new Date(2022, 5, 15, 2, 12, 25)),
+          defaultValue: adapter.date('2022-06-15T02:12:25'),
           key: 'ArrowDown',
           expectedValue: '02:12 PM',
           selectedSection: 'meridiem',
@@ -107,7 +107,7 @@ describe('<TimeField /> - Editing', () => {
       it('should set the meridiem to AM when a value in PM is provided', () => {
         testFieldKeyPress({
           format: adapter.formats.fullTime12h,
-          defaultValue: adapter.date(new Date(2022, 5, 15, 14, 12, 25)),
+          defaultValue: adapter.date('2022-06-15T14:12:25'),
           key: 'ArrowDown',
           expectedValue: '02:12 AM',
           selectedSection: 'meridiem',
@@ -129,7 +129,7 @@ describe('<TimeField /> - Editing', () => {
       it('should increment the hour when a value is provided', () => {
         testFieldKeyPress({
           format: adapter.formats.hours24h,
-          defaultValue: adapter.date(new Date(2022, 5, 15, 14, 12, 25)),
+          defaultValue: adapter.date('2022-06-15T14:12:25'),
           key: 'ArrowUp',
           expectedValue: '15',
         });
@@ -138,7 +138,7 @@ describe('<TimeField /> - Editing', () => {
       it('should go to the first hour of the current day when a value in the last hour is provided', () => {
         testFieldKeyPress({
           format: adapter.formats.fullTime24h,
-          defaultValue: adapter.date(new Date(2022, 5, 15, 23, 12, 25)),
+          defaultValue: adapter.date('2022-06-15T23:12:25'),
           key: 'ArrowUp',
           expectedValue: '00:12',
         });
@@ -155,7 +155,7 @@ describe('<TimeField /> - Editing', () => {
       it('should increment the minutes when a value is provided', () => {
         testFieldKeyPress({
           format: adapter.formats.minutes,
-          defaultValue: adapter.date(new Date(2022, 5, 15, 14, 12, 25)),
+          defaultValue: adapter.date('2022-06-15T14:12:25'),
           key: 'ArrowUp',
           expectedValue: '13',
         });
@@ -164,7 +164,7 @@ describe('<TimeField /> - Editing', () => {
       it('should go to the first minute of the current hour when a value with 59 minutes is provided', () => {
         testFieldKeyPress({
           format: adapter.formats.fullTime24h,
-          defaultValue: adapter.date(new Date(2022, 5, 15, 14, 59, 25)),
+          defaultValue: adapter.date('2022-06-15T14:59:25'),
           key: 'ArrowUp',
           expectedValue: '14:00',
           selectedSection: 'minutes',
@@ -185,7 +185,7 @@ describe('<TimeField /> - Editing', () => {
       it('should set the meridiem to PM when a value in AM is provided', () => {
         testFieldKeyPress({
           format: adapter.formats.fullTime12h,
-          defaultValue: adapter.date(new Date(2022, 5, 15, 2, 12, 25)),
+          defaultValue: adapter.date('2022-06-15T02:12:25'),
           key: 'ArrowUp',
           expectedValue: '02:12 PM',
           selectedSection: 'meridiem',
@@ -195,7 +195,7 @@ describe('<TimeField /> - Editing', () => {
       it('should set the meridiem to AM when a value in PM is provided', () => {
         testFieldKeyPress({
           format: adapter.formats.fullTime12h,
-          defaultValue: adapter.date(new Date(2022, 5, 15, 14, 12, 25)),
+          defaultValue: adapter.date('2022-06-15T14:12:25'),
           key: 'ArrowUp',
           expectedValue: '02:12 AM',
           selectedSection: 'meridiem',
@@ -215,7 +215,7 @@ describe('<TimeField /> - Editing', () => {
     it('should concatenate the digit pressed to the current section value if the output is valid', () => {
       testFieldChange({
         format: adapter.formats.minutes,
-        defaultValue: adapter.date(new Date(2022, 5, 15, 14, 12, 25)),
+        defaultValue: adapter.date('2022-06-15T14:12:25'),
         keyStrokes: [
           { value: '1', expected: '01' },
           { value: '2', expected: '12' },
@@ -226,7 +226,7 @@ describe('<TimeField /> - Editing', () => {
     it('should set the minute to the digit pressed if the concatenate exceeds the maximum value for the section', () => {
       testFieldChange({
         format: adapter.formats.minutes,
-        defaultValue: adapter.date(new Date(2022, 5, 15, 14, 12, 25)),
+        defaultValue: adapter.date('2022-06-15T14:12:25'),
         keyStrokes: [
           { value: '7', expected: '07' },
           { value: '2', expected: '02' },
@@ -245,7 +245,7 @@ describe('<TimeField /> - Editing', () => {
     it('should not edit value when props.readOnly = true and a value is provided (digit)', () => {
       testFieldChange({
         format: adapter.formats.minutes,
-        defaultValue: adapter.date(new Date(2022, 5, 15, 14, 12, 25)),
+        defaultValue: adapter.date('2022-06-15T14:12:25'),
         readOnly: true,
         keyStrokes: [{ value: '1', expected: '12' }],
       });
@@ -328,7 +328,7 @@ describe('<TimeField /> - Editing', () => {
     it('should not edit value when props.readOnly = true and a value is provided (letter)', () => {
       testFieldChange({
         format: adapter.formats.meridiem,
-        defaultValue: adapter.date(new Date(2022, 5, 15, 14, 12, 25)),
+        defaultValue: adapter.date('2022-06-15T14:12:25'),
         readOnly: true,
         keyStrokes: [{ value: 'a', expected: 'PM' }],
       });
@@ -355,7 +355,7 @@ describe('<TimeField /> - Editing', () => {
     it('should set meridiem to AM when pressing "a" and a value is provided', () => {
       testFieldChange({
         format: adapter.formats.meridiem,
-        defaultValue: adapter.date(new Date(2022, 5, 15, 14, 12, 25)),
+        defaultValue: adapter.date('2022-06-15T14:12:25'),
         selectedSection: 'meridiem',
         // Press "a"
         keyStrokes: [{ value: 'a', expected: 'AM' }],
@@ -365,7 +365,7 @@ describe('<TimeField /> - Editing', () => {
     it('should set meridiem to PM when pressing "p" and a value is provided', () => {
       testFieldChange({
         format: adapter.formats.meridiem,
-        defaultValue: adapter.date(new Date(2022, 5, 15, 14, 12, 25)),
+        defaultValue: adapter.date('2022-06-15T14:12:25'),
         selectedSection: 'meridiem',
         // Press "p"
         keyStrokes: [{ value: 'p', expected: 'PM' }],
@@ -382,7 +382,7 @@ describe('<TimeField /> - Editing', () => {
         const onChangeV7 = spy();
 
         const v7Response = renderWithProps({
-          defaultValue: adapter.date(new Date(2010, 3, 3, 3, 3, 3)),
+          defaultValue: adapter.date('2010-04-03T03:03:03'),
           onChange: onChangeV7,
         });
 
@@ -398,7 +398,7 @@ describe('<TimeField /> - Editing', () => {
 
         const v6Response = renderWithProps({
           shouldUseV6TextField: true,
-          defaultValue: adapter.date(new Date(2010, 3, 3, 3, 3, 3)),
+          defaultValue: adapter.date('2010-04-03T03:03:03'),
           onChange: onChangeV6,
         });
 
@@ -414,7 +414,7 @@ describe('<TimeField /> - Editing', () => {
         const onChangeV7 = spy();
 
         const v7Response = renderWithProps({
-          defaultValue: adapter.date(new Date(2010, 3, 3, 3, 3, 3)),
+          defaultValue: adapter.date('2010-04-03T03:03:03'),
           onChange: onChangeV7,
           format: adapter.formats.fullTime24h,
         });
@@ -438,7 +438,7 @@ describe('<TimeField /> - Editing', () => {
 
         const v6Response = renderWithProps({
           shouldUseV6TextField: true,
-          defaultValue: adapter.date(new Date(2010, 3, 3, 3, 3, 3)),
+          defaultValue: adapter.date('2010-04-03T03:03:03'),
           onChange: onChangeV6,
           format: adapter.formats.fullTime24h,
         });
@@ -462,7 +462,7 @@ describe('<TimeField /> - Editing', () => {
         const onChangeV7 = spy();
 
         const v7Response = renderWithProps({
-          defaultValue: adapter.date(new Date(2010, 3, 3, 3, 3, 3)),
+          defaultValue: adapter.date('2010-04-03T03:03:03'),
           onChange: onChangeV7,
           format: adapter.formats.hours24h,
         });
@@ -479,7 +479,7 @@ describe('<TimeField /> - Editing', () => {
 
         const v6Response = renderWithProps({
           shouldUseV6TextField: true,
-          defaultValue: adapter.date(new Date(2010, 3, 3, 3, 3, 3)),
+          defaultValue: adapter.date('2010-04-03T03:03:03'),
           onChange: onChangeV6,
           format: adapter.formats.hours24h,
         });
@@ -515,7 +515,7 @@ describe('<TimeField /> - Editing', () => {
     it('should use `minitesStep` to increase minutes', () => {
       testFieldKeyPress({
         format: adapter.formats.minutes,
-        defaultValue: adapter.date(new Date(2022, 5, 15, 14, 0, 25)),
+        defaultValue: adapter.date('2022-06-15T14:00:25'),
         key: 'ArrowUp',
         minutesStep: 5,
         expectedValue: '05',
@@ -525,27 +525,27 @@ describe('<TimeField /> - Editing', () => {
     it('should use `minitesStep` to decrease minutes', () => {
       testFieldKeyPress({
         format: adapter.formats.minutes,
-        defaultValue: adapter.date(new Date(2022, 5, 15, 14, 0, 25)),
+        defaultValue: adapter.date('2022-06-15T14:00:25'),
         key: 'ArrowDown',
         minutesStep: 5,
         expectedValue: '55',
       });
     });
 
-    it('should go to the closest valid values acording to `minitesStep` when pressing ArrowDown', () => {
+    it('should go to the closest valid values according to `minutesStep` when pressing ArrowDown', () => {
       testFieldKeyPress({
         format: adapter.formats.minutes,
-        defaultValue: adapter.date(new Date(2022, 5, 15, 14, 2, 25)),
+        defaultValue: adapter.date('2022-06-15T14:02:25'),
         key: 'ArrowDown',
         minutesStep: 5,
         expectedValue: '00',
       });
     });
 
-    it('should go to the closest valid values acording to `minitesStep` when pressing ArrowUp', () => {
+    it('should go to the closest valid values according to `minutesStep` when pressing ArrowUp', () => {
       testFieldKeyPress({
         format: adapter.formats.minutes,
-        defaultValue: adapter.date(new Date(2022, 5, 15, 14, 2, 25)),
+        defaultValue: adapter.date('2022-06-15T14:02:25'),
         key: 'ArrowUp',
         minutesStep: 5,
         expectedValue: '05',
