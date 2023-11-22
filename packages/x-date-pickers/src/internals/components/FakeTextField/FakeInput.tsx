@@ -2,7 +2,7 @@ import * as React from 'react';
 import clsx from 'clsx';
 import Box from '@mui/material/Box';
 import { useFormControl } from '@mui/material/FormControl';
-import { styled, Theme } from '@mui/material/styles';
+import { styled } from '@mui/material/styles';
 import useForkRef from '@mui/utils/useForkRef';
 import {
   unstable_composeClasses as composeClasses,
@@ -17,7 +17,7 @@ const SectionsWrapper = styled(Box, {
   name: 'MuiFakeInput',
   slot: 'Root',
   overridesResolver: (props, styles) => styles.root,
-})(({ theme, ownerState }: { theme: Theme; ownerState: OwnerStateType }) => {
+})<{ ownerState: OwnerStateType }>(({ theme, ownerState }) => {
   const borderColor =
     theme.palette.mode === 'light' ? 'rgba(0, 0, 0, 0.23)' : 'rgba(255, 255, 255, 0.23)';
   return {
@@ -69,7 +69,7 @@ const SectionsContainer = styled('div', {
   name: 'MuiFakeInput',
   slot: 'Input',
   overridesResolver: (props, styles) => styles.input,
-})(({ theme, ownerState }) => {
+})<{ ownerState: OwnerStateType }>(({ theme, ownerState }) => {
   return {
     fontFamily: theme.typography.fontFamily,
     fontSize: 'inherit',
@@ -215,6 +215,7 @@ interface OwnerStateType extends FakeInputProps {
   fullWidth?: boolean;
   variant?: 'filled' | 'outlined' | 'standard';
   size?: 'small' | 'medium';
+  adornedStart?: boolean;
 }
 
 const FakeInput = React.forwardRef(function FakeInput(
