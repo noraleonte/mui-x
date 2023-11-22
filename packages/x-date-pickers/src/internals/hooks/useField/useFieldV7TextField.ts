@@ -154,6 +154,15 @@ export const useFieldV7TextField = <
 
         setSelectedSections(sectionIndex - 1);
       });
+    } else if (!isFocusInsideContainer(containerRef)) {
+      // setTimeout(() => {
+      //   containerRef
+      //     .current!.querySelector<HTMLSpanElement>(
+      //       `span[data-sectionindex="${sectionOrder.startIndex}"] .content`,
+      //     )!
+      //     .focus();
+      //   setSelectedSections(sectionOrder.startIndex);
+      // });
     } else {
       const hasClickedOnASection = containerRef.current
         .querySelector('.MuiFakeInput-input')!
@@ -322,9 +331,11 @@ export const useFieldV7TextField = <
           onClick: getInputContainerClickHandler(index),
         } as React.HTMLAttributes<HTMLSpanElement>,
         content: {
-          tabIndex: parsedSelectedSections === 'all' ? undefined : 0,
+          tabIndex: typeof parsedSelectedSections === 'number' ? 0 : undefined,
           className: 'content',
-          contentEditable: parsedSelectedSections === index && !disabled && !readOnly,
+          contentEditable:
+            (parsedSelectedSections === null && index === 0) ||
+            (parsedSelectedSections === index && !disabled && !readOnly),
           suppressContentEditableWarning: true,
           role: 'textbox',
           children: section.value || section.placeholder,
@@ -389,6 +400,7 @@ export const useFieldV7TextField = <
       onInput: handleContainerInput,
       onPaste: handleContainerPaste,
       onBlur: handleContainerBlur,
+      tabIndex: typeof parsedSelectedSections === 'number' && isFocused ? undefined : 0,
       contentEditable: parsedSelectedSections === 'all',
       suppressContentEditableWarning: true,
       elements,
