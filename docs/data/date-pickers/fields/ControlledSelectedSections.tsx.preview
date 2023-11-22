@@ -11,6 +11,6 @@
 </Stack>
 <DateField
   inputRef={inputRef}
-  selectedSections={selectedSections}
-  onSelectedSectionsChange={setSelectedSections}
+  selectedSections={selectedSection}
+  onSelectedSectionsChange={setSelectedSection}
 />

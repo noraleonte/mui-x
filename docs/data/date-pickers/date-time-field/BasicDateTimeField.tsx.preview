@@ -1,1 +1,1 @@
-<DateTimeField label="Basic date time field" />
+<DateTimeField format="MM / DD - YYYY" />

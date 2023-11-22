@@ -7,13 +7,13 @@ import { FieldSectionType, FieldSelectedSections } from '@mui/x-date-pickers/mod
 import { DateField } from '@mui/x-date-pickers/DateField';
 
 export default function ControlledSelectedSections() {
-  const [selectedSections, setSelectedSections] =
+  const [selectedSection, setSelectedSection] =
     React.useState<FieldSelectedSections>(null);
   const inputRef = React.useRef<HTMLInputElement>(null);
 
   const setSelectedSectionType = (selectedSectionType: FieldSectionType) => {
     inputRef.current?.focus();
-    setSelectedSections(selectedSectionType);
+    setSelectedSection(selectedSectionType);
   };
 
   return (
@@ -32,8 +32,8 @@ export default function ControlledSelectedSections() {
         </Stack>
         <DateField
           inputRef={inputRef}
-          selectedSections={selectedSections}
-          onSelectedSectionsChange={setSelectedSections}
+          selectedSections={selectedSection}
+          onSelectedSectionsChange={setSelectedSection}
         />
       </Stack>
     </LocalizationProvider>

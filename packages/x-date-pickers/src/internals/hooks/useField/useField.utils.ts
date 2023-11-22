@@ -1,9 +1,9 @@
+import * as React from 'react';
 import {
   AvailableAdjustKeyCode,
   FieldSectionsValueBoundaries,
   SectionNeighbors,
   SectionOrdering,
-  FieldSectionWithoutPosition,
   FieldSectionValueBoundaries,
 } from './useField.types';
 import {
@@ -16,6 +16,7 @@ import {
 } from '../../../models';
 import { PickersLocaleText } from '../../../locales/utils/pickersLocaleTextApi';
 import { getMonthsInYear } from '../../utils/date-utils';
+import { getActiveElement } from '../../utils/utils';
 
 export const getDateSectionConfigFromFormatToken = <TDate>(
   utils: MuiPickersAdapter<TDate>,
@@ -69,7 +70,7 @@ export const getDaysInWeekStr = <TDate>(
 ) => {
   const elements: TDate[] = [];
 
-  const now = utils.dateWithTimezone(undefined, timezone);
+  const now = utils.date(undefined, timezone);
   const startDate = utils.startOfWeek(now);
   const endDate = utils.endOfWeek(now);
 
@@ -90,7 +91,7 @@ export const getLetterEditingOptions = <TDate>(
 ) => {
   switch (sectionType) {
     case 'month': {
-      return getMonthsInYear(utils, utils.dateWithTimezone(undefined, timezone)).map((month) =>
+      return getMonthsInYear(utils, utils.date(undefined, timezone)).map((month) =>
         utils.formatByString(month, format!),
       );
     }
@@ -100,7 +101,7 @@ export const getLetterEditingOptions = <TDate>(
     }
 
     case 'meridiem': {
-      const now = utils.dateWithTimezone(undefined, timezone);
+      const now = utils.date(undefined, timezone);
       return [utils.startOfDay(now), utils.endOfDay(now)].map((date) =>
         utils.formatByString(date, format),
       );
@@ -207,7 +208,7 @@ export const adjustSectionValue = <TDate, TSection extends FieldSection>(
 
     if (shouldSetAbsolute) {
       if (section.type === 'year' && !isEnd && !isStart) {
-        return utils.formatByString(utils.dateWithTimezone(undefined, timezone), section.format);
+        return utils.formatByString(utils.date(undefined, timezone), section.format);
       }
 
       if (delta > 0 || isStart) {
@@ -273,7 +274,7 @@ export const adjustSectionValue = <TDate, TSection extends FieldSection>(
 };
 
 export const getSectionVisibleValue = (
-  section: FieldSectionWithoutPosition,
+  section: FieldSection,
   target: 'input-rtl' | 'input-ltr' | 'non-input',
 ) => {
   let value = section.value || section.placeholder;
@@ -311,46 +312,6 @@ export const getSectionVisibleValue = (
   return value;
 };
 
-export const cleanString = (dirtyString: string) =>
-  dirtyString.replace(/[\u2066\u2067\u2068\u2069]/g, '');
-
-export const addPositionPropertiesToSections = <TSection extends FieldSection>(
-  sections: FieldSectionWithoutPosition<TSection>[],
-  isRTL: boolean,
-): TSection[] => {
-  let position = 0;
-  let positionInInput = isRTL ? 1 : 0;
-  const newSections: TSection[] = [];
-
-  for (let i = 0; i < sections.length; i += 1) {
-    const section = sections[i];
-    const renderedValue = getSectionVisibleValue(section, isRTL ? 'input-rtl' : 'input-ltr');
-    const sectionStr = `${section.startSeparator}${renderedValue}${section.endSeparator}`;
-
-    const sectionLength = cleanString(sectionStr).length;
-    const sectionLengthInInput = sectionStr.length;
-
-    // The ...InInput values consider the unicode characters but do include them in their indexes
-    const cleanedValue = cleanString(renderedValue);
-    const startInInput =
-      positionInInput + renderedValue.indexOf(cleanedValue[0]) + section.startSeparator.length;
-    const endInInput = startInInput + cleanedValue.length;
-
-    newSections.push({
-      ...section,
-      start: position,
-      end: position + sectionLength,
-      startInInput,
-      endInInput,
-    } as TSection);
-    position += sectionLength;
-    // Move position to the end of string associated to the current section
-    positionInInput += sectionLengthInInput;
-  }
-
-  return newSections;
-};
-
 const getSectionPlaceholder = <TDate>(
   utils: MuiPickersAdapter<TDate>,
   timezone: PickersTimezone,
@@ -361,10 +322,8 @@ const getSectionPlaceholder = <TDate>(
   switch (sectionConfig.type) {
     case 'year': {
       return localeText.fieldYearPlaceholder({
-        digitAmount: utils.formatByString(
-          utils.dateWithTimezone(undefined, timezone),
-          currentTokenValue,
-        ).length,
+        digitAmount: utils.formatByString(utils.date(undefined, timezone), currentTokenValue)
+          .length,
       });
     }
 
@@ -425,7 +384,7 @@ const isFourDigitYearFormat = <TDate>(
   utils: MuiPickersAdapter<TDate>,
   timezone: PickersTimezone,
   format: string,
-) => utils.formatByString(utils.dateWithTimezone(undefined, timezone), format).length === 4;
+) => utils.formatByString(utils.date(undefined, timezone), format).length === 4;
 
 export const doesSectionFormatHaveLeadingZeros = <TDate>(
   utils: MuiPickersAdapter<TDate>,
@@ -438,7 +397,7 @@ export const doesSectionFormatHaveLeadingZeros = <TDate>(
     return false;
   }
 
-  const now = utils.dateWithTimezone(undefined, timezone);
+  const now = utils.date(undefined, timezone);
 
   switch (sectionType) {
     // We can't use `changeSectionValueFormat`, because  `utils.parse('1', 'YYYY')` returns `1971` instead of `1`.
@@ -507,7 +466,7 @@ export const splitFormatIntoSections = <TDate>(
   isRTL: boolean,
 ) => {
   let startSeparator: string = '';
-  const sections: FieldSectionWithoutPosition[] = [];
+  const sections: FieldSection[] = [];
   const now = utils.date()!;
 
   const commitToken = (token: string) => {
@@ -684,7 +643,16 @@ export const getDateFromDateSections = <TDate>(
   return utils.parse(dateWithoutSeparatorStr, formatWithoutSeparator)!;
 };
 
-export const createDateStrForInputFromSections = (sections: FieldSection[], isRTL: boolean) => {
+export const createDateStrForV7HiddenInputFromSections = (sections: FieldSection[]) =>
+  sections
+    .map((section) => {
+      return `${section.startSeparator}${section.value || section.placeholder}${
+        section.endSeparator
+      }`;
+    })
+    .join('');
+
+export const createDateStrForV6InputFromSections = (sections: FieldSection[], isRTL: boolean) => {
   const formattedSections = sections.map((section) => {
     const dateValue = getSectionVisibleValue(section, isRTL ? 'input-rtl' : 'input-ltr');
 
@@ -709,7 +677,7 @@ export const getSectionsBoundaries = <TDate>(
   utils: MuiPickersAdapter<TDate>,
   timezone: PickersTimezone,
 ): FieldSectionsValueBoundaries<TDate> => {
-  const today = utils.dateWithTimezone(undefined, timezone);
+  const today = utils.date(undefined, timezone);
   const endOfYear = utils.endOfYear(today);
   const endOfDay = utils.endOfDay(today);
 
@@ -824,7 +792,7 @@ export const validateSections = <TSection extends FieldSection>(
 const transferDateSectionValue = <TDate>(
   utils: MuiPickersAdapter<TDate>,
   timezone: PickersTimezone,
-  section: FieldSectionWithoutPosition,
+  section: FieldSection,
   dateToTransferFrom: TDate,
   dateToTransferTo: TDate,
 ) => {
@@ -899,7 +867,7 @@ export const mergeDateIntoReferenceDate = <TDate>(
   utils: MuiPickersAdapter<TDate>,
   timezone: PickersTimezone,
   dateToTransferFrom: TDate,
-  sections: FieldSectionWithoutPosition[],
+  sections: FieldSection[],
   referenceDate: TDate,
   shouldLimitToEditedSections: boolean,
 ) =>
@@ -918,10 +886,7 @@ export const mergeDateIntoReferenceDate = <TDate>(
 
 export const isAndroid = () => navigator.userAgent.toLowerCase().indexOf('android') > -1;
 
-export const getSectionOrder = (
-  sections: FieldSectionWithoutPosition[],
-  isRTL: boolean,
-): SectionOrdering => {
+export const getSectionOrder = (sections: FieldSection[], isRTL: boolean): SectionOrdering => {
   const neighbors: SectionNeighbors = {};
   if (!isRTL) {
     sections.forEach((_, index) => {
@@ -970,4 +935,22 @@ export const getSectionOrder = (
   });
 
   return { neighbors, startIndex: rtl2ltr[0], endIndex: rtl2ltr[sections.length - 1] };
+};
+
+export const getSectionIndexFromDOMElement = (element: HTMLSpanElement | undefined) => {
+  const sectionIndex = Number(
+    (element === undefined ? undefined : element.parentElement)?.dataset.sectionindex ?? '-1',
+  );
+
+  return sectionIndex === -1 ? null : sectionIndex;
+};
+
+export const isFocusInsideContainer = (
+  containerRef: React.RefObject<HTMLDivElement>,
+): containerRef is { current: HTMLDivElement } => {
+  if (typeof document === 'undefined' || !containerRef.current) {
+    return false;
+  }
+
+  return containerRef.current.contains(getActiveElement(document));
 };

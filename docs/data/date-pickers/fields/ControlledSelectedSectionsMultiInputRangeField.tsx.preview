@@ -10,6 +10,6 @@
         ownerState.position === 'start' ? startInputRef : endInputRef,
     }),
   }}
-  selectedSections={selectedSections}
-  onSelectedSectionsChange={setSelectedSections}
+  selectedSections={selectedSection}
+  onSelectedSectionsChange={setSelectedSection}
 />

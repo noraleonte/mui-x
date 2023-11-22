@@ -169,7 +169,7 @@ export const usePickerValue = <
     value: inValue,
     defaultValue: inDefaultValue,
     closeOnSelect = wrapperVariant === 'desktop',
-    selectedSections: selectedSectionsProp,
+    selectedSections: selectedSectionProp,
     onSelectedSectionsChange,
     timezone: timezoneProp,
   } = props;
@@ -213,7 +213,7 @@ export const usePickerValue = <
   const adapter = useLocalizationContext<TDate>();
 
   const [selectedSections, setSelectedSections] = useControlled({
-    controlled: selectedSectionsProp,
+    controlled: selectedSectionProp,
     default: null,
     name: 'usePickerValue',
     state: 'selectedSections',

@@ -12,7 +12,7 @@ import {
 import { MultiInputDateRangeField } from '@mui/x-date-pickers-pro/MultiInputDateRangeField';
 
 export default function ControlledSelectedSectionsMultiInputRangeField() {
-  const [selectedSections, setSelectedSections] =
+  const [selectedSection, setSelectedSection] =
     React.useState<FieldSelectedSections>(null);
   const startInputRef = React.useRef<HTMLInputElement>(null);
   const endInputRef = React.useRef<HTMLInputElement>(null);
@@ -26,7 +26,7 @@ export default function ControlledSelectedSectionsMultiInputRangeField() {
     } else {
       endInputRef.current?.focus();
     }
-    setSelectedSections(selectedSectionType);
+    setSelectedSection(selectedSectionType);
   };
 
   const renderDateHeader = (position: RangePosition) => (
@@ -61,8 +61,8 @@ export default function ControlledSelectedSectionsMultiInputRangeField() {
                 ownerState.position === 'start' ? startInputRef : endInputRef,
             }),
           }}
-          selectedSections={selectedSections}
-          onSelectedSectionsChange={setSelectedSections}
+          selectedSections={selectedSection}
+          onSelectedSectionsChange={setSelectedSection}
         />
       </Stack>
     </LocalizationProvider>

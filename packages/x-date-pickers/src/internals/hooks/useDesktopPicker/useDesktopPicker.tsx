@@ -11,7 +11,7 @@ import { usePicker } from '../usePicker';
 import { LocalizationProvider } from '../../../LocalizationProvider';
 import { PickersLayout } from '../../../PickersLayout';
 import { InferError } from '../useValidation';
-import { FieldSection, BaseSingleInputFieldProps } from '../../../models';
+import { FieldSection, BaseSingleInputFieldProps, FieldRef } from '../../../models';
 import { DateOrTimeViewWithMeridiem } from '../../models';
 
 /**
@@ -36,6 +36,7 @@ export const useDesktopPicker = <
     sx,
     format,
     formatDensity,
+    shouldUseV6TextField,
     timezone,
     label,
     inputRef,
@@ -47,8 +48,9 @@ export const useDesktopPicker = <
   } = props;
 
   const utils = useUtils<TDate>();
-  const internalInputRef = React.useRef<HTMLInputElement>(null);
   const containerRef = React.useRef<HTMLDivElement>(null);
+  const fieldRef = React.useRef<FieldRef<FieldSection>>(null);
+
   const labelId = useId();
   const isToolbarHidden = innerSlotProps?.toolbar?.hidden ?? false;
 
@@ -63,7 +65,7 @@ export const useDesktopPicker = <
   } = usePicker<TDate | null, TDate, TView, FieldSection, TExternalProps, {}>({
     ...pickerParams,
     props,
-    inputRef: internalInputRef,
+    fieldRef,
     autoFocusView: true,
     additionalViewProps: {},
     wrapperVariant: 'desktop',
@@ -112,10 +114,12 @@ export const useDesktopPicker = <
       sx,
       format,
       formatDensity,
+      shouldUseV6TextField,
       timezone,
       label,
       autoFocus: autoFocus && !props.open,
       focused: open ? true : undefined,
+      ...(inputRef ? { inputRef } : {}),
     },
     ownerState: props,
   });
@@ -149,8 +153,6 @@ export const useDesktopPicker = <
 
   const Layout = slots.layout ?? PickersLayout;
 
-  const handleInputRef = useForkRef(internalInputRef, fieldProps.inputRef, inputRef);
-
   let labelledById = labelId;
   if (isToolbarHidden) {
     if (label) {
@@ -171,13 +173,15 @@ export const useDesktopPicker = <
     },
   };
 
+  const handleFieldRef = useForkRef(fieldRef, fieldProps.unstableFieldRef);
+
   const renderPicker = () => (
     <LocalizationProvider localeText={localeText}>
       <Field
         {...fieldProps}
         slots={slotsForField}
         slotProps={slotProps}
-        inputRef={handleInputRef}
+        unstableFieldRef={handleFieldRef}
       />
       <PickersPopper
         role="dialog"

@@ -14,7 +14,7 @@ import {
 import { SingleInputDateRangeField } from '@mui/x-date-pickers-pro/SingleInputDateRangeField';
 
 export default function ControlledSelectedSectionsSingleInputRangeField() {
-  const [selectedSections, setSelectedSections] =
+  const [selectedSection, setSelectedSection] =
     React.useState<FieldSelectedSections>(null);
   const inputRef = React.useRef<HTMLInputElement>(null);
   const fieldRef = React.useRef<FieldRef<RangeFieldSection>>(null);
@@ -29,7 +29,7 @@ export default function ControlledSelectedSectionsSingleInputRangeField() {
 
     inputRef.current?.focus();
     const sections = fieldRef.current.getSections().map((el) => el.type);
-    setSelectedSections(
+    setSelectedSection(
       position === 'start'
         ? sections.indexOf(selectedSectionType)
         : sections.lastIndexOf(selectedSectionType),
@@ -64,8 +64,8 @@ export default function ControlledSelectedSectionsSingleInputRangeField() {
           sx={{ minWidth: 300 }}
           unstableFieldRef={fieldRef}
           inputRef={inputRef}
-          selectedSections={selectedSections}
-          onSelectedSectionsChange={setSelectedSections}
+          selectedSections={selectedSection}
+          onSelectedSectionsChange={setSelectedSection}
         />
       </Stack>
     </LocalizationProvider>

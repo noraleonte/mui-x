@@ -2,7 +2,18 @@ import { expect } from 'chai';
 import { SinonSpy } from 'sinon';
 import { cleanText } from 'test/utils/pickers';
 
-export const expectInputValue = (
+export const expectFieldValueV7 = (
+  fieldContainer: HTMLDivElement,
+  expectedValue: string,
+  specialCase?: 'singleDigit' | 'RTL',
+) => {
+  const content = fieldContainer.querySelector<HTMLDivElement>('.fake-text-field-input-content')!;
+
+  const value = cleanText(content.textContent ?? '', specialCase);
+  return expect(value).to.equal(expectedValue);
+};
+
+export const expectFieldValueV6 = (
   input: HTMLInputElement,
   expectedValue: string,
   specialCase?: 'singleDigit' | 'RTL',
@@ -11,7 +22,7 @@ export const expectInputValue = (
   return expect(value).to.equal(expectedValue);
 };
 
-export const expectInputPlaceholder = (
+export const expectFieldPlaceholderV6 = (
   input: HTMLInputElement,
   placeholder: string,
   specialCase?: 'singleDigit' | 'RTL',

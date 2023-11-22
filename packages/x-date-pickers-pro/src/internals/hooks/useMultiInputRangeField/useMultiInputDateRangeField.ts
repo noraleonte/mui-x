@@ -29,10 +29,8 @@ import { excludeProps } from './shared';
 export const useMultiInputDateRangeField = <TDate, TTextFieldSlotProps extends {}>({
   sharedProps: inSharedProps,
   startTextFieldProps,
-  startInputRef,
   unstableStartFieldRef,
   endTextFieldProps,
-  endInputRef,
   unstableEndFieldRef,
 }: UseMultiInputDateRangeFieldParams<
   TDate,
@@ -55,6 +53,8 @@ export const useMultiInputDateRangeField = <TDate, TTextFieldSlotProps extends {
     selectedSections,
     onSelectedSectionsChange,
     timezone: timezoneProp,
+    shouldUseV6TextField,
+    autoFocus,
   } = sharedProps;
 
   const { value, handleValueChange, timezone } = useControlledValueWithTimezone({
@@ -120,6 +120,8 @@ export const useMultiInputDateRangeField = <TDate, TTextFieldSlotProps extends {
     onChange: handleStartDateChange,
     selectedSections,
     onSelectedSectionsChange,
+    shouldUseV6TextField,
+    autoFocus, // Do not add on end field.
   };
 
   const endFieldProps: UseDateFieldComponentProps<
@@ -140,17 +142,15 @@ export const useMultiInputDateRangeField = <TDate, TTextFieldSlotProps extends {
     onChange: handleEndDateChange,
     selectedSections,
     onSelectedSectionsChange,
+    shouldUseV6TextField,
   };
 
-  const startDateResponse = useDateField({
-    props: startFieldProps,
-    inputRef: startInputRef,
-  }) as UseFieldResponse<TTextFieldSlotProps>;
+  const startDateResponse = useDateField(startFieldProps) as UseFieldResponse<
+    TTextFieldSlotProps,
+    any
+  >;
 
-  const endDateResponse = useDateField({
-    props: endFieldProps,
-    inputRef: endInputRef,
-  }) as UseFieldResponse<TTextFieldSlotProps>;
+  const endDateResponse = useDateField(endFieldProps) as UseFieldResponse<TTextFieldSlotProps, any>;
 
   /* TODO: Undo this change when a clearable behavior for multiple input range fields is implemented */
   return {

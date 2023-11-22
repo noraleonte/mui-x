@@ -1,4 +1,5 @@
 import { screen, userEvent } from '@mui-internal/test-utils';
+import { getFieldRoot } from 'test/utils/pickers/fields';
 
 export type OpenPickerParams =
   | {
@@ -16,22 +17,23 @@ export type OpenPickerParams =
     };
 
 export const openPicker = (params: OpenPickerParams) => {
+  const fieldRoot = getFieldRoot(
+    params.type === 'date-range' && !params.isSingleInput && params.initialFocus === 'end' ? 1 : 0,
+  );
+
   if (params.type === 'date-range') {
     if (params.isSingleInput) {
-      const target = screen.getByRole<HTMLInputElement>('textbox');
-      userEvent.mousePress(target);
+      userEvent.mousePress(fieldRoot);
       const cursorPosition = params.initialFocus === 'start' ? 0 : target.value.length - 1;
 
-      return target.setSelectionRange(cursorPosition, cursorPosition);
+      // TODO: Bring back end selection
     }
 
-    const target = screen.getAllByRole('textbox')[params.initialFocus === 'start' ? 0 : 1];
-
-    return userEvent.mousePress(target);
+    return userEvent.mousePress(fieldRoot);
   }
 
   if (params.variant === 'mobile') {
-    return userEvent.mousePress(screen.getByRole('textbox'));
+    return userEvent.mousePress(fieldRoot);
   }
 
   const target =

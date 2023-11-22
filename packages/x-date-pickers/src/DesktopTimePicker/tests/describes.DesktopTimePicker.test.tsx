@@ -4,13 +4,12 @@ import {
   createPickerRenderer,
   wrapPickerMount,
   adapterToUse,
-  expectInputValue,
-  expectInputPlaceholder,
-  getTextbox,
+  expectFieldValueV7,
   describeValidation,
   describeValue,
   describePicker,
   formatFullTimeValue,
+  getFieldRoot,
 } from 'test/utils/pickers';
 import { DesktopTimePicker } from '@mui/x-date-pickers/DesktopTimePicker';
 
@@ -55,24 +54,23 @@ describe('<DesktopTimePicker /> - Describes', () => {
     componentFamily: 'picker',
     type: 'time',
     variant: 'desktop',
-    values: [
-      adapterToUse.date(new Date(2018, 0, 1, 11, 30)),
-      adapterToUse.date(new Date(2018, 0, 1, 12, 35)),
-    ],
+    values: [adapterToUse.date('2018-01-01T11:30:00'), adapterToUse.date('2018-01-01T12:35:00')],
     emptyValue: null,
     clock,
     assertRenderedValue: (expectedValue: any) => {
       const hasMeridiem = adapterToUse.is12HourCycleInCurrentLocale();
-      const input = getTextbox();
-      if (!expectedValue) {
-        expectInputPlaceholder(input, hasMeridiem ? 'hh:mm aa' : 'hh:mm');
+      const fieldRoot = getFieldRoot();
+
+      let expectedValueStr: string;
+      if (expectedValue) {
+        expectedValueStr = formatFullTimeValue(adapterToUse, expectedValue);
+      } else {
+        expectedValueStr = hasMeridiem ? 'hh:mm aa' : 'hh:mm';
       }
-      expectInputValue(
-        input,
-        expectedValue ? formatFullTimeValue(adapterToUse, expectedValue) : '',
-      );
+
+      expectFieldValueV7(fieldRoot, expectedValueStr);
     },
-    setNewValue: (value, { isOpened, applySameValue, selectSection }) => {
+    setNewValue: (value, { isOpened, applySameValue, selectSection, pressKey }) => {
       const newValue = applySameValue
         ? value
         : adapterToUse.addMinutes(adapterToUse.addHours(value, 1), 5);
@@ -94,21 +92,19 @@ describe('<DesktopTimePicker /> - Describes', () => {
         }
       } else {
         selectSection('hours');
-        const input = getTextbox();
-        userEvent.keyPress(input, { key: 'ArrowUp' });
-        // move to the minutes section
-        userEvent.keyPress(input, { key: 'ArrowRight' });
-        // increment by 5 minutes
-        userEvent.keyPress(input, { key: 'PageUp' });
+        pressKey(undefined, 'ArrowUp');
+
+        selectSection('minutes');
+        pressKey(undefined, 'PageUp'); // increment by 5 minutes
+
         const hasMeridiem = adapterToUse.is12HourCycleInCurrentLocale();
         if (hasMeridiem) {
-          // move to the meridiem section
-          userEvent.keyPress(input, { key: 'ArrowRight' });
+          selectSection('meridiem');
           const previousHours = adapterToUse.getHours(value);
           const newHours = adapterToUse.getHours(newValue);
           // update meridiem section if it changed
           if ((previousHours < 12 && newHours >= 12) || (previousHours >= 12 && newHours < 12)) {
-            userEvent.keyPress(input, { key: 'ArrowUp' });
+            pressKey(undefined, 'ArrowUp');
           }
         }
       }

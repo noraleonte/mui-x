@@ -2,14 +2,13 @@ import { screen, userEvent, fireTouchChangedEvent } from '@mui-internal/test-uti
 import {
   createPickerRenderer,
   adapterToUse,
-  expectInputValue,
-  expectInputPlaceholder,
+  expectFieldValueV7,
   openPicker,
   getClockTouchEvent,
-  getTextbox,
   describeValidation,
   describeValue,
   describePicker,
+  getFieldRoot,
 } from 'test/utils/pickers';
 import { MobileDateTimePicker } from '@mui/x-date-pickers/MobileDateTimePicker';
 
@@ -35,25 +34,23 @@ describe('<MobileDateTimePicker /> - Describes', () => {
     type: 'date-time',
     variant: 'mobile',
     clock,
-    values: [
-      adapterToUse.date(new Date(2018, 0, 1, 11, 30)),
-      adapterToUse.date(new Date(2018, 0, 2, 12, 35)),
-    ],
+    values: [adapterToUse.date('2018-01-01T11:30:00'), adapterToUse.date('2018-01-02T12:35:00')],
     emptyValue: null,
     assertRenderedValue: (expectedValue: any) => {
       const hasMeridiem = adapterToUse.is12HourCycleInCurrentLocale();
-      const input = getTextbox();
-      if (!expectedValue) {
-        expectInputPlaceholder(input, hasMeridiem ? 'MM/DD/YYYY hh:mm aa' : 'MM/DD/YYYY hh:mm');
-      }
-      const expectedValueStr = expectedValue
-        ? adapterToUse.format(
-            expectedValue,
-            hasMeridiem ? 'keyboardDateTime12h' : 'keyboardDateTime24h',
-          )
-        : '';
+      const fieldRoot = getFieldRoot();
 
-      expectInputValue(input, expectedValueStr);
+      let expectedValueStr: string;
+      if (expectedValue) {
+        expectedValueStr = adapterToUse.format(
+          expectedValue,
+          hasMeridiem ? 'keyboardDateTime12h' : 'keyboardDateTime24h',
+        );
+      } else {
+        expectedValueStr = hasMeridiem ? 'MM/DD/YYYY hh:mm aa' : 'MM/DD/YYYY hh:mm';
+      }
+
+      expectFieldValueV7(fieldRoot, expectedValueStr);
     },
     setNewValue: (value, { isOpened, applySameValue }) => {
       if (!isOpened) {

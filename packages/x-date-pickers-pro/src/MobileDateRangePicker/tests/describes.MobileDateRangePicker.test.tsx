@@ -11,11 +11,11 @@ import {
   createPickerRenderer,
   wrapPickerMount,
   openPicker,
-  expectInputPlaceholder,
-  expectInputValue,
+  expectFieldValueV7,
   describeRangeValidation,
   describeValue,
   describePicker,
+  getFieldRoot,
 } from 'test/utils/pickers';
 
 describe('<MobileDateRangePicker /> - Describes', () => {
@@ -62,25 +62,23 @@ describe('<MobileDateRangePicker /> - Describes', () => {
     clock,
     values: [
       // initial start and end dates
-      [adapterToUse.date(new Date(2018, 0, 1)), adapterToUse.date(new Date(2018, 0, 4))],
+      [adapterToUse.date('2018-01-01'), adapterToUse.date('2018-01-04')],
       // start and end dates after `setNewValue`
-      [adapterToUse.date(new Date(2018, 0, 2)), adapterToUse.date(new Date(2018, 0, 5))],
+      [adapterToUse.date('2018-01-02'), adapterToUse.date('2018-01-05')],
     ],
     emptyValue: [null, null],
     assertRenderedValue: (expectedValues: any[]) => {
-      // `getAllByRole('textbox')` does not work here, because inputs are `readonly`
-      const textBoxes: HTMLInputElement[] = [
-        screen.getByLabelText('Start'),
-        screen.getByLabelText('End'),
-      ];
-      expectedValues.forEach((value, index) => {
-        const input = textBoxes[index];
-        // TODO: Support single range input
-        if (!value) {
-          expectInputPlaceholder(input, 'MM/DD/YYYY');
-        }
-        expectInputValue(input, value ? adapterToUse.format(value, 'keyboardDate') : '');
-      });
+      const startFieldRoot = getFieldRoot(0);
+      const expectedStartValueStr = expectedValues[0]
+        ? adapterToUse.format(expectedValues[0], 'keyboardDate')
+        : 'MM/DD/YYYY';
+      expectFieldValueV7(startFieldRoot, expectedStartValueStr);
+
+      const endFieldRoot = getFieldRoot(1);
+      const expectedEndValueStr = expectedValues[1]
+        ? adapterToUse.format(expectedValues[1], 'keyboardDate')
+        : 'MM/DD/YYYY';
+      expectFieldValueV7(endFieldRoot, expectedEndValueStr);
     },
     setNewValue: (value, { isOpened, applySameValue, setEndDate = false }) => {
       let newValue: any[];

@@ -1,15 +1,13 @@
-import * as React from 'react';
-import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
+import { DateTimeField } from '@mui/x-date-pickers/DateTimeField';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { AdapterFormats } from '@mui/x-date-pickers/models';
-import { screen } from '@mui-internal/test-utils/createRenderer';
 import { expect } from 'chai';
 import {
   createPickerRenderer,
-  expectInputPlaceholder,
-  expectInputValue,
+  expectFieldValueV7,
   describeGregorianAdapter,
   TEST_DATE_ISO_STRING,
+  buildFieldInteractions,
 } from 'test/utils/pickers';
 import enUS from 'date-fns/locale/en-US';
 import fr from 'date-fns/locale/fr';
@@ -80,7 +78,7 @@ describe('<AdapterDateFns />', () => {
   });
 
   describe('Picker localization', () => {
-    const testDate = new Date(2018, 4, 15, 9, 35);
+    const testDate = '2018-05-15T09:35:00';
     const localizedTexts = {
       undefined: {
         placeholder: 'MM/DD/YYYY hh:mm aa',
@@ -101,25 +99,28 @@ describe('<AdapterDateFns />', () => {
       const localeObject = localeKey === 'undefined' ? undefined : { fr, de }[localeKey];
 
       describe(`test with the ${localeName} locale`, () => {
-        const { render, adapter } = createPickerRenderer({
+        const { render, clock, adapter } = createPickerRenderer({
           clock: 'fake',
           adapterName: 'date-fns',
           locale: localeObject,
         });
 
-        it('should have correct placeholder', () => {
-          render(<DateTimePicker />);
+        const { renderWithProps } = buildFieldInteractions({
+          render,
+          clock,
+          Component: DateTimeField,
+        });
 
-          expectInputPlaceholder(
-            screen.getByRole('textbox'),
-            localizedTexts[localeKey].placeholder,
-          );
+        it('should have correct placeholder', () => {
+          const v7Response = renderWithProps({});
+
+          expectFieldValueV7(v7Response.fieldContainer, localizedTexts[localeKey].placeholder);
         });
 
         it('should have well formatted value', () => {
-          render(<DateTimePicker value={adapter.date(testDate)} />);
+          const v7Response = renderWithProps({ value: adapter.date(testDate) });
 
-          expectInputValue(screen.getByRole('textbox'), localizedTexts[localeKey].value);
+          expectFieldValueV7(v7Response.fieldContainer, localizedTexts[localeKey].value);
         });
       });
     });

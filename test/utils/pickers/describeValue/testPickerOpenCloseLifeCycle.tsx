@@ -2,7 +2,7 @@ import * as React from 'react';
 import { expect } from 'chai';
 import { spy } from 'sinon';
 import { screen, userEvent } from '@mui-internal/test-utils';
-import { getExpectedOnChangeCount, getTextbox, openPicker } from 'test/utils/pickers';
+import { getExpectedOnChangeCount, getFieldRoot, openPicker } from 'test/utils/pickers';
 import { DescribeValueTestSuite } from './describeValue.types';
 
 export const testPickerOpenCloseLifeCycle: DescribeValueTestSuite<any, 'picker'> = (
@@ -51,13 +51,16 @@ export const testPickerOpenCloseLifeCycle: DescribeValueTestSuite<any, 'picker'>
       const onAccept = spy();
       const onClose = spy();
 
-      const { selectSection } = renderWithProps({
-        onChange,
-        onAccept,
-        onClose,
-        defaultValue: values[0],
-        open: true,
-      });
+      const { selectSection } = renderWithProps(
+        {
+          onChange,
+          onAccept,
+          onClose,
+          defaultValue: values[0],
+          open: true,
+        },
+        { componentFamily },
+      );
 
       expect(onChange.callCount).to.equal(0);
       expect(onAccept.callCount).to.equal(0);
@@ -83,17 +86,12 @@ export const testPickerOpenCloseLifeCycle: DescribeValueTestSuite<any, 'picker'>
         return;
       }
 
-      const { selectSection } = renderWithProps({ defaultValue: values[0] });
+      const { selectSection } = renderWithProps({ defaultValue: values[0] }, { componentFamily });
 
       // Change the value
       setNewValue(values[0], { selectSection });
-      let textbox: HTMLInputElement;
-      if (pickerParams.type === 'date-range') {
-        textbox = screen.getAllByRole<HTMLInputElement>('textbox')[0];
-      } else {
-        textbox = getTextbox();
-      }
-      expect(textbox.scrollLeft).to.be.equal(0);
+      const fieldRoot = getFieldRoot();
+      expect(fieldRoot.scrollLeft).to.be.equal(0);
     });
 
     it('should call onChange, onClose and onAccept when selecting a value and `props.closeOnSelect` is true', () => {
@@ -101,14 +99,17 @@ export const testPickerOpenCloseLifeCycle: DescribeValueTestSuite<any, 'picker'>
       const onAccept = spy();
       const onClose = spy();
 
-      const { selectSection } = renderWithProps({
-        onChange,
-        onAccept,
-        onClose,
-        defaultValue: values[0],
-        open: true,
-        closeOnSelect: true,
-      });
+      const { selectSection } = renderWithProps(
+        {
+          onChange,
+          onAccept,
+          onClose,
+          defaultValue: values[0],
+          open: true,
+          closeOnSelect: true,
+        },
+        { componentFamily },
+      );
 
       expect(onChange.callCount).to.equal(0);
       expect(onAccept.callCount).to.equal(0);
@@ -134,14 +135,17 @@ export const testPickerOpenCloseLifeCycle: DescribeValueTestSuite<any, 'picker'>
       const onAccept = spy();
       const onClose = spy();
 
-      const { selectSection } = renderWithProps({
-        onChange,
-        onAccept,
-        onClose,
-        open: true,
-        value: values[0],
-        closeOnSelect: true,
-      });
+      const { selectSection } = renderWithProps(
+        {
+          onChange,
+          onAccept,
+          onClose,
+          open: true,
+          value: values[0],
+          closeOnSelect: true,
+        },
+        { componentFamily },
+      );
 
       // Change the value (same value)
       setNewValue(values[0], { isOpened: true, applySameValue: true, selectSection });
@@ -164,14 +168,17 @@ export const testPickerOpenCloseLifeCycle: DescribeValueTestSuite<any, 'picker'>
       const onAccept = spy();
       const onClose = spy();
 
-      const { selectSection } = renderWithProps({
-        onChange,
-        onAccept,
-        onClose,
-        defaultValue: values[0],
-        open: true,
-        closeOnSelect: false,
-      });
+      const { selectSection } = renderWithProps(
+        {
+          onChange,
+          onAccept,
+          onClose,
+          defaultValue: values[0],
+          open: true,
+          closeOnSelect: false,
+        },
+        { componentFamily },
+      );
 
       // Change the value
       let newValue = setNewValue(values[0], { isOpened: true, selectSection });
@@ -214,14 +221,17 @@ export const testPickerOpenCloseLifeCycle: DescribeValueTestSuite<any, 'picker'>
       const onAccept = spy();
       const onClose = spy();
 
-      const { selectSection } = renderWithProps({
-        onChange,
-        onAccept,
-        onClose,
-        defaultValue: values[0],
-        open: true,
-        closeOnSelect: false,
-      });
+      const { selectSection } = renderWithProps(
+        {
+          onChange,
+          onAccept,
+          onClose,
+          defaultValue: values[0],
+          open: true,
+          closeOnSelect: false,
+        },
+        { componentFamily },
+      );
 
       // Change the value (already tested)
       const newValue = setNewValue(values[0], { isOpened: true, selectSection });
@@ -278,14 +288,17 @@ export const testPickerOpenCloseLifeCycle: DescribeValueTestSuite<any, 'picker'>
       const onAccept = spy();
       const onClose = spy();
 
-      const { selectSection } = renderWithProps({
-        onChange,
-        onAccept,
-        onClose,
-        defaultValue: values[0],
-        open: true,
-        closeOnSelect: false,
-      });
+      const { selectSection } = renderWithProps(
+        {
+          onChange,
+          onAccept,
+          onClose,
+          defaultValue: values[0],
+          open: true,
+          closeOnSelect: false,
+        },
+        { componentFamily },
+      );
 
       // Change the value (already tested)
       const newValue = setNewValue(values[0], { isOpened: true, selectSection });

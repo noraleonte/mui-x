@@ -14,7 +14,6 @@ export interface DescribeRangeValidationInputOptions
   extends DescribeValidationInputOptions,
     DescribeRangeValidationKeyboardOptions {
   isSingleInput?: boolean;
-  variant?: 'mobile' | 'desktop';
 }
 
 export interface DescribeRangeValidationOptions
