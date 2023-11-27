@@ -7,7 +7,7 @@ import { refType } from '@mui/utils';
 import { DateFieldProps } from './DateField.types';
 import { useDateField } from './useDateField';
 import { useClearableField } from '../hooks';
-import { FakeTextField } from '../internals/components/FakeTextField';
+import { PickersTextField } from '../internals/components/PickersTextField';
 import { useConvertFieldResponseIntoMuiTextFieldProps } from '../internals/hooks/useConvertFieldResponseIntoMuiTextFieldProps';
 
 type DateFieldComponent = (<TDate>(
@@ -38,7 +38,7 @@ const DateField = React.forwardRef(function DateField<TDate>(
   const ownerState = themeProps;
 
   const TextField =
-    slots?.textField ?? (inProps.shouldUseV6TextField ? MuiTextField : FakeTextField);
+    slots?.textField ?? (inProps.shouldUseV6TextField ? MuiTextField : PickersTextField);
   const textFieldProps: DateFieldProps<TDate> = useSlotProps({
     elementType: TextField,
     externalSlotProps: slotProps?.textField,

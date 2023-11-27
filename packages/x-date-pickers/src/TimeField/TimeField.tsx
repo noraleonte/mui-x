@@ -7,7 +7,7 @@ import { refType } from '@mui/utils';
 import { TimeFieldProps } from './TimeField.types';
 import { useTimeField } from './useTimeField';
 import { useClearableField } from '../hooks';
-import { FakeTextField } from '../internals/components/FakeTextField';
+import { PickersTextField } from '../internals/components/PickersTextField';
 import { useConvertFieldResponseIntoMuiTextFieldProps } from '../internals/hooks/useConvertFieldResponseIntoMuiTextFieldProps';
 
 type TimeFieldComponent = (<TDate>(
@@ -38,7 +38,7 @@ const TimeField = React.forwardRef(function TimeField<TDate>(
   const ownerState = themeProps;
 
   const TextField =
-    slots?.textField ?? (inProps.shouldUseV6TextField ? MuiTextField : FakeTextField);
+    slots?.textField ?? (inProps.shouldUseV6TextField ? MuiTextField : PickersTextField);
   const textFieldProps: TimeFieldProps<TDate> = useSlotProps({
     elementType: TextField,
     externalSlotProps: slotProps?.textField,

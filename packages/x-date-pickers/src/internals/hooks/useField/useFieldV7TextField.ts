@@ -8,9 +8,10 @@ import {
   UseFieldTextFieldInteractions,
   UseFieldTextFieldParams,
 } from './useField.types';
-import { FakeTextFieldElement } from '../../components/FakeTextField/FakeTextField';
+import { PickersTextFieldElement } from '../../components/PickersTextField/PickersTextField';
 import { FieldSection } from '../../../models';
 import { getActiveElement } from '../../utils/utils';
+import { Console } from 'console';
 
 const noop = () => {};
 
@@ -75,7 +76,7 @@ export const useFieldV7TextField = <
 
         const target =
           parsedSelectedSections === 'all'
-            ? containerRef.current.querySelector<HTMLDivElement>('.MuiFakeInput-input')!
+            ? containerRef.current.querySelector<HTMLDivElement>('.MuiPickersInput-input')!
             : containerRef.current.querySelector<HTMLSpanElement>(
                 `span[data-sectionindex="${parsedSelectedSections}"] .content`,
               )!;
@@ -165,7 +166,7 @@ export const useFieldV7TextField = <
       // });
     } else {
       const hasClickedOnASection = containerRef.current
-        .querySelector('.MuiFakeInput-input')!
+        .querySelector('.MuiPickersInput-input')!
         .contains(event.target as Node);
       if (!hasClickedOnASection) {
         setSelectedSections(sectionOrder.startIndex);
@@ -316,7 +317,7 @@ export const useFieldV7TextField = <
     revertDOMSectionChange(sectionIndex);
   });
 
-  const elements = React.useMemo<FakeTextFieldElement[]>(() => {
+  const elements = React.useMemo<PickersTextFieldElement[]>(() => {
     const orderedSections: { section: TSection; index: number }[] = [];
     let sectionIndex: number | null = sectionOrder.startIndex;
     while (sectionIndex != null) {
@@ -352,12 +353,12 @@ export const useFieldV7TextField = <
         before: {
           className: 'before',
           children: section.startSeparator,
-          style: { height: 16, fontSize: 12, whiteSpace: 'pre' },
+          style: { whiteSpace: 'pre' },
         },
         after: {
           className: 'after',
           children: section.endSeparator,
-          style: { height: 16, fontSize: 12, whiteSpace: 'pre' },
+          style: { whiteSpace: 'pre' },
         },
       };
     });

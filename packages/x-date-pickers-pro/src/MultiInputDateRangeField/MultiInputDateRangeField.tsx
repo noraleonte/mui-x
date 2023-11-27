@@ -14,7 +14,7 @@ import {
 import {
   splitFieldInternalAndForwardedProps,
   FieldsTextFieldProps,
-  FakeTextField,
+  PickersTextField,
   useConvertFieldResponseIntoMuiTextFieldProps,
 } from '@mui/x-date-pickers/internals';
 import { MultiInputDateRangeFieldProps } from './MultiInputDateRangeField.types';
@@ -117,7 +117,7 @@ const MultiInputDateRangeField = React.forwardRef(function MultiInputDateRangeFi
   });
 
   const TextField =
-    slots?.textField ?? (inProps.shouldUseV6TextField ? MuiTextField : FakeTextField);
+    slots?.textField ?? (inProps.shouldUseV6TextField ? MuiTextField : PickersTextField);
   const startTextFieldProps: FieldsTextFieldProps = useSlotProps({
     elementType: TextField,
     externalSlotProps: slotProps?.textField,

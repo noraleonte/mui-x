@@ -2,7 +2,7 @@ import * as React from 'react';
 import PropTypes from 'prop-types';
 import MuiTextField from '@mui/material/TextField';
 import {
-  FakeTextField,
+  PickersTextField,
   useConvertFieldResponseIntoMuiTextFieldProps,
 } from '@mui/x-date-pickers/internals';
 import { useThemeProps } from '@mui/material/styles';
@@ -39,7 +39,7 @@ const SingleInputDateTimeRangeField = React.forwardRef(function SingleInputDateT
   const ownerState = themeProps;
 
   const TextField =
-    slots?.textField ?? (inProps.shouldUseV6TextField ? MuiTextField : FakeTextField);
+    slots?.textField ?? (inProps.shouldUseV6TextField ? MuiTextField : PickersTextField);
   const textFieldProps: SingleInputDateTimeRangeFieldProps<TDate> = useSlotProps({
     elementType: TextField,
     externalSlotProps: slotProps?.textField,

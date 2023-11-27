@@ -3,7 +3,6 @@ import clsx from 'clsx';
 import Box from '@mui/material/Box';
 import { useFormControl } from '@mui/material/FormControl';
 import { styled } from '@mui/material/styles';
-import useForkRef from '@mui/utils/useForkRef';
 import {
   unstable_composeClasses as composeClasses,
   unstable_capitalize as capitalize,
@@ -252,9 +251,6 @@ const PickersInput = React.forwardRef(function PickersInput(
     ...other
   } = props;
 
-  const inputRef = React.useRef<HTMLDivElement>(null);
-  const handleInputRef = useForkRef(ref, inputRef);
-
   const muiFormControl = useFormControl();
   const fcs = formControlState({
     props,
@@ -291,12 +287,12 @@ const PickersInput = React.forwardRef(function PickersInput(
 
   return (
     <SectionsWrapper
-      ref={handleInputRef}
       {...other}
       className={classes.root}
       onClick={onWrapperClick}
       ownerState={ownerState}
       aria-invalid={fcs.error}
+      ref={ref}
     >
       {startAdornment}
       <SectionsContainer ownerState={ownerState} className={classes.input}>

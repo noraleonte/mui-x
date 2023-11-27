@@ -17,7 +17,7 @@ import type { PickerValueManager } from '../usePicker';
 import { InferError, Validator } from '../useValidation';
 import type { UseFieldStateResponse } from './useFieldState';
 import type { UseFieldCharacterEditingResponse } from './useFieldCharacterEditing';
-import { FakeTextFieldElement } from '../../components/FakeTextField/FakeTextField';
+import { PickersTextFieldElement } from '../../components/PickersTextField/PickersTextField';
 
 export interface UseFieldParams<
   TValue,
@@ -184,7 +184,7 @@ export type UseFieldResponse<
         ref: React.Ref<HTMLDivElement>;
         valueStr: string;
         onValueStrChange: React.ChangeEventHandler<HTMLInputElement>;
-        elements: FakeTextFieldElement[];
+        elements: PickersTextFieldElement[];
       });
 
 export type FieldSectionValueBoundaries<TDate, SectionType extends FieldSectionType> = {

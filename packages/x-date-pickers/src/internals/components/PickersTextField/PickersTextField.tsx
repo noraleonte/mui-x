@@ -83,19 +83,9 @@ export const PickersTextField = React.forwardRef(function PickersTextField(
 
   const classes = useUtilityClasses(ownerState);
 
-  // TODO: delete after behavior implementation
   const onWrapperClick = () => {
     if (!focused) {
       setFocused(true);
-      const container = rootRef.current;
-
-      // Find the first input element within the container
-      const firstInput = container?.querySelector<HTMLElement>('.content');
-
-      // Check if the input element exists before focusing it
-      if (firstInput) {
-        firstInput.focus();
-      }
 
       inputRef.current?.focus();
     }

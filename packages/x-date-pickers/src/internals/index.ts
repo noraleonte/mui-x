@@ -1,4 +1,4 @@
-export { FakeTextField } from './components/FakeTextField';
+export { PickersTextField } from './components/PickersTextField';
 export { PickersArrowSwitcher } from './components/PickersArrowSwitcher/PickersArrowSwitcher';
 export type {
   ExportedPickersArrowSwitcherProps,
