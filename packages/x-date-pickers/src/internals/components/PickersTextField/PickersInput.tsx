@@ -88,7 +88,7 @@ const SectionContainer = styled('span', {
   flexGrow: 1,
 }));
 
-const SectionInput = styled('span', {
+const SectionContent = styled('span', {
   name: 'MuiPickersInput',
   slot: 'Content',
   overridesResolver: (props, styles) => styles.content,
@@ -97,6 +97,7 @@ const SectionInput = styled('span', {
   lineHeight: '1.4375em', // 23px
   letterSpacing: 'inherit',
   width: 'fit-content',
+  outline: 'none',
 }));
 
 const SectionSeparator = styled('span', {
@@ -152,7 +153,7 @@ function InputContent({
             {...before}
             className={clsx(pickersInputClasses.before, before?.className)}
           />
-          <SectionInput
+          <SectionContent
             {...content}
             className={clsx(pickersInputClasses.content, content?.className)}
             {...{ ownerState }}

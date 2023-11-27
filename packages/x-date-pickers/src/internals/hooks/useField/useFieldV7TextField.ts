@@ -345,19 +345,14 @@ export const useFieldV7TextField = <
           onDragOver: handleInputContentDragOver,
           onMouseUp: handleInputContentMouseUp,
           inputMode: section.contentType === 'letter' ? 'text' : 'numeric',
-          style: {
-            outline: 'none',
-          },
         },
         before: {
           className: 'before',
           children: section.startSeparator,
-          style: { whiteSpace: 'pre' },
         },
         after: {
           className: 'after',
           children: section.endSeparator,
-          style: { whiteSpace: 'pre' },
         },
       };
     });
