@@ -8,7 +8,7 @@ import {
   UseFieldTextFieldInteractions,
   UseFieldTextFieldParams,
 } from './useField.types';
-import { PickersTextFieldElement } from '../../components/PickersTextField/PickersTextField';
+import { PickersInputElement } from '../../components/PickersTextField/PickersInput.types';
 import { FieldSection } from '../../../models';
 import { getActiveElement } from '../../utils/utils';
 
@@ -155,14 +155,14 @@ export const useFieldV7TextField = <
         setSelectedSections(sectionIndex - 1);
       });
     } else if (!isFocusInsideContainer(containerRef)) {
-      // setTimeout(() => {
-      //   containerRef
-      //     .current!.querySelector<HTMLSpanElement>(
-      //       `span[data-sectionindex="${sectionOrder.startIndex}"] .content`,
-      //     )!
-      //     .focus();
-      //   setSelectedSections(sectionOrder.startIndex);
-      // });
+      setTimeout(() => {
+        containerRef
+          .current!.querySelector<HTMLSpanElement>(
+            `span[data-sectionindex="${sectionOrder.startIndex}"] .content`,
+          )!
+          .focus();
+        setSelectedSections(sectionOrder.startIndex);
+      });
     } else {
       const hasClickedOnASection = containerRef.current
         .querySelector('.MuiPickersInput-input')!
@@ -316,7 +316,7 @@ export const useFieldV7TextField = <
     revertDOMSectionChange(sectionIndex);
   });
 
-  const elements = React.useMemo<PickersTextFieldElement[]>(() => {
+  const elements = React.useMemo<PickersInputElement[]>(() => {
     const orderedSections: { section: TSection; index: number }[] = [];
     let sectionIndex: number | null = sectionOrder.startIndex;
     while (sectionIndex != null) {

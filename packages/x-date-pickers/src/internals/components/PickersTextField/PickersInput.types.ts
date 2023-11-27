@@ -24,6 +24,7 @@ export interface PickersInputProps extends FieldsTextFieldProps {
   endAdornment?: React.ReactNode;
   startAdornment?: React.ReactNode;
   onBlur?: React.FocusEventHandler;
+  onClick: React.MouseEventHandler;
   onChange?: React.FormEventHandler;
   onFocus?: React.FocusEventHandler;
   onKeyDown?: React.KeyboardEventHandler;

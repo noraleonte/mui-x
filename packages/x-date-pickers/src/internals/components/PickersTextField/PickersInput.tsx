@@ -289,12 +289,16 @@ const PickersInput = React.forwardRef(function PickersInput(
     <SectionsWrapper
       {...other}
       className={classes.root}
-      onClick={onWrapperClick}
       ownerState={ownerState}
       aria-invalid={fcs.error}
       ref={ref}
+      onClick={(e) => {
+        other.onClick(e);
+        onWrapperClick();
+      }}
     >
       {startAdornment}
+
       <SectionsContainer ownerState={ownerState} className={classes.input}>
         <InputContent
           elements={elements}
