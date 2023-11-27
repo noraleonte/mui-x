@@ -11,7 +11,6 @@ import {
 import { PickersTextFieldElement } from '../../components/PickersTextField/PickersTextField';
 import { FieldSection } from '../../../models';
 import { getActiveElement } from '../../utils/utils';
-import { Console } from 'console';
 
 const noop = () => {};
 
