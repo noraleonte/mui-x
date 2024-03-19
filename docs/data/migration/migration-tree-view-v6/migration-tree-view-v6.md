@@ -4,21 +4,19 @@ productId: x-tree-view
 
 # Migration from v6 to v7
 
-<!-- #default-branch-switch -->
-
 <p class="description">This guide describes the changes needed to migrate the Tree View from v6 to v7.</p>
 
 ## Introduction
 
-TBD
+To get started, check out [the blog post about the release of MUI X v7](https://mui.com/blog/mui-x-v7/).
 
-## Start using the beta release
+## Start using the new release
 
-In `package.json`, change the version of the tree view package to `next`.
+In `package.json`, change the version of the tree view package to `latest` or `^7.0.0`.
 
 ```diff
 -"@mui/x-tree-view": "6.x.x",
-+"@mui/x-tree-view": "next",
++"@mui/x-tree-view": "^7.0.0",
 ```
 
 ## Update `@mui/material` package
