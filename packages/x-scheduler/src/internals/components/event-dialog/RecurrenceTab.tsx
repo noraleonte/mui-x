@@ -420,7 +420,9 @@ export function RecurrenceTab(props: RecurrenceTabProps) {
           </SectionHeaderTitle>
           <RepeatSectionContent className={classes.eventDialogRepeatSectionContent}>
             <InlineRow className={classes.eventDialogInlineRow}>
-              <RepeatSectionLabel className={classes.eventDialogRepeatSectionLabel}>{localeText.recurrenceEveryLabel}</RepeatSectionLabel>
+              <RepeatSectionLabel className={classes.eventDialogRepeatSectionLabel}>
+                {localeText.recurrenceEveryLabel}
+              </RepeatSectionLabel>
               <TextField
                 type="number"
                 slotProps={{ htmlInput: { min: 1 } }}
