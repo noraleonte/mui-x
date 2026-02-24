@@ -15,4 +15,4 @@ githubLabel: 'scope: scheduler'
 This package is not published yet.
 :::
 
-TODO: Implement a simple overview page.
+{{"component": "modules/components/overview/scheduler/mainDemo/MainDemo.tsx"}}
