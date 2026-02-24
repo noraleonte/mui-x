@@ -179,7 +179,7 @@ export const MonthView = React.memo(
         const cellHeight = cellRef.current!.clientHeight;
         const eventContainerHeight = cellHeight - CELL_PADDING - DAY_NUMBER_HEADER_HEIGHT;
         const maxEventsCount = Math.floor(eventContainerHeight / (EVENT_HEIGHT + EVENT_GAP));
-        setMaxEvents(Math.max(1, maxEventsCount)); 
+        setMaxEvents(Math.max(1, maxEventsCount));
       },
       true,
     );
