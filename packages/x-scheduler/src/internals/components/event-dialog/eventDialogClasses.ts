@@ -59,6 +59,10 @@ export interface EventDialogClasses {
   eventDialogRepeatSectionContent: string;
   /** Styles applied to the event dialog recurrence selector toggle group element. */
   eventDialogRecurrenceSelectorToggleGroup: string;
+  /** Styles applied to the event dialog frequency select element. */
+  eventDialogFrequencySelect: string;
+  /** Styles applied to the event dialog small number field element. */
+  eventDialogSmallNumberField: string;
 }
 
 export type EventDialogClassKey = keyof EventDialogClasses;
@@ -94,6 +98,8 @@ export const eventDialogClassKeys: EventDialogClassKey[] = [
   'eventDialogEndsRadioGroup',
   'eventDialogRepeatSectionContent',
   'eventDialogRecurrenceSelectorToggleGroup',
+  'eventDialogFrequencySelect',
+  'eventDialogSmallNumberField',
 ];
 
 // Create a slots object for reuse in useUtilityClasses (avoids duplication in EventCalendar.tsx and EventTimelinePremium.tsx)
@@ -128,4 +134,6 @@ export const eventDialogSlots: Record<EventDialogClassKey, [EventDialogClassKey]
   eventDialogEndsRadioGroup: ['eventDialogEndsRadioGroup'],
   eventDialogRepeatSectionContent: ['eventDialogRepeatSectionContent'],
   eventDialogRecurrenceSelectorToggleGroup: ['eventDialogRecurrenceSelectorToggleGroup'],
+  eventDialogFrequencySelect: ['eventDialogFrequencySelect'],
+  eventDialogSmallNumberField: ['eventDialogSmallNumberField'],
 };

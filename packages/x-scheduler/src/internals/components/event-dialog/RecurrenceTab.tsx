@@ -121,6 +121,20 @@ const RecurrenceSelectorToggleGroup = styled(ToggleButtonGroup, {
   },
 }));
 
+const FrequencySelect = styled(Select, {
+  name: 'MuiEventDialog',
+  slot: 'FrequencySelect',
+})({
+  maxWidth: 120,
+});
+
+const SmallNumberField = styled(TextField, {
+  name: 'MuiEventDialog',
+  slot: 'SmallNumberField',
+})({
+  maxWidth: 100,
+});
+
 interface RecurrenceTabProps {
   occurrence: SchedulerRenderableEventOccurrence;
   controlled: ControlledValue;
@@ -423,30 +437,31 @@ export function RecurrenceTab(props: RecurrenceTabProps) {
               <RepeatSectionLabel className={classes.eventDialogRepeatSectionLabel}>
                 {localeText.recurrenceEveryLabel}
               </RepeatSectionLabel>
-              <TextField
+              <SmallNumberField
+                className={classes.eventDialogSmallNumberField}
                 type="number"
                 slotProps={{ htmlInput: { min: 1 } }}
                 value={controlled.rruleDraft.interval}
                 onChange={handleChangeInterval}
                 disabled={customDisabled}
                 size="small"
-                sx={{ width: 80 }}
               />
-              <Select
+              <FrequencySelect
+                className={classes.eventDialogFrequencySelect}
                 value={controlled.rruleDraft.freq}
                 onChange={(event) =>
                   handleChangeFrequency(event.target.value as RecurringEventFrequency)
                 }
                 disabled={customDisabled}
                 size="small"
-                sx={{ minWidth: 120 }}
+                fullWidth
               >
                 {recurrenceFrequencyOptions.map(({ label, value: freqValue }) => (
                   <MenuItem key={label} value={freqValue}>
                     {label}
                   </MenuItem>
                 ))}
-              </Select>
+              </FrequencySelect>
             </InlineRow>
 
             {controlled.rruleDraft.freq === 'WEEKLY' && (
@@ -532,14 +547,14 @@ export function RecurrenceTab(props: RecurrenceTabProps) {
                 control={<Radio size="small" disabled={customDisabled} />}
                 label={localeText.recurrenceEndsAfterLabel}
               />
-              <TextField
+              <SmallNumberField
+                className={classes.eventDialogSmallNumberField}
                 type="number"
                 slotProps={{ htmlInput: { min: 1 } }}
                 value={customEndsValue === 'after' ? (controlled.rruleDraft.count ?? 1) : 1}
                 onChange={handleChangeCount}
                 disabled={customDisabled || customEndsValue !== 'after'}
                 size="small"
-                sx={{ width: 80 }}
               />
               {localeText.recurrenceEndsTimesLabel}
             </InlineRow>
