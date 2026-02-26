@@ -58,9 +58,7 @@ export const getNeutralVibesTheme = (mode: 'light' | 'dark'): ThemeOptions => {
   return createTheme({
     typography: {
       fontFamily: '"General Sans", sans-serif',
-      body1: {
-        fontFamily: '"General Sans", sans-serif',
-      },
+
       button: {
         textTransform: 'capitalize',
       },
@@ -105,9 +103,6 @@ export const getNeutralVibesTheme = (mode: 'light' | 'dark'): ThemeOptions => {
             }),
           },
         ],
-        styleOverrides: {
-          root: {},
-        },
       },
       // EventTimeline
       MuiEventTimeline: {

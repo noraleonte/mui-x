@@ -309,13 +309,13 @@ export const DayGridEvent = React.forwardRef(function DayGridEvent(
                 className={classes.dayGridEventLinesClamp}
                 style={{ '--number-of-lines': 1 } as React.CSSProperties}
               >
-                <DayGridEventTitle className={classes.dayGridEventTitle} as="span">
-                  {occurrence.title}
-                </DayGridEventTitle>{' '}
                 <DayGridEventTime className={classes.dayGridEventTime}>
                   <span>{formatTime(occurrence.displayTimezone.start.value)}</span>
                   <span> - {formatTime(occurrence.displayTimezone.end.value)}</span>
-                </DayGridEventTime>
+                </DayGridEventTime>{' '}
+                <DayGridEventTitle className={classes.dayGridEventTitle} as="span">
+                  {occurrence.title}
+                </DayGridEventTitle>
               </DayGridEventLinesClamp>
             </DayGridEventCardContent>
 
