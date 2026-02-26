@@ -6,7 +6,7 @@ import { EventTimelinePremium } from '@mui/x-scheduler-premium/event-timeline-pr
 import { useEventTimelinePremiumApiRef } from '@mui/x-scheduler-premium/use-event-timeline-premium-api-ref';
 import { EventTimelinePremiumView } from '@mui/x-scheduler-headless-premium/models';
 import { SchedulerEvent } from '@mui/x-scheduler/models';
-import { timelineEvents, timelineResources, defaultVisibleDate } from './data';
+import { timelineEvents, timelineResources, timelineDefaultVisibleDate } from './data';
 
 const viewOptions: EventTimelinePremiumView[] = ['time', 'days', 'weeks', 'months', 'years'];
 
@@ -38,7 +38,7 @@ export default function TimelineDemo() {
         events={events}
         onEventsChange={setEvents}
         resources={timelineResources}
-        defaultVisibleDate={defaultVisibleDate}
+        defaultVisibleDate={timelineDefaultVisibleDate}
         view={view}
         onViewChange={setView}
       />

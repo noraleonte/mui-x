@@ -1,33 +1,54 @@
 import * as React from 'react';
-import { ThemeOptions, createTheme, ThemeProvider, useTheme } from '@mui/material/styles';
+import { createTheme, ThemeProvider, useTheme } from '@mui/material/styles';
 import Paper from '@mui/material/Paper';
 import Stack from '@mui/material/Stack';
-import Switch from '@mui/material/Switch';
-import FormControlLabel from '@mui/material/FormControlLabel';
+import Select, { SelectChangeEvent } from '@mui/material/Select';
+import MenuItem from '@mui/material/MenuItem';
 import { EventCalendarPremium } from '@mui/x-scheduler-premium/event-calendar-premium';
 import { SchedulerEvent } from '@mui/x-scheduler/models';
 import ViewToggleGroup, { SchedulerView } from './ViewToggleGroup';
 import TimelineDemo from './TimelineDemo';
-import { calendarEvents, calendarResources, defaultVisibleDate } from './data';
-import { getTheme } from '../theme/getTheme';
+import { calendarEvents, calendarResources, calendarDefaultVisibleDate } from './data';
+import { getSoftEdgesTheme } from '../theme/softEdgesTheme';
+import { getNeutralVibesTheme } from '../theme/neutralVibesTheme';
+
+type CustomThemeName = 'default' | 'softEdges' | 'neutralVibes';
+
+const themeOptions: { value: CustomThemeName; label: string }[] = [
+  { value: 'default', label: 'Default theme' },
+  { value: 'softEdges', label: 'Soft edges' },
+  { value: 'neutralVibes', label: 'Neutral vibes' },
+];
 
 export default function MainDemo() {
   const brandingTheme = useTheme();
 
   const [selectedView, setSelectedView] = React.useState<SchedulerView>('calendar');
-  const [showCustomTheme, setShowCustomTheme] = React.useState(false);
+  const [selectedTheme, setSelectedTheme] = React.useState<CustomThemeName>('default');
   const [calendarEventsState, setCalendarEventsState] =
     React.useState<SchedulerEvent[]>(calendarEvents);
 
-  const baseTheme = createTheme({ palette: { mode: brandingTheme.palette.mode } });
-  const customTheme = createTheme(
-    brandingTheme as ThemeOptions,
-    getTheme(brandingTheme.palette.mode),
-  );
+  const handleThemeChange = (event: SelectChangeEvent) => {
+    setSelectedTheme(event.target.value as CustomThemeName);
+  };
+
+  const theme = React.useMemo(() => {
+    const mode = brandingTheme.palette.mode;
+    const baseTheme = createTheme({ palette: { mode } });
+
+    switch (selectedTheme) {
+      case 'softEdges':
+        return getSoftEdgesTheme(mode);
+      case 'neutralVibes':
+        return getNeutralVibesTheme(mode);
+      default:
+        return baseTheme;
+    }
+  }, [brandingTheme, selectedTheme]);
 
   return (
     <Stack spacing={1} sx={{ p: 1, width: '100%' }}>
-      {/* Toolbar: view toggle + customization switch */}
+      {/* Toolbar: view toggle + theme selector */}
       <Stack
         direction="row"
         alignItems="center"
@@ -36,18 +57,21 @@ export default function MainDemo() {
         gap={1}
       >
         <ViewToggleGroup selected={selectedView} onToggleChange={setSelectedView} />
-        <FormControlLabel
-          control={
-            <Switch
-              checked={showCustomTheme}
-              onChange={() => setShowCustomTheme((prev) => !prev)}
-              size="small"
-            />
-          }
-          label="Custom theme"
-        />
+        <Select
+          value={selectedTheme}
+          defaultValue="default"
+          onChange={handleThemeChange}
+          size="small"
+          sx={{ minWidth: 140 }}
+        >
+          {themeOptions.map((option) => (
+            <MenuItem key={option.value} value={option.value}>
+              {option.label}
+            </MenuItem>
+          ))}
+        </Select>
       </Stack>
-      <ThemeProvider theme={showCustomTheme ? customTheme : baseTheme}>
+      <ThemeProvider theme={theme}>
         {/* Demo content */}
         {selectedView === 'calendar' && (
           <Paper variant="outlined" elevation={0} sx={{ height: 600, width: '100%', p: 1 }}>
@@ -55,9 +79,10 @@ export default function MainDemo() {
               events={calendarEventsState}
               onEventsChange={setCalendarEventsState}
               resources={calendarResources}
-              defaultVisibleDate={defaultVisibleDate}
+              defaultVisibleDate={calendarDefaultVisibleDate}
               defaultView="week"
               defaultPreferences={{ isSidePanelOpen: false }}
+              areEventsDraggable
             />
           </Paper>
         )}
