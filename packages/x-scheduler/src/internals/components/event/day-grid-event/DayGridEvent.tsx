@@ -54,7 +54,6 @@ const DayGridEventRoot = styled(CalendarGrid.DayEvent, {
     ...(DayGridEventBaseStyles(theme) as any),
     '&[data-variant="filled"]': {
       backgroundColor: 'var(--event-surface-bold)',
-      color: 'var(--event-on-surface-bold)',
       '&:active': {},
       '&:hover': {
         backgroundColor: 'var(--event-surface-bold-hover)',
@@ -74,12 +73,6 @@ const DayGridEventRoot = styled(CalendarGrid.DayEvent, {
       '&:active': {},
       '&:hover': {
         backgroundColor: theme.palette.action.hover,
-      },
-      [`& .${eventCalendarClasses.dayGridEventTime}`]: {
-        color: theme.palette.text.secondary,
-      },
-      [`& .${eventCalendarClasses.dayGridEventTitle}`]: {
-        color: theme.palette.text.primary,
       },
     },
   }),
@@ -106,6 +99,12 @@ const DayGridEventTitle = styled('p', {
   fontSize: theme.typography.caption.fontSize,
   lineHeight: 1.43,
   flexGrow: 1,
+  '[data-variant="filled"] &': {
+    color: 'var(--event-on-surface-bold)',
+  },
+  '[data-variant="compact"] &': {
+    color: theme.palette.text.primary,
+  },
 }));
 
 const DayGridEventTime = styled('time', {
@@ -124,6 +123,9 @@ const DayGridEventTime = styled('time', {
     '& > span:last-of-type': {
       display: 'none',
     },
+  },
+  '[data-variant="compact"] &': {
+    color: theme.palette.text.secondary,
   },
 }));
 
@@ -301,20 +303,22 @@ export const DayGridEvent = React.forwardRef(function DayGridEvent(
                   : localeText.noResourceAriaLabel
               }
             />
-            <DayGridEventLinesClamp
-              className={classes.dayGridEventLinesClamp}
-              style={{ '--number-of-lines': 1 } as React.CSSProperties}
-            >
-              <DayGridEventCardContent className={classes.dayGridEventCardContent}>
+
+            <DayGridEventCardContent className={classes.dayGridEventCardContent}>
+              <DayGridEventLinesClamp
+                className={classes.dayGridEventLinesClamp}
+                style={{ '--number-of-lines': 1 } as React.CSSProperties}
+              >
+                <DayGridEventTitle className={classes.dayGridEventTitle} as="span">
+                  {occurrence.title}
+                </DayGridEventTitle>{' '}
                 <DayGridEventTime className={classes.dayGridEventTime}>
                   <span>{formatTime(occurrence.displayTimezone.start.value)}</span>
                   <span> - {formatTime(occurrence.displayTimezone.end.value)}</span>
                 </DayGridEventTime>
-                <DayGridEventTitle className={classes.dayGridEventTitle} as="span">
-                  {occurrence.title}
-                </DayGridEventTitle>
-              </DayGridEventCardContent>
-            </DayGridEventLinesClamp>
+              </DayGridEventLinesClamp>
+            </DayGridEventCardContent>
+
             {isRecurring && (
               <DayGridEventRecurringIcon
                 className={classes.dayGridEventRecurringIcon}
