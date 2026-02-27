@@ -47,7 +47,7 @@ export default function MainDemo() {
   }, [brandingTheme, selectedTheme]);
 
   return (
-    <Stack spacing={1} sx={{ p: 1, width: '100%' }}>
+    <Stack spacing={1} sx={{ p: 1, width: '100%', mb: 6 }}>
       {/* Toolbar: view toggle + theme selector */}
       <Stack
         direction="row"
@@ -80,9 +80,10 @@ export default function MainDemo() {
               onEventsChange={setCalendarEventsState}
               resources={calendarResources}
               defaultVisibleDate={calendarDefaultVisibleDate}
-              defaultView="week"
+              defaultView="month"
               defaultPreferences={{ isSidePanelOpen: false }}
               areEventsDraggable
+              areEventsResizable
             />
           </Paper>
         )}

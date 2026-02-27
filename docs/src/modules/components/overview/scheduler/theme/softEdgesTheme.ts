@@ -1,32 +1,7 @@
 import { ThemeOptions, alpha, createTheme } from '@mui/material/styles';
 import '@mui/x-scheduler-premium/theme-augmentation';
 import '@mui/x-scheduler/theme-augmentation';
-
-const grey = {
-  50: '#faf9fb',
-  100: '#f2eff3',
-  200: '#eae7ec',
-  300: '#e3dfe6',
-  400: '#dbd8e0',
-  500: '#d0cdd7',
-  600: '#bcbac7',
-  700: '#84828e',
-  800: '#65636d',
-  900: '#211f26',
-};
-
-const darkGrey = {
-  50: '#171618',
-  100: '#232225',
-  200: '#2b292d',
-  300: '#323035',
-  400: '#3c393f',
-  500: '#49474e',
-  600: '#7C7A85',
-  700: '#B5B2BC',
-  800: '#EEEEF0',
-  900: '#FAFAFA',
-};
+import { darkGrey, grey } from './colors';
 
 export const getSoftEdgesTheme = (mode: 'light' | 'dark'): ThemeOptions => {
   return createTheme({
@@ -113,6 +88,16 @@ export const getSoftEdgesTheme = (mode: 'light' | 'dark'): ThemeOptions => {
           }),
         },
       },
+      // Event Dialog
+      // Event Dialog
+      MuiEventDialog: {
+        styleOverrides: {
+          resourceMenuColorDot: ({ theme }) => ({
+            borderRadius: theme.shape.borderRadius,
+          }),
+        },
+      },
+      // Event Timeline
       MuiEventTimeline: {
         styleOverrides: {
           event: {
@@ -122,6 +107,7 @@ export const getSoftEdgesTheme = (mode: 'light' | 'dark'): ThemeOptions => {
           },
         },
       },
+      // Event Calendar
       MuiEventCalendar: {
         styleOverrides: {
           timeGridEvent: {

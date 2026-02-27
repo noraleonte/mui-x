@@ -41,6 +41,8 @@ export default function TimelineDemo() {
         defaultVisibleDate={timelineDefaultVisibleDate}
         view={view}
         onViewChange={setView}
+        areEventsResizable
+        areEventsDraggable
       />
     </Paper>
   );

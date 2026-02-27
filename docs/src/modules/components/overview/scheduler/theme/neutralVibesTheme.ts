@@ -1,58 +1,8 @@
 import { alpha, ThemeOptions, createTheme } from '@mui/material/styles';
 import '@mui/x-scheduler-premium/theme-augmentation';
-import { eventCalendarClasses } from '@mui/x-scheduler/event-calendar';
 import '@mui/x-scheduler/theme-augmentation';
-
-// const grey = {
-//   50: '#FAFAFB',
-//   100: '#E6E5EB',
-//   200: '#D1CFD9',
-//   300: '#A4A0B2',
-//   400: '#77738C',
-//   500: '#5D5974',
-//   600: '#46435B',
-//   700: '#302E43',
-//   800: '#1F1D2E',
-//   900: '#14131F',
-// };
-
-// const darkGrey = {
-//   50: '#0A0A10',
-//   100: '#101019',
-//   200: '#15141F',
-//   300: '#1B1A29',
-//   400: '#272536',
-//   500: '#77738C',
-//   600: '#A4A0B2',
-//   700: '#BCB9C6',
-//   800: '#E6E5EB',
-//   900: '#FAFAFB',
-// };
-const grey = {
-  50: '#faf9fb',
-  100: '#f2eff3',
-  200: '#eae7ec',
-  300: '#e3dfe6',
-  400: '#dbd8e0',
-  500: '#d0cdd7',
-  600: '#bcbac7',
-  700: '#84828e',
-  800: '#65636d',
-  900: '#211f26',
-};
-
-const darkGrey = {
-  50: '#171618',
-  100: '#232225',
-  200: '#2b292d',
-  300: '#323035',
-  400: '#3c393f',
-  500: '#49474e',
-  600: '#7C7A85',
-  700: '#B5B2BC',
-  800: '#EEEEF0',
-  900: '#FAFAFA',
-};
+import { eventCalendarClasses } from '@mui/x-scheduler/event-calendar';
+import { darkGrey, grey } from './colors';
 
 export const getNeutralVibesTheme = (mode: 'light' | 'dark'): ThemeOptions => {
   return createTheme({
@@ -103,6 +53,14 @@ export const getNeutralVibesTheme = (mode: 'light' | 'dark'): ThemeOptions => {
             }),
           },
         ],
+      },
+      // Event Dialog
+      MuiEventDialog: {
+        styleOverrides: {
+          resourceMenuColorDot: ({ theme }) => ({
+            borderRadius: theme.shape.borderRadius,
+          }),
+        },
       },
       // EventTimeline
       MuiEventTimeline: {
