@@ -1,9 +1,9 @@
-import { ThemeOptions, alpha, createTheme } from '@mui/material/styles';
+import { Theme, alpha, createTheme } from '@mui/material/styles';
 import '@mui/x-scheduler-premium/theme-augmentation';
 import '@mui/x-scheduler/theme-augmentation';
 import { darkGrey, grey } from './colors';
 
-export const getSoftEdgesTheme = (mode: 'light' | 'dark'): ThemeOptions => {
+export const getSoftEdgesTheme = (mode: 'light' | 'dark'): Theme => {
   return createTheme({
     palette: {
       mode,
@@ -92,7 +92,7 @@ export const getSoftEdgesTheme = (mode: 'light' | 'dark'): ThemeOptions => {
       // Event Dialog
       MuiEventDialog: {
         styleOverrides: {
-          resourceMenuColorDot: ({ theme }) => ({
+          eventDialogResourceMenuColorDot: ({ theme }) => ({
             borderRadius: theme.shape.borderRadius,
           }),
         },

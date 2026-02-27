@@ -11,7 +11,7 @@ type CommunityOrProProps = {
   caption: string;
   description: string;
   communityDescription: string;
-  proDescription: string;
+  proDescription?: string;
   premiumDescription?: string;
 };
 
