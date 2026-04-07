@@ -41,6 +41,10 @@ function Watermark(props: WatermarkProps) {
     return null;
   }
 
+  // TODO: re-enable. Temporarily disabled while developing the playground.
+  return null;
+
+  // eslint-disable-next-line no-unreachable
   return (
     <div
       style={{

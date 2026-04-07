@@ -77,6 +77,9 @@ export function showMissingLicenseKeyError({
   plan: string;
   packageName: string;
 }) {
+  // TODO: re-enable. Temporarily disabled while developing the playground.
+  return;
+  // eslint-disable-next-line no-unreachable
   showError([
     'MUI X: Missing license key.',
     '',
