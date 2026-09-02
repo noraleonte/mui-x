@@ -1,0 +1,25 @@
+{
+  "name": "@mui-x-internal/performance-tree-view",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test:performance": "node scripts/run.mjs",
+    "build": "pnpm --filter=\"@mui/x-tree-view-pro...\" build"
+  },
+  "devDependencies": {
+    "@emotion/react": "catalog:",
+    "@emotion/styled": "catalog:",
+    "@mui/internal-benchmark": "0.0.3-canary.19",
+    "@mui/material": "catalog:",
+    "@mui/system": "catalog:",
+    "@mui/x-license": "workspace:^",
+    "@mui/x-tree-view": "workspace:^",
+    "@mui/x-tree-view-pro": "workspace:^",
+    "@vitejs/plugin-react": "catalog:",
+    "@vitest/browser-playwright": "catalog:",
+    "react": "catalog:",
+    "react-dom": "catalog:",
+    "vite": "catalog:",
+    "vitest": "catalog:"
+  }
+}
