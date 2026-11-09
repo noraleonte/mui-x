@@ -18,7 +18,12 @@ import { selectorChartAxisZoomData } from '../../internals/plugins/useChartProZo
 import type { UseChartProZoomSignature } from '../../internals/plugins/useChartProZoom';
 import { ChartsAxisZoomSliderThumb } from './ChartsAxisZoomSliderThumb';
 import { ChartsTooltipZoomSliderValue } from './ChartsTooltipZoomSliderValue';
-import { calculateZoomEnd, calculateZoomFromPoint, calculateZoomStart } from './zoom-utils';
+import {
+  calculateZoomEnd,
+  calculateZoomFromPoint,
+  calculateZoomSliderPosition,
+  calculateZoomStart,
+} from './zoom-utils';
 import {
   ZOOM_SLIDER_THUMB_HEIGHT,
   ZOOM_SLIDER_THUMB_WIDTH,
@@ -101,7 +106,7 @@ export function ChartsAxisZoomSliderActiveTrack({
   const touchTargetRef = React.useRef<SVGRectElement>(null);
   const [startThumbEl, setStartThumbEl] = React.useState<SVGRectElement | null>(null);
   const [endThumbEl, setEndThumbEl] = React.useState<SVGRectElement | null>(null);
-  const { tooltipStart, tooltipEnd } = getZoomSliderTooltipsText(axis, drawingArea);
+  const { tooltipStart, tooltipEnd } = getZoomSliderTooltipsText(axis, drawingArea, reverse);
   const classes = useUtilityClasses({ axisDirection });
 
   const previewThumbWidth =
@@ -263,51 +268,33 @@ export function ChartsAxisZoomSliderActiveTrack({
   let endThumbX: number;
   let endThumbY: number;
 
-  const { minStart, maxEnd } = selectorChartAxisZoomOptionsLookup(store.state, axisId);
-  const range = maxEnd - minStart;
-  const zoomStart = Math.max(minStart, zoomData.start);
-  const zoomEnd = Math.min(zoomData.end, maxEnd);
+  const { start, end } = calculateZoomSliderPosition(
+    zoomData,
+    selectorChartAxisZoomOptionsLookup(store.state, axisId),
+    axisDirection === 'x' ? drawingArea.width : drawingArea.height,
+  );
+  const thumbOffset = ZOOM_SLIDER_THUMB_HEIGHT < size ? (size - ZOOM_SLIDER_THUMB_HEIGHT) / 2 : 0;
 
   if (axisDirection === 'x') {
-    previewX = ((zoomStart - minStart) / range) * drawingArea.width;
+    previewX = Math.min(start, end);
     previewY = 0;
-    previewWidth = (drawingArea.width * (zoomEnd - zoomStart)) / range;
+    previewWidth = Math.abs(end - start);
     previewHeight = size;
 
-    startThumbX = ((zoomStart - minStart) / range) * drawingArea.width;
-    startThumbY = ZOOM_SLIDER_THUMB_HEIGHT < size ? (size - ZOOM_SLIDER_THUMB_HEIGHT) / 2 : 0;
-    endThumbX = ((zoomEnd - minStart) / range) * drawingArea.width;
-    endThumbY = ZOOM_SLIDER_THUMB_HEIGHT < size ? (size - ZOOM_SLIDER_THUMB_HEIGHT) / 2 : 0;
-
-    if (reverse) {
-      previewX = drawingArea.width - previewX - previewWidth;
-
-      startThumbX = drawingArea.width - startThumbX;
-      endThumbX = drawingArea.width - endThumbX;
-    }
-
-    startThumbX -= previewThumbWidth / 2;
-    endThumbX -= previewThumbWidth / 2;
+    startThumbX = start - previewThumbWidth / 2;
+    startThumbY = thumbOffset;
+    endThumbX = end - previewThumbWidth / 2;
+    endThumbY = thumbOffset;
   } else {
     previewX = 0;
-    previewY = drawingArea.height - ((zoomEnd - minStart) / range) * drawingArea.height;
+    previewY = Math.min(start, end);
     previewWidth = size;
-    previewHeight = (drawingArea.height * (zoomEnd - zoomStart)) / range;
+    previewHeight = Math.abs(end - start);
 
-    startThumbX = ZOOM_SLIDER_THUMB_HEIGHT < size ? (size - ZOOM_SLIDER_THUMB_HEIGHT) / 2 : 0;
-    startThumbY = drawingArea.height - ((zoomStart - minStart) / range) * drawingArea.height;
-    endThumbX = ZOOM_SLIDER_THUMB_HEIGHT < size ? (size - ZOOM_SLIDER_THUMB_HEIGHT) / 2 : 0;
-    endThumbY = drawingArea.height - ((zoomEnd - minStart) / range) * drawingArea.height;
-
-    if (reverse) {
-      previewY = drawingArea.height - previewY - previewHeight;
-
-      startThumbY = drawingArea.height - startThumbY;
-      endThumbY = drawingArea.height - endThumbY;
-    }
-
-    startThumbY -= previewThumbHeight / 2;
-    endThumbY -= previewThumbHeight / 2;
+    startThumbX = thumbOffset;
+    startThumbY = start - previewThumbHeight / 2;
+    endThumbX = thumbOffset;
+    endThumbY = end - previewThumbHeight / 2;
   }
 
   const previewOffset = ZOOM_SLIDER_THUMB_HEIGHT > size ? (ZOOM_SLIDER_THUMB_HEIGHT - size) / 2 : 0;
@@ -399,7 +386,11 @@ export function ChartsAxisZoomSliderActiveTrack({
 /**
  * Returns the text for the tooltips on the thumbs of the zoom slider.
  */
-function getZoomSliderTooltipsText(axis: ComputedAxis, drawingArea: ChartDrawingArea) {
+function getZoomSliderTooltipsText(
+  axis: ComputedAxis,
+  drawingArea: ChartDrawingArea,
+  reverse: boolean | undefined,
+) {
   const formatValue = (value: Date | number | null) => {
     if (axis.valueFormatter) {
       return axis.valueFormatter(value, { location: 'zoom-slider-tooltip', scale: axis.scale });
@@ -417,7 +408,7 @@ function getZoomSliderTooltipsText(axis: ComputedAxis, drawingArea: ChartDrawing
     [start, end] = [end, start]; // Invert for y-axis
   }
 
-  if (axis.reverse) {
+  if (reverse) {
     [start, end] = [end, start]; // Reverse the start and end if the axis is reversed
   }
 

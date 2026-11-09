@@ -30,12 +30,12 @@ export function calculateZoomFromPoint(state: ChartState<any>, axisId: AxisId, p
 
 export function calculateZoomFromPointImpl(
   drawingArea: ChartDrawingArea,
-  axis: Pick<DefaultedXAxis | DefaultedYAxis, 'position' | 'reverse'>,
-  zoomOptions: Pick<DefaultizedZoomOptions, 'minStart' | 'maxEnd'>,
+  axis: Pick<DefaultedXAxis | DefaultedYAxis, 'position'>,
+  zoomOptions: Pick<DefaultizedZoomOptions, 'minStart' | 'maxEnd' | 'reverse'>,
   point: Pick<DOMPoint, 'x' | 'y'>,
 ) {
   const { left, top, height, width } = drawingArea;
-  const { minStart, maxEnd } = zoomOptions;
+  const { minStart, maxEnd, reverse } = zoomOptions;
 
   const axisDirection = axis.position === 'right' || axis.position === 'left' ? 'y' : 'x';
   const range = maxEnd - minStart;
@@ -47,13 +47,32 @@ export function calculateZoomFromPointImpl(
     pointerZoom = ((top + height - point.y) / height) * range;
   }
 
-  if (axis.reverse) {
+  if (reverse) {
     pointerZoom = maxEnd - pointerZoom;
   } else {
     pointerZoom += minStart;
   }
 
   return pointerZoom;
+}
+
+export function calculateZoomSliderPosition(
+  zoomData: Pick<ZoomData, 'start' | 'end'>,
+  zoomOptions: Pick<DefaultizedZoomOptions, 'axisDirection' | 'minStart' | 'maxEnd' | 'reverse'>,
+  sliderSize: number,
+) {
+  const { axisDirection, minStart, maxEnd, reverse } = zoomOptions;
+  const range = maxEnd - minStart;
+  // Zoom grows left to right on x, bottom to top on y.
+  const isFlipped = (axisDirection === 'y') !== reverse;
+
+  const getPosition = (zoom: number) => {
+    const ratio = (Math.min(maxEnd, Math.max(minStart, zoom)) - minStart) / range;
+
+    return (isFlipped ? 1 - ratio : ratio) * sliderSize;
+  };
+
+  return { start: getPosition(zoomData.start), end: getPosition(zoomData.end) };
 }
 
 export function calculateZoomStart(

@@ -1,5 +1,10 @@
 import { describe, it, expect } from 'vitest';
-import { calculateZoomEnd, calculateZoomStart, calculateZoomFromPointImpl } from './zoom-utils';
+import {
+  calculateZoomEnd,
+  calculateZoomStart,
+  calculateZoomFromPointImpl,
+  calculateZoomSliderPosition,
+} from './zoom-utils';
 import type { ZoomData } from '../../models';
 
 describe('Zoom Utils', () => {
@@ -96,8 +101,8 @@ describe('Zoom Utils', () => {
     it('should calculate correct zoom value for x-axis (bottom position)', () => {
       const result = calculateZoomFromPointImpl(
         defaultDrawingArea,
-        { position: 'bottom', reverse: false },
-        { minStart: 0, maxEnd: 100 },
+        { position: 'bottom' },
+        { minStart: 0, maxEnd: 100, reverse: false },
         { x: 200, y: 0 },
       );
 
@@ -107,8 +112,8 @@ describe('Zoom Utils', () => {
     it('should calculate correct zoom value for y-axis (left position)', () => {
       const result = calculateZoomFromPointImpl(
         defaultDrawingArea,
-        { position: 'left', reverse: false },
-        { minStart: 0, maxEnd: 100 },
+        { position: 'left' },
+        { minStart: 0, maxEnd: 100, reverse: false },
         { x: 0, y: 100 },
       );
 
@@ -118,8 +123,8 @@ describe('Zoom Utils', () => {
     it('should handle reversed x-axis', () => {
       const result = calculateZoomFromPointImpl(
         defaultDrawingArea,
-        { position: 'bottom', reverse: true },
-        { minStart: 0, maxEnd: 100 },
+        { position: 'bottom' },
+        { minStart: 0, maxEnd: 100, reverse: true },
         { x: 300, y: 0 },
       );
 
@@ -129,8 +134,8 @@ describe('Zoom Utils', () => {
     it('should handle reversed y-axis', () => {
       const result = calculateZoomFromPointImpl(
         defaultDrawingArea,
-        { position: 'left', reverse: true },
-        { minStart: 0, maxEnd: 100 },
+        { position: 'left' },
+        { minStart: 0, maxEnd: 100, reverse: true },
         { x: 0, y: 180 },
       );
 
@@ -140,12 +145,90 @@ describe('Zoom Utils', () => {
     it('should handle custom min/max range', () => {
       const result = calculateZoomFromPointImpl(
         defaultDrawingArea,
-        { position: 'bottom', reverse: false },
-        { minStart: 20, maxEnd: 80 },
+        { position: 'bottom' },
+        { minStart: 20, maxEnd: 80, reverse: false },
         { x: 150, y: 0 },
       );
 
       expect(result).to.eq(35);
+    });
+  });
+
+  describe('calculateZoomSliderPosition', () => {
+    const zoomData = { start: 0, end: 25 };
+    const zoomOptions = { minStart: 0, maxEnd: 100 };
+
+    it('should place the zoom start on the left of an x-axis slider', () => {
+      const result = calculateZoomSliderPosition(
+        zoomData,
+        { ...zoomOptions, axisDirection: 'x', reverse: false },
+        200,
+      );
+
+      expect(result).to.deep.eq({ start: 0, end: 50 });
+    });
+
+    it('should place the zoom start on the right of a reversed x-axis slider', () => {
+      const result = calculateZoomSliderPosition(
+        zoomData,
+        { ...zoomOptions, axisDirection: 'x', reverse: true },
+        200,
+      );
+
+      expect(result).to.deep.eq({ start: 200, end: 150 });
+    });
+
+    it('should place the zoom start at the bottom of a y-axis slider', () => {
+      const result = calculateZoomSliderPosition(
+        zoomData,
+        { ...zoomOptions, axisDirection: 'y', reverse: false },
+        200,
+      );
+
+      expect(result).to.deep.eq({ start: 200, end: 150 });
+    });
+
+    it('should place the zoom start at the top of a reversed y-axis slider', () => {
+      const result = calculateZoomSliderPosition(
+        zoomData,
+        { ...zoomOptions, axisDirection: 'y', reverse: true },
+        200,
+      );
+
+      expect(result).to.deep.eq({ start: 0, end: 50 });
+    });
+
+    it('should handle custom min/max range', () => {
+      const result = calculateZoomSliderPosition(
+        { start: 20, end: 50 },
+        { minStart: 20, maxEnd: 80, axisDirection: 'y', reverse: false },
+        200,
+      );
+
+      expect(result).to.deep.eq({ start: 200, end: 100 });
+    });
+
+    it('should clamp the zoom range to the min/max range', () => {
+      const result = calculateZoomSliderPosition(
+        { start: 0, end: 100 },
+        { minStart: 20, maxEnd: 80, axisDirection: 'x', reverse: false },
+        200,
+      );
+
+      expect(result).to.deep.eq({ start: 0, end: 200 });
+    });
+
+    it('should be the inverse of `calculateZoomFromPointImpl`', () => {
+      const drawingArea = { left: 100, top: 100, right: 300, bottom: 200, width: 200, height: 100 };
+      const options = { minStart: 20, maxEnd: 80, axisDirection: 'y', reverse: true } as const;
+
+      const { start } = calculateZoomSliderPosition({ start: 35, end: 80 }, options, 100);
+      const zoom = calculateZoomFromPointImpl(drawingArea, { position: 'left' }, options, {
+        x: 0,
+        y: drawingArea.top + start,
+      });
+
+      expect(zoom).to.eq(35);
     });
   });
 });

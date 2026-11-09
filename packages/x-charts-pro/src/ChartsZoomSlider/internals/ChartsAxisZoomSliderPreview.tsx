@@ -6,6 +6,7 @@ import { alpha } from '@mui/system';
 import useId from '@mui/utils/useId';
 import { selectorChartAxisZoomData } from '../../internals/plugins/useChartProZoom';
 import { ChartsAxisZoomSliderPreviewContent } from './ChartsAxisZoomSliderPreviewContent';
+import { calculateZoomSliderPosition } from './zoom-utils';
 
 const PreviewBackgroundRect = styled('rect', {
   slot: 'internal',
@@ -73,17 +74,21 @@ function PreviewRectangles(props: {
   let width;
   let height;
 
-  const range = zoomOptions.maxEnd - zoomOptions.minStart;
+  const { start, end } = calculateZoomSliderPosition(
+    zoomData,
+    zoomOptions,
+    axisDirection === 'x' ? props.width : props.height,
+  );
   if (axisDirection === 'x') {
-    x = props.x + ((zoomData.start - zoomOptions.minStart) / range) * props.width;
+    x = props.x + Math.min(start, end);
     y = props.y;
-    width = ((zoomData.end - zoomData.start) / range) * props.width;
+    width = Math.abs(end - start);
     height = props.height;
   } else {
     x = props.x;
-    y = props.y + (1 - zoomData.end / range) * props.height;
+    y = props.y + Math.min(start, end);
     width = props.width;
-    height = ((zoomData.end - zoomData.start) / range) * props.height;
+    height = Math.abs(end - start);
   }
 
   return (
